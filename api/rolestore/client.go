@@ -281,3 +281,34 @@ func (store *Client) GetRole(id string) (*Role, error) {
 
 	return result, nil
 }
+
+func (store *Client) GetRoleMembers(id string) ([]*User, error) {
+	url := fmt.Sprintf("%s/role-store/api/v1/roles/%s/members",
+		store.api.Endpoint(), url.PathEscape(id))
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := store.api.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, api.ErrorFromResponse(resp, body)
+	}
+
+	result := &usersResult{}
+	err = json.Unmarshal(body, result)
+	if err != nil {
+		return nil, fmt.Errorf("malformed response: %s", err)
+	}
+
+	return result.Items, nil
+}
