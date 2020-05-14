@@ -21,8 +21,8 @@ type User struct {
 type Role struct {
 	ID          string   `json:"id"`
 	Name        string   `json:"name"`
-	Explicit    bool     `json:"explicit"`
-	Implicit    bool     `json:"implicit"`
+	Explicit    bool     `json:"explicit" tabulate:"@userCtx"`
+	Implicit    bool     `json:"implicit" tabulate:"@userCtx"`
 	System      bool     `json:"system"`
 	GrantType   string   `json:"grant_type"`
 	Comment     string   `json:"comment"`
