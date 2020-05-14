@@ -131,7 +131,7 @@ func (client *Client) resourceOwnerPasswordCredentialsGrant() (
 	form.Add("username", client.config.APIClientID)
 	form.Add("password", client.config.APIClientSecret)
 
-	tokenURL := client.passwordURL()
+	tokenURL := client.tokenURL()
 
 	req, err := http.NewRequest(http.MethodPost, tokenURL,
 		strings.NewReader(form.Encode()))
@@ -209,10 +209,6 @@ func (client *Client) authorizationURL(q string) string {
 
 func (client *Client) tokenURL() string {
 	return fmt.Sprintf("%s/auth/api/v1/oauth/token", client.endpoint)
-}
-
-func (client *Client) passwordURL() string {
-	return fmt.Sprintf("%s/auth/api/v1/token", client.endpoint)
 }
 
 func (client *Client) loginURL() string {
