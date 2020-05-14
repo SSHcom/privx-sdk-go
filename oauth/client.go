@@ -103,7 +103,14 @@ func (client *Client) Token() (string, error) {
 		client.token = nil
 		client.m.Unlock()
 
-		token, err := client.newToken()
+		var token *AccessToken
+		var err error
+
+		if false {
+			token, err = client.authorizationCodeGrant()
+		} else {
+			token, err = client.resourceOwnerPasswordCredentialsGrant()
+		}
 
 		client.m.Lock()
 		client.authPending = false
@@ -116,7 +123,55 @@ func (client *Client) Token() (string, error) {
 	return client.token.AccessToken, nil
 }
 
-func (client *Client) newToken() (*AccessToken, error) {
+func (client *Client) resourceOwnerPasswordCredentialsGrant() (
+	*AccessToken, error) {
+
+	form := url.Values{}
+	form.Add("grant_type", "password")
+	form.Add("username", client.config.APIClientID)
+	form.Add("password", client.config.APIClientSecret)
+
+	tokenURL := client.tokenURL()
+
+	req, err := http.NewRequest(http.MethodPost, tokenURL,
+		strings.NewReader(form.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", UserAgent)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(client.config.ClientID, client.config.ClientSecret)
+
+	resp, err := client.http.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		err = decodeError("", body)
+		if err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("unexpected response code: %s", resp.Status)
+	}
+
+	token := new(AccessToken)
+	err = json.Unmarshal(body, token)
+	if err != nil {
+		return nil, err
+	}
+	token.notAfter = time.Now().Add(
+		time.Duration(token.ExpiresIn) * time.Second)
+
+	return token, nil
+}
+
+func (client *Client) authorizationCodeGrant() (*AccessToken, error) {
 
 	codeVerifier, err := pkce.NewCodeVerifier()
 	if err != nil {
