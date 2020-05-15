@@ -48,11 +48,11 @@ jobs:
     - name: Coverage
       run: |
         export GOPATH=$(go env GOPATH)
-        ls $GOPATH
-        ls $GOPATH/src
+        $(go env GOPATH)/bin/overalls -project=github.com/SSHcom/privx-sdk-go
+        echo "---"
+        ls 
+        echo "---"
         ls $GOPATH/src/github.com/SSHcom/privx-sdk-go
-        ls $GOPATH/src/github.com/SSHcom/privx-sdk-go/api
-        $(go env GOPATH)/bin/overalls -coverprofile=github.com/SSHcom/privx-sdk-go/overalls.coverprofile -project=github.com/SSHcom/privx-sdk-go
         $(go env GOPATH)/bin/goveralls -coverprofile=github.com/SSHcom/privx-sdk-go/overalls.coverprofile -service=github
 
     - name: Vet
