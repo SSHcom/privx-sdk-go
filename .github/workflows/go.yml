@@ -53,6 +53,7 @@ jobs:
         ls 
         echo "---"
         ls $GOPATH/src/github.com/SSHcom/privx-sdk-go
+        cd $GOPATH/src/github.com/SSHcom/privx-sdk-go
         $(go env GOPATH)/bin/goveralls -coverprofile=$GOPATH/src/github.com/SSHcom/privx-sdk-go/overalls.coverprofile -service=github
 
     - name: Vet
