@@ -46,6 +46,8 @@ jobs:
       run: go test github.com/SSHcom/privx-sdk-go/...
 
     - name: Coverage
+      env:
+        COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         export GOPATH=$(go env GOPATH)
         $(go env GOPATH)/bin/overalls -project=github.com/SSHcom/privx-sdk-go
