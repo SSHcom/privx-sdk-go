@@ -7,9 +7,12 @@
 package api
 
 import (
+	"bytes"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"time"
@@ -106,4 +109,72 @@ func (client *Client) Do(req *http.Request) (*http.Response, error) {
 		return resp, err
 	}
 	return nil, fmt.Errorf("request failed after %d tries", retryLimit)
+}
+
+//
+type Request struct {
+	client  *Client
+	http    *http.Request
+	payload *bytes.Buffer
+	fail    error
+}
+
+func (req Request) encodeJSON(data ...interface{}) Request {
+	if req.fail != nil {
+		return req
+	}
+
+	if len(data) > 0 {
+		encoded, err := json.Marshal(data[1])
+		req.payload = bytes.NewBuffer(encoded)
+		req.fail = err
+	}
+
+	return req
+}
+
+//
+func (client *Client) Get(url string, data ...interface{}) Request {
+	request := Request{client: client}
+	request.encodeJSON(data...)
+
+	if request.fail != nil {
+		return request
+	}
+
+	req, err := http.NewRequest(
+		http.MethodGet,
+		fmt.Sprintf("%s/%s", client.endpoint, url),
+		request.payload,
+	)
+
+	request.http = req
+	request.fail = err
+
+	return request
+}
+
+//
+func (req Request) Recv(data interface{}) error {
+	out, err := req.client.Do(req.http)
+	if err != nil {
+		return err
+	}
+
+	defer out.Body.Close()
+	body, err := ioutil.ReadAll(out.Body)
+	if err != nil {
+		return err
+	}
+
+	if out.StatusCode != http.StatusOK {
+		return fmt.Errorf("HTTP error: %s", out.Status)
+	}
+
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

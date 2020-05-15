@@ -18,7 +18,7 @@ import (
 )
 
 type Client struct {
-	api *api.Client
+	*api.Client
 }
 
 type usersResult struct {
@@ -32,9 +32,7 @@ type rolesResult struct {
 }
 
 func NewClient(api *api.Client) (*Client, error) {
-	return &Client{
-		api: api,
-	}, nil
+	return &Client{api}, nil
 }
 
 func (store *Client) SearchUsers(keywords, source string) ([]*User, error) {
@@ -77,35 +75,10 @@ func (store *Client) SearchUsers(keywords, source string) ([]*User, error) {
 	return result.Items, nil
 }
 
-func (store *Client) GetUser(id string) (*User, error) {
-	url := fmt.Sprintf("%s/role-store/api/v1/users/%s",
-		store.api.Endpoint(), url.PathEscape(id))
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := store.api.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("HTTP error: %s", resp.Status)
-	}
-
-	result := new(User)
-	err = json.Unmarshal(body, result)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
+func (store *Client) GetUser(id string) (user *User, err error) {
+	url := fmt.Sprintf("/role-store/api/v1/users/%s", url.PathEscape(id))
+	err = store.Get(url).Recv(user)
+	return
 }
 
 func (store *Client) GetUserRoles(id string) ([]*Role, error) {
