@@ -21,7 +21,7 @@ jobs:
       with:
         path: ./src/github.com/${{ github.repository }}
 
-    - name: Get Tools
+    - name: Get tools
       run: |
         go get golang.org/x/lint/golint
         go get github.com/mattn/goveralls
@@ -40,23 +40,18 @@ jobs:
     #   $(go env GOPATH)/bin/golint -set_exit_status ./...
 
     - name: Build
-      run: go build -v github.com/SSHcom/privx-sdk-go/...
+      run: go build -v github.com/${{ github.repository }}/...
 
     - name: Test
-      run: go test github.com/SSHcom/privx-sdk-go/...
+      run: go test github.com/${{ github.repository }}/...
 
     - name: Coverage
       env:
         COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         export GOPATH=$(go env GOPATH)
-        $(go env GOPATH)/bin/overalls -project=github.com/SSHcom/privx-sdk-go
-        echo "---"
-        ls 
-        echo "---"
-        ls $GOPATH/src/github.com/SSHcom/privx-sdk-go
-        cd $GOPATH/src/github.com/SSHcom/privx-sdk-go
-        $(go env GOPATH)/bin/goveralls -coverprofile=$GOPATH/src/github.com/SSHcom/privx-sdk-go/overalls.coverprofile -service=github
+        $(go env GOPATH)/bin/overalls -project=github.com/${{ github.repository }}
+        $(go env GOPATH)/bin/goveralls -coverprofile=$GOPATH/src/github.com/${{ github.repository }}/overalls.coverprofile -service=github
 
     - name: Vet
       run: go vet ./...
