@@ -47,9 +47,6 @@ jobs:
 
     - name: Coverage
       run: |
-        go env
-        ls $GOPATH
-        ls $GOPATH/src
         $(go env GOPATH)/bin/overalls -project=github.com/SSHcom/privx-sdk-go
         $(go env GOPATH)/bin/goveralls -service=github
 
