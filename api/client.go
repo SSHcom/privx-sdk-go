@@ -86,10 +86,7 @@ func NewClient(opts ...Option) (*Client, error) {
 	return client, nil
 }
 
-func (client *Client) Endpoint() string {
-	return client.endpoint
-}
-
+//
 func (client *Client) Do(req *http.Request) (*http.Response, error) {
 	retryLimit := 2
 	for i := 0; i < retryLimit; i++ {
@@ -111,64 +108,63 @@ func (client *Client) Do(req *http.Request) (*http.Response, error) {
 	return nil, fmt.Errorf("request failed after %d tries", retryLimit)
 }
 
-//
-type Request struct {
+// CURL is a builder type, constructs HTTP request
+type CURL struct {
 	client  *Client
-	http    *http.Request
+	method  string
+	url     string
 	payload *bytes.Buffer
+	output  *http.Response
 	fail    error
 }
 
-func (req Request) encodeJSON(data ...interface{}) Request {
-	if req.fail != nil {
-		return req
+// URL creates URL connector
+func (client *Client) URL(method, url string) *CURL {
+	return &CURL{
+		client: client,
+		method: method,
+		url:    fmt.Sprintf("%s/%s", client.endpoint, url),
 	}
+}
 
-	if len(data) > 0 {
-		encoded, err := json.Marshal(data[1])
-		req.payload = bytes.NewBuffer(encoded)
-		req.fail = err
-	}
-
-	return req
+// Get creates URL connector
+func (client *Client) Get(url string) *CURL {
+	return client.URL(http.MethodGet, url)
 }
 
 //
-func (client *Client) Get(url string, data ...interface{}) Request {
-	request := Request{client: client}
-	request.encodeJSON(data...)
+func (curl *CURL) Send(data interface{}) *CURL {
+	return curl.encodeJSON(data)
+}
 
-	if request.fail != nil {
-		return request
+func (curl *CURL) encodeJSON(data interface{}) *CURL {
+	if curl.fail != nil {
+		return curl
 	}
 
-	req, err := http.NewRequest(
-		http.MethodGet,
-		fmt.Sprintf("%s/%s", client.endpoint, url),
-		request.payload,
-	)
-
-	request.http = req
-	request.fail = err
-
-	return request
+	encoded, err := json.Marshal(data)
+	if curl.fail = err; err == nil {
+		curl.payload = bytes.NewBuffer(encoded)
+	}
+	return curl
 }
 
 //
-func (req Request) Recv(data interface{}) error {
-	out, err := req.client.Do(req.http)
+func (curl *CURL) Recv(data interface{}) error {
+	curl = curl.unsafeIO()
+
+	if curl.fail != nil {
+		return curl.fail
+	}
+
+	defer curl.output.Body.Close()
+	body, err := ioutil.ReadAll(curl.output.Body)
 	if err != nil {
 		return err
 	}
 
-	defer out.Body.Close()
-	body, err := ioutil.ReadAll(out.Body)
-	if err != nil {
-		return err
-	}
-
-	if out.StatusCode != http.StatusOK {
-		return fmt.Errorf("HTTP error: %s", out.Status)
+	if curl.output.StatusCode != http.StatusOK {
+		return fmt.Errorf("HTTP error: %s", curl.output.Status)
 	}
 
 	err = json.Unmarshal(body, &data)
@@ -177,4 +173,18 @@ func (req Request) Recv(data interface{}) error {
 	}
 
 	return nil
+}
+
+func (curl *CURL) unsafeIO() *CURL {
+	if curl.fail != nil {
+		return curl
+	}
+
+	req, err := http.NewRequest(curl.method, curl.url, curl.payload)
+	if curl.fail = err; err != nil {
+		return curl
+	}
+
+	curl.output, curl.fail = curl.client.Do(req)
+	return curl
 }
