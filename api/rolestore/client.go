@@ -70,7 +70,7 @@ func (store *Client) SearchUsers(keywords, source string) ([]*User, error) {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("HTTP error: %s", resp.Status)
+		return nil, api.ErrorFromResponse(resp, body)
 	}
 
 	result := &usersResult{}
@@ -102,7 +102,7 @@ func (store *Client) GetUser(id string) (*User, error) {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("HTTP error: %s", resp.Status)
+		return nil, api.ErrorFromResponse(resp, body)
 	}
 
 	result := new(User)
@@ -134,7 +134,7 @@ func (store *Client) GetUserRoles(id string) ([]*Role, error) {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("HTTP error: %s", resp.Status)
+		return nil, api.ErrorFromResponse(resp, body)
 	}
 
 	result := &rolesResult{}
@@ -147,7 +147,7 @@ func (store *Client) GetUserRoles(id string) ([]*Role, error) {
 }
 
 // AddUserRole adds the specified role for the user. If the user
-// already has the role, this funtion does nothing.
+// already has the role, this function does nothing.
 func (store *Client) AddUserRole(userID, roleID string) error {
 	// Get user's current roles.
 	roles, err := store.GetUserRoles(userID)
@@ -178,7 +178,7 @@ func (store *Client) AddUserRole(userID, roleID string) error {
 }
 
 // RemoveUserRole removes the specified role from the user. If the
-// user does not have the role, this funtion does nothing.
+// user does not have the role, this function does nothing.
 func (store *Client) RemoveUserRole(userID, roleID string) error {
 	// Get user's current roles.
 	roles, err := store.GetUserRoles(userID)
@@ -226,7 +226,7 @@ func (store *Client) setUserRoles(userID string, roles []*Role) error {
 		return err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("HTTP error: %s", resp.Status)
+		return api.ErrorFromResponse(resp, body)
 	}
 
 	return nil
@@ -251,7 +251,7 @@ func (store *Client) GetRoles() ([]*Role, error) {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("HTTP error: %s", resp.Status)
+		return nil, api.ErrorFromResponse(resp, body)
 	}
 
 	result := &rolesResult{}
