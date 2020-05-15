@@ -23,6 +23,15 @@ type Certificate struct {
 	X509 *x509.Certificate
 }
 
+// MarshalText implements the encoding.TextMarshaler interface.
+func (cert Certificate) MarshalText() (text []byte, err error) {
+	block := &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: cert.X509.Raw,
+	}
+	return pem.EncodeToMemory(block), nil
+}
+
 // UnmarshalText unmarshals certificate from a configuration file PEM
 // block.
 func (cert *Certificate) UnmarshalText(text []byte) error {
