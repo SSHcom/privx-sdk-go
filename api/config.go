@@ -12,15 +12,19 @@ import (
 	"fmt"
 )
 
+// Config defines SDK client configuration information.
 type Config struct {
 	Endpoint    string
 	Certificate *Certificate
 }
 
+// Certificate specifies a trusted CA certificate for the REST endpoint.
 type Certificate struct {
 	X509 *x509.Certificate
 }
 
+// UnmarshalText unmarshals certificate from a configuration file PEM
+// block.
 func (cert *Certificate) UnmarshalText(text []byte) error {
 	block, _ := pem.Decode(text)
 	if block == nil {

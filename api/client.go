@@ -17,6 +17,7 @@ import (
 	"github.com/SSHcom/privx-sdk-go/oauth"
 )
 
+// Client is an SDK client instance.
 type Client struct {
 	Auth     *oauth.Client
 	endpoint string
@@ -83,10 +84,13 @@ func NewClient(opts ...Option) (*Client, error) {
 	return client, nil
 }
 
+// Endpoint return the REST API endpoint URL.
 func (client *Client) Endpoint() string {
 	return client.endpoint
 }
 
+// Do executes the argument HTTP request and returns it response. The
+// Do function handles the API OAuth2 authentication.
 func (client *Client) Do(req *http.Request) (*http.Response, error) {
 	retryLimit := 2
 	for i := 0; i < retryLimit; i++ {

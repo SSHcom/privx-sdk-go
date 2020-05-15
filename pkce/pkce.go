@@ -16,14 +16,23 @@ import (
 )
 
 const (
-	MethodS256               = "S256"
-	ParamCodeChallenge       = "code_challenge"
+	// MethodS256 specifies the S256 (SHA-256) verification method.
+	MethodS256 = "S256"
+	// ParamCodeChallenge defines the "code_challenge" form parameter
+	// name.
+	ParamCodeChallenge = "code_challenge"
+	// ParamCodeChallengeMethod defines the "code_challenge_method"
+	// form parameter.
 	ParamCodeChallengeMethod = "code_challenge_method"
-	ParamCodeVerifier        = "code_verifier"
+	// ParamCodeVerifier defines the "code_verifier" form parameter
+	// name.
+	ParamCodeVerifier = "code_verifier"
 )
 
+// CodeVerifier defines a code verifier instance.
 type CodeVerifier string
 
+// NewCodeVerifier creates a new random code verifier instance.
 func NewCodeVerifier() (CodeVerifier, error) {
 	var buf [32]byte
 
@@ -39,11 +48,14 @@ func (v CodeVerifier) String() string {
 	return string(v)
 }
 
+// ChallengeS256 creates a new S256 challenge. The function returns
+// the challenge value and the challenge method specifier.
 func (v CodeVerifier) ChallengeS256() (string, string) {
 	digest := sha256.Sum256([]byte(v))
 	return base64.RawURLEncoding.EncodeToString(digest[:]), MethodS256
 }
 
+// Verify verifies the challenge against the code verifier intance.
 func (v CodeVerifier) Verify(challenge, method string) bool {
 	if method != MethodS256 {
 		return false
