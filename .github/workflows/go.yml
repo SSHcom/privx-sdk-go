@@ -49,7 +49,6 @@ jobs:
       env:
         COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        export GOPATH=$(go env GOPATH)
         $(go env GOPATH)/bin/overalls -project=github.com/${{ github.repository }}
         $(go env GOPATH)/bin/goveralls -coverprofile=$GOPATH/src/github.com/${{ github.repository }}/overalls.coverprofile -service=github
 
