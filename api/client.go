@@ -10,7 +10,9 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"net"
 	"net/http"
+	"time"
 
 	"github.com/SSHcom/privx-sdk-go/oauth"
 )
@@ -21,24 +23,64 @@ type Client struct {
 	http     *http.Client
 }
 
-func NewClient(auth *oauth.Client, endpoint string, cert *x509.Certificate,
-	verbose bool) (*Client, error) {
+// Option is configuration applied to the client
+type Option func(*Client) *Client
 
-	tlsConfig := &tls.Config{}
-	if cert != nil {
-		pool := x509.NewCertPool()
-		pool.AddCert(cert)
-		tlsConfig.RootCAs = pool
+// Endpoint defines a target PrivX API endpoint
+func Endpoint(endpoint string) Option {
+	return func(client *Client) *Client {
+		client.endpoint = endpoint
+		return client
 	}
-	return &Client{
-		Auth:     auth,
-		endpoint: endpoint,
+}
+
+// Authenticator setup credential provider for api
+func Authenticator(auth *oauth.Client) Option {
+	return func(client *Client) *Client {
+		client.Auth = auth
+		return client
+	}
+}
+
+// X509 setup trust certificate
+func X509(cert *x509.Certificate) Option {
+	return func(client *Client) *Client {
+		tlsConfig := &tls.Config{}
+		if cert != nil {
+			pool := x509.NewCertPool()
+			pool.AddCert(cert)
+			tlsConfig.RootCAs = pool
+		}
+		client.http.Transport.(*http.Transport).TLSClientConfig = tlsConfig
+		return client
+	}
+}
+
+// Verbose enables debug-level logging
+func Verbose() Option {
+	return func(client *Client) *Client {
+		return client
+	}
+}
+
+// NewClient creates an instance of PrivX API client
+func NewClient(opts ...Option) (*Client, error) {
+	client := &Client{
 		http: &http.Client{
 			Transport: &http.Transport{
-				TLSClientConfig: tlsConfig,
+				ReadBufferSize: 128 * 1024,
+				Dial: (&net.Dialer{
+					Timeout: 10 * time.Second,
+				}).Dial,
 			},
 		},
-	}, nil
+	}
+
+	for _, opt := range opts {
+		client = opt(client)
+	}
+
+	return client, nil
 }
 
 func (client *Client) Endpoint() string {
