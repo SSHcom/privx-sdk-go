@@ -27,6 +27,9 @@ jobs:
             dep ensure
         fi
 
+    - name: Lint
+      run: golint ./...
+      
     - name: Build
       run: go build -v ./...
 
