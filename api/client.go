@@ -16,12 +16,14 @@ import (
 	"net"
 	"net/http"
 	"time"
-
-	"github.com/SSHcom/privx-sdk-go/oauth"
 )
 
+type IdentityProvider interface {
+	Token() (string, error)
+}
+
 type Client struct {
-	Auth     *oauth.Client
+	IdentityProvider
 	endpoint string
 	http     *http.Client
 }
@@ -37,10 +39,10 @@ func Endpoint(endpoint string) Option {
 	}
 }
 
-// Authenticator setup credential provider for api
-func Authenticator(auth *oauth.Client) Option {
+// IdP setup credential provider for api
+func IdP(idp IdentityProvider) Option {
 	return func(client *Client) *Client {
-		client.Auth = auth
+		client.IdentityProvider = idp
 		return client
 	}
 }
@@ -67,7 +69,7 @@ func Verbose() Option {
 }
 
 // NewClient creates an instance of PrivX API client
-func NewClient(opts ...Option) (*Client, error) {
+func NewClient(opts ...Option) *Client {
 	client := &Client{
 		http: &http.Client{
 			Transport: &http.Transport{
@@ -83,18 +85,22 @@ func NewClient(opts ...Option) (*Client, error) {
 		client = opt(client)
 	}
 
-	return client, nil
+	return client
 }
 
 //
 func (client *Client) Do(req *http.Request) (*http.Response, error) {
 	retryLimit := 2
 	for i := 0; i < retryLimit; i++ {
-		token, err := client.Auth.Token()
-		if err != nil {
-			return nil, err
+
+		if client.IdentityProvider != nil {
+			token, err := client.Token()
+			if err != nil {
+				return nil, err
+			}
+			req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 		}
-		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+
 		resp, err := client.http.Do(req)
 		if err != nil {
 			return nil, err
@@ -121,9 +127,10 @@ type CURL struct {
 // URL creates URL connector
 func (client *Client) URL(method, url string) *CURL {
 	return &CURL{
-		client: client,
-		method: method,
-		url:    fmt.Sprintf("%s/%s", client.endpoint, url),
+		client:  client,
+		method:  method,
+		url:     fmt.Sprintf("%s/%s", client.endpoint, url),
+		payload: bytes.NewBuffer(nil),
 	}
 }
 
