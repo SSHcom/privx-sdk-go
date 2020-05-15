@@ -16,18 +16,24 @@ import (
 	"github.com/SSHcom/privx-sdk-go/api"
 )
 
+// Bag contains secret data. The secret data is a JSON object and it
+// can have nested values and objects.
 type Bag map[string]interface{}
 
+// Client is a Vault client instance.
 type Client struct {
 	api *api.Client
 }
 
+// NewClient creates a new Vault client instance, using the argument
+// SDK API client.
 func NewClient(api *api.Client) (*Client, error) {
 	return &Client{
 		api: api,
 	}, nil
 }
 
+// Get gets the content of the argument secret.
 func (vault *Client) Get(name string) (Bag, error) {
 	secretURL := fmt.Sprintf("%s/vault/api/v1/secrets/%s",
 		vault.api.Endpoint(),

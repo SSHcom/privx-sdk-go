@@ -26,9 +26,12 @@ import (
 )
 
 const (
+	// UserAgent specifies the HTTP user-agent string for the SDK
+	// clients.
 	UserAgent = "privx-sdk-go"
 )
 
+// Config contains OAuth2 client configuration information.
 type Config struct {
 	ClientID        string `toml:"oauth_client_id"`
 	ClientSecret    string `toml:"oauth_client_secret"`
@@ -37,6 +40,7 @@ type Config struct {
 	APIClientSecret string `toml:"api_client_secret"`
 }
 
+// Client is an OAuth2 client instance.
 type Client struct {
 	endpoint       string
 	m              *sync.Mutex
@@ -48,6 +52,7 @@ type Client struct {
 	token          *AccessToken
 }
 
+// AccessToken contains OAuth2 access token information.
 type AccessToken struct {
 	AccessToken  string `json:"access_token"`
 	TokenType    string `json:"token_type"`
@@ -56,6 +61,7 @@ type AccessToken struct {
 	notAfter     time.Time
 }
 
+// NewClient creates a new OAuth2 client instance.
 func NewClient(config Config, endpoint string, cert *x509.Certificate,
 	verbose bool) (*Client, error) {
 

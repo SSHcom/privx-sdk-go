@@ -23,11 +23,14 @@ const (
 	configFileName = "privx-sdk.toml"
 )
 
+// Config contains PrivX SDK client configuration information.
 type Config struct {
 	API  api.Config
 	Auth oauth.Config
 }
 
+// Default resolves the default SDK client configuration file
+// location.
 func Default() string {
 	var defaultConfig string
 
@@ -43,6 +46,8 @@ func Default() string {
 	return defaultConfig
 }
 
+// Read reads the specified configuration file and returns the
+// configuration information.
 func Read(path string) (*Config, error) {
 	f, err := os.Open(path)
 	if err != nil {
