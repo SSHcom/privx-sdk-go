@@ -21,7 +21,6 @@ jobs:
 
     - name: Get dependencies
       run: |
-        go get -u golang.org/x/lint/golint
         go get -v -t -d ./...
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
@@ -29,7 +28,10 @@ jobs:
         fi
 
     - name: Lint
-      run: golint ./...
+      run: |
+        export PATH=${PATH}:`go env GOPATH`/bin
+        go get -u golang.org/x/lint/golint
+        golint ./...
 
     - name: Build
       run: go build -v ./...
