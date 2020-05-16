@@ -16,14 +16,20 @@ import (
 	"net"
 	"net/http"
 	"time"
+
+	"github.com/SSHcom/privx-sdk-go/oauth"
 )
 
-type IdentityProvider interface {
-	Token() (string, error)
+// Connector is HTTP connector for api
+type Connector interface {
+	Get(string, ...interface{}) *CURL
+	Put(string, ...interface{}) *CURL
 }
 
+//
 type Client struct {
-	IdentityProvider
+	auth oauth.Provider
+	// TODO: rename endpoint -> host
 	endpoint string
 	http     *http.Client
 }
@@ -39,10 +45,10 @@ func Endpoint(endpoint string) Option {
 	}
 }
 
-// IdP setup credential provider for api
-func IdP(idp IdentityProvider) Option {
+// AccessToken setup access token provider for api
+func AccessToken(auth oauth.Provider) Option {
 	return func(client *Client) *Client {
-		client.IdentityProvider = idp
+		client.auth = auth
 		return client
 	}
 }
@@ -93,8 +99,8 @@ func (client *Client) Do(req *http.Request) (*http.Response, error) {
 	retryLimit := 2
 	for i := 0; i < retryLimit; i++ {
 
-		if client.IdentityProvider != nil {
-			token, err := client.Token()
+		if client.auth != nil {
+			token, err := client.auth.Token()
 			if err != nil {
 				return nil, err
 			}
@@ -135,8 +141,13 @@ func (client *Client) URL(method, url string) *CURL {
 }
 
 // Get creates URL connector
-func (client *Client) Get(url string) *CURL {
-	return client.URL(http.MethodGet, url)
+func (client *Client) Get(templateURL string, args ...interface{}) *CURL {
+	return client.URL(http.MethodGet, fmt.Sprintf(templateURL, args...))
+}
+
+// Put creates URL connector
+func (client *Client) Put(templateURL string, args ...interface{}) *CURL {
+	return client.URL(http.MethodPut, fmt.Sprintf(templateURL, args...))
 }
 
 //
@@ -177,6 +188,27 @@ func (curl *CURL) Recv(data interface{}) error {
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+//
+func (curl *CURL) RecvStatus() error {
+	curl = curl.unsafeIO()
+
+	if curl.fail != nil {
+		return curl.fail
+	}
+
+	defer curl.output.Body.Close()
+	_, err := ioutil.ReadAll(curl.output.Body)
+	if err != nil {
+		return err
+	}
+
+	if curl.output.StatusCode != http.StatusOK {
+		return fmt.Errorf("HTTP error: %s", curl.output.Status)
 	}
 
 	return nil

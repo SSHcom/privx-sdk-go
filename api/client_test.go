@@ -23,7 +23,13 @@ func (idp MockIdP) Token() (string, error) {
 	return idp.string, nil
 }
 
-var idp = api.IdP(MockIdP{"trusted"})
+var access = api.AccessToken(MockIdP{"trusted"})
+
+// TODO:
+//  - template
+//  - send
+//  - error
+//  - bad format
 
 func TestRecv(t *testing.T) {
 	ts := mock()
@@ -33,7 +39,7 @@ func TestRecv(t *testing.T) {
 		ID string `json:"id"`
 	}
 
-	err := api.NewClient(idp, api.Endpoint(ts.URL)).
+	err := api.NewClient(access, api.Endpoint(ts.URL)).
 		Get("/").
 		Recv(&data)
 
