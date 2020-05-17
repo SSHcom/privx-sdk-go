@@ -30,7 +30,6 @@ jobs:
 
     - name: go get deps
       run: |
-        go get -v -t -d github.com/${{ github.repository }}/...
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
@@ -51,8 +50,6 @@ jobs:
         ls $(go env GOPATH)/src/github.com/${{ github.repository }}/
         echo "--"
         ls $(go env GOPATH)/src/github.com/${{ github.repository }}/api
-        echo "--"
-        ls $(go env GOPATH)/src/github.com/fogfish/privx-sdk-go/api
         $(go env GOPATH)/bin/goveralls -coverprofile=$(go env GOPATH)/src/github.com/${{ github.repository }}/overalls.coverprofile -service=github
 
     - name: go vet
