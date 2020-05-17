@@ -30,13 +30,13 @@ jobs:
 
     - name: go get tools
       run: |
-        go env
         go get golang.org/x/lint/golint
         go get github.com/mattn/goveralls
         go get github.com/go-playground/overalls
 
     - name: go get deps
       run: |
+        cd $(go env GOPATH)/src/github.com/${{ github.repository }}
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
