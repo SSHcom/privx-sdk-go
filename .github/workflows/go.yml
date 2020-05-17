@@ -47,6 +47,10 @@ jobs:
         COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         $(go env GOPATH)/bin/overalls -project=github.com/${{ github.repository }}
+        echo "--"
+        ls $(go env GOPATH)/src/github.com/${{ github.repository }}/
+        echo "--"
+        ls $(go env GOPATH)/src/github.com/${{ github.repository }}/api
         $(go env GOPATH)/bin/goveralls -coverprofile=$(go env GOPATH)/src/github.com/${{ github.repository }}/overalls.coverprofile -service=github
 
     - name: go vet
