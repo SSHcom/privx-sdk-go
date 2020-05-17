@@ -36,12 +36,7 @@ jobs:
 
     - name: go get deps
       run: |
-        cd github.com/${{ github.repository }}/...
-        go get -v -t -d
-        if [ -f Gopkg.toml ]; then
-          curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-          dep ensure
-        fi
+        go get -v -t -d github.com/${{ github.repository }}/...
 
     - name: go build
       run: go build -v github.com/${{ github.repository }}/...
