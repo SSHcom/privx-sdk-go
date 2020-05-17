@@ -48,16 +48,12 @@ jobs:
       env:
         COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        $(go env GOPATH)/bin/overalls -project=github.com/${{ github.repository }}
-        echo "--"
-        ls $(go env GOPATH)/src/github.com/${{ github.repository }}/
-        echo "--"
-        ls $(go env GOPATH)/src/github.com/${{ github.repository }}/api
-        $(go env GOPATH)/bin/goveralls -coverprofile=$(go env GOPATH)/src/github.com/${{ github.repository }}/overalls.coverprofile -service=github
+        overalls -project=github.com/${{ github.repository }}
+        goveralls -coverprofile=$(go env GOPATH)/src/github.com/${{ github.repository }}/overalls.coverprofile -service=github
 
     - name: go vet
       run: go vet github.com/${{ github.repository }}/...
 
     - name: golint
       run: |
-        $(go env GOPATH)/bin/golint -set_exit_status github.com/${{ github.repository }}/...
+        golint -set_exit_status github.com/${{ github.repository }}/...
