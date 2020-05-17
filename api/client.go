@@ -131,6 +131,7 @@ type CURL struct {
 	fail    error
 }
 
+// URL creates URL connector
 func (client *Client) URL(method, url string) *CURL {
 	return &CURL{
 		client:  client,
@@ -150,7 +151,7 @@ func (client *Client) Put(templateURL string, args ...interface{}) *CURL {
 	return client.URL(http.MethodPut, fmt.Sprintf(templateURL, args...))
 }
 
-//
+// Send payload to destination URL.
 func (curl *CURL) Send(data interface{}) *CURL {
 	return curl.encodeJSON(data)
 }
@@ -167,7 +168,7 @@ func (curl *CURL) encodeJSON(data interface{}) *CURL {
 	return curl
 }
 
-//
+// Recv payload from target URL.
 func (curl *CURL) Recv(data interface{}) error {
 	curl = curl.unsafeIO()
 
@@ -193,7 +194,7 @@ func (curl *CURL) Recv(data interface{}) error {
 	return nil
 }
 
-//
+// RecvStatus payload from target URL and discards it.
 func (curl *CURL) RecvStatus() error {
 	curl = curl.unsafeIO()
 
