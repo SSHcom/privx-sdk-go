@@ -28,8 +28,7 @@ type Connector interface {
 
 // Client is an SDK client instance.
 type Client struct {
-	auth oauth.Provider
-	// TODO: rename endpoint -> host
+	auth     oauth.Provider
 	endpoint string
 	http     *http.Client
 }
@@ -137,7 +136,7 @@ func (client *Client) URL(method, url string) *CURL {
 	return &CURL{
 		client:  client,
 		method:  method,
-		url:     fmt.Sprintf("%s/%s", client.endpoint, url),
+		url:     client.endpoint + url,
 		payload: bytes.NewBuffer(nil),
 	}
 }
