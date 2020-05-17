@@ -21,7 +21,7 @@ type MockAccess struct {
 	string
 }
 
-func (idp MockIdP) Token() (string, error) {
+func (idp MockAccess) Token() (string, error) {
 	return idp.string, nil
 }
 
