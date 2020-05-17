@@ -131,7 +131,6 @@ type CURL struct {
 	fail    error
 }
 
-// URL creates URL connector
 func (client *Client) URL(method, url string) *CURL {
 	return &CURL{
 		client:  client,
