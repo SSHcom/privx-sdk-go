@@ -17,7 +17,7 @@ import (
 )
 
 //
-type MockIdP struct {
+type MockAccess struct {
 	string
 }
 
@@ -25,7 +25,7 @@ func (idp MockIdP) Token() (string, error) {
 	return idp.string, nil
 }
 
-var access = api.AccessToken(MockIdP{"trusted"})
+var access = api.AccessToken(MockAccess{"trusted"})
 
 func TestGet(t *testing.T) {
 	ts := mockStatus()
