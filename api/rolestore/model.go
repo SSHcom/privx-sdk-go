@@ -6,6 +6,7 @@
 
 package rolestore
 
+// User contains PrivX user information.
 type User struct {
 	ID                string   `json:"id"`
 	SourceUserID      string   `json:"source_user_id"`
@@ -18,6 +19,7 @@ type User struct {
 	Roles             []Role   `json:"roles"`
 }
 
+// Role contains PrivX role information.
 type Role struct {
 	ID          string   `json:"id"`
 	Name        string   `json:"name"`
@@ -31,6 +33,7 @@ type Role struct {
 	MemberCount int      `json:"member_count"`
 }
 
+// Context defines the context information for a role.
 type Context struct {
 	Enabled   bool   `json:"enabled"`
 	BlockRole bool   `json:"block_role"`

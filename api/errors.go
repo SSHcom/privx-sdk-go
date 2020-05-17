@@ -13,6 +13,7 @@ import (
 	"net/http"
 )
 
+// ErrorResponse contains REST endpoint error response information.
 type ErrorResponse struct {
 	ErrorCode    string        `json:"error_code"`
 	ErrorMessage string        `json:"error_message,omitempty"`
@@ -20,12 +21,16 @@ type ErrorResponse struct {
 	Details      []ErrorDetail `json:"details,omitempty"`
 }
 
+// ErrorDetail contains detailed error information, linked with the
+// error response.
 type ErrorDetail struct {
 	ErrorCode    string `json:"error_code"`
 	ErrorMessage string `json:"error_message,omitempty"`
 	Property     string `json:"property,omitempty"`
 }
 
+// ErrorFromResponse creates an error value from the REST API error
+// response.
 func ErrorFromResponse(r *http.Response, responseBody []byte) error {
 	if len(responseBody) == 0 {
 		return fmt.Errorf("HTTP error: %s", r.Status)

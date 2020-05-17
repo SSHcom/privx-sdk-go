@@ -7,31 +7,51 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
+        # os: [ubuntu-latest, macos-latest]
     steps:
-
+  
     - name: Set up Go 1.14
-      uses: actions/setup-go@v1
+      uses: actions/setup-go@v2
       with:
         go-version: 1.14
       id: go
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
+      with:
+        path: ./src/github.com/${{ github.repository }}
 
-    - name: Get dependencies
+    - name: go get tools
       run: |
-        go get -v -t -d ./...
+        go get golang.org/x/lint/golint
+        go get github.com/mattn/goveralls
+        go get github.com/go-playground/overalls
+
+    - name: go get deps
+      run: |
+        go get -v -t -d github.com/${{ github.repository }}/...
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
 
-    - name: Build
-      run: go build -v ./...
+    - name: go build
+      run: go build -v github.com/${{ github.repository }}/...
 
-    - name: Test
-      run: go test ./...
+    - name: go test
+      run: go test github.com/${{ github.repository }}/...
 
-    - name: Vet
-      run: go vet ./...
+    - name: coverage
+      env:
+        COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        $(go env GOPATH)/bin/overalls -project=github.com/${{ github.repository }}
+        $(go env GOPATH)/bin/goveralls -coverprofile=$(go env GOPATH)/src/github.com/${{ github.repository }}/overalls.coverprofile -service=github
+
+    - name: go vet
+      run: go vet github.com/${{ github.repository }}/...
+
+    - name: golint
+      run: |
+        $(go env GOPATH)/bin/golint -set_exit_status github.com/${{ github.repository }}/...

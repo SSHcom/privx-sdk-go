@@ -26,7 +26,7 @@ type Connector interface {
 	Put(string, ...interface{}) *CURL
 }
 
-//
+// Client is an SDK client instance.
 type Client struct {
 	auth oauth.Provider
 	// TODO: rename endpoint -> host
@@ -95,6 +95,8 @@ func NewClient(opts ...Option) *Client {
 }
 
 //
+// Do executes the argument HTTP request and returns it response. The
+// Do function handles the API OAuth2 authentication.
 func (client *Client) Do(req *http.Request) (*http.Response, error) {
 	retryLimit := 2
 	for i := 0; i < retryLimit; i++ {

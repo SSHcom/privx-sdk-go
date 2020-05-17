@@ -12,6 +12,7 @@ import (
 	"github.com/SSHcom/privx-sdk-go/api"
 )
 
+// Client is a role-store client instance.
 type Client struct {
 	client api.Connector
 }
@@ -26,10 +27,14 @@ type rolesResult struct {
 	Items []*Role `json:"items"`
 }
 
+// NewClient creates a new role-store client instance, using the
+// argument SDK API client.
 func NewClient(client api.Connector) *Client {
 	return &Client{client: client}
 }
 
+// SearchUsers searches for users, matching the keywords and source
+// criteria.
 func (store *Client) SearchUsers(keywords, source string) ([]*User, error) {
 	result := usersResult{}
 	err := store.client.
@@ -43,6 +48,7 @@ func (store *Client) SearchUsers(keywords, source string) ([]*User, error) {
 	return result.Items, err
 }
 
+// GetUser gets information about the argument user ID.
 func (store *Client) GetUser(id string) (user *User, err error) {
 	err = store.client.
 		Get("/role-store/api/v1/users/%s", url.PathEscape(id)).
@@ -51,6 +57,7 @@ func (store *Client) GetUser(id string) (user *User, err error) {
 	return
 }
 
+// GetUserRoles gets the roles of the argument user ID.
 func (store *Client) GetUserRoles(id string) ([]*Role, error) {
 	result := rolesResult{}
 	err := store.client.
@@ -60,6 +67,8 @@ func (store *Client) GetUserRoles(id string) ([]*Role, error) {
 	return result.Items, err
 }
 
+// AddUserRole adds the specified role for the user. If the user
+// already has the role, this function does nothing.
 func (store *Client) AddUserRole(userID, roleID string) error {
 	// Get user's current roles.
 	roles, err := store.GetUserRoles(userID)
@@ -89,6 +98,8 @@ func (store *Client) AddUserRole(userID, roleID string) error {
 	return store.setUserRoles(userID, roles)
 }
 
+// RemoveUserRole removes the specified role from the user. If the
+// user does not have the role, this function does nothing.
 func (store *Client) RemoveUserRole(userID, roleID string) error {
 	// Get user's current roles.
 	roles, err := store.GetUserRoles(userID)
@@ -117,6 +128,7 @@ func (store *Client) setUserRoles(userID string, roles []*Role) error {
 		RecvStatus()
 }
 
+// GetRoles gets all configured roles.
 func (store *Client) GetRoles() ([]*Role, error) {
 	result := rolesResult{}
 
@@ -127,6 +139,7 @@ func (store *Client) GetRoles() ([]*Role, error) {
 	return result.Items, err
 }
 
+// GetRole gets information about the argument role ID.
 func (store *Client) GetRole(id string) (role Role, err error) {
 	err = store.client.
 		Get("/role-store/api/v1/roles/%s", url.PathEscape(id)).
@@ -135,6 +148,7 @@ func (store *Client) GetRole(id string) (role Role, err error) {
 	return
 }
 
+// GetRoleMembers gets all members (users) of the argument role ID.
 func (store *Client) GetRoleMembers(id string) ([]*User, error) {
 	result := usersResult{}
 
