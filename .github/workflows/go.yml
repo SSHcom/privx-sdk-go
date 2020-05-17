@@ -30,10 +30,10 @@ jobs:
 
     - name: go get tools
       run: |
-        curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
         go get golang.org/x/lint/golint
         go get github.com/mattn/goveralls
         go get github.com/go-playground/overalls
+        curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
     - name: go get deps
       run: |
