@@ -7,11 +7,6 @@
 package rolestore
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 
 	"github.com/SSHcom/privx-sdk-go/api"
@@ -19,7 +14,7 @@ import (
 
 // Client is a role-store client instance.
 type Client struct {
-	api *api.Client
+	client api.Connector
 }
 
 type usersResult struct {
@@ -34,116 +29,42 @@ type rolesResult struct {
 
 // NewClient creates a new role-store client instance, using the
 // argument SDK API client.
-func NewClient(api *api.Client) (*Client, error) {
-	return &Client{
-		api: api,
-	}, nil
+func NewClient(client api.Connector) *Client {
+	return &Client{client: client}
 }
 
 // SearchUsers searches for users, matching the keywords and source
 // criteria.
 func (store *Client) SearchUsers(keywords, source string) ([]*User, error) {
-	url := fmt.Sprintf("%s/role-store/api/v1/users/search",
-		store.api.Endpoint())
+	result := usersResult{}
+	err := store.client.
+		Get("/role-store/api/v1/users/search").
+		Send(map[string]string{
+			"keywords": keywords,
+			"source":   source,
+		}).
+		Recv(&result)
 
-	body, err := json.Marshal(map[string]string{
-		"keywords": keywords,
-		"source":   source,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := store.api.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return nil, api.ErrorFromResponse(resp, body)
-	}
-
-	result := &usersResult{}
-	err = json.Unmarshal(body, result)
-	if err != nil {
-		return nil, fmt.Errorf("malformed response: %s", err)
-	}
-
-	return result.Items, nil
+	return result.Items, err
 }
 
 // GetUser gets information about the argument user ID.
-func (store *Client) GetUser(id string) (*User, error) {
-	url := fmt.Sprintf("%s/role-store/api/v1/users/%s",
-		store.api.Endpoint(), url.PathEscape(id))
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
+func (store *Client) GetUser(id string) (user *User, err error) {
+	err = store.client.
+		Get("/role-store/api/v1/users/%s", url.PathEscape(id)).
+		Recv(user)
 
-	resp, err := store.api.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return nil, api.ErrorFromResponse(resp, body)
-	}
-
-	result := new(User)
-	err = json.Unmarshal(body, result)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return
 }
 
 // GetUserRoles gets the roles of the argument user ID.
 func (store *Client) GetUserRoles(id string) ([]*Role, error) {
-	url := fmt.Sprintf("%s/role-store/api/v1/users/%s/roles",
-		store.api.Endpoint(), url.PathEscape(id))
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
+	result := rolesResult{}
+	err := store.client.
+		Get("/role-store/api/v1/users/%s/roles", url.PathEscape(id)).
+		Recv(&result)
 
-	resp, err := store.api.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return nil, api.ErrorFromResponse(resp, body)
-	}
-
-	result := &rolesResult{}
-	err = json.Unmarshal(body, result)
-	if err != nil {
-		return nil, err
-	}
-
-	return result.Items, nil
+	return result.Items, err
 }
 
 // AddUserRole adds the specified role for the user. If the user
@@ -202,127 +123,38 @@ func (store *Client) RemoveUserRole(userID, roleID string) error {
 }
 
 func (store *Client) setUserRoles(userID string, roles []*Role) error {
-	url := fmt.Sprintf("%s/role-store/api/v1/users/%s/roles",
-		store.api.Endpoint(), url.PathEscape(userID))
-
-	body, err := json.Marshal(roles)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest(http.MethodPut, url, bytes.NewReader(body))
-	if err != nil {
-		return err
-	}
-
-	resp, err := store.api.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	body, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return api.ErrorFromResponse(resp, body)
-	}
-
-	return nil
+	return store.client.
+		Put("/role-store/api/v1/users/%s/roles", url.PathEscape(userID)).
+		RecvStatus()
 }
 
 // GetRoles gets all configured roles.
 func (store *Client) GetRoles() ([]*Role, error) {
-	url := fmt.Sprintf("%s/role-store/api/v1/roles", store.api.Endpoint())
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
+	result := rolesResult{}
 
-	resp, err := store.api.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	err := store.client.
+		Get("/role-store/api/v1/roles").
+		Recv(&result)
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return nil, api.ErrorFromResponse(resp, body)
-	}
-
-	result := &rolesResult{}
-	err = json.Unmarshal(body, result)
-	if err != nil {
-		return nil, err
-	}
-
-	return result.Items, nil
+	return result.Items, err
 }
 
 // GetRole gets information about the argument role ID.
-func (store *Client) GetRole(id string) (*Role, error) {
-	url := fmt.Sprintf("%s/role-store/api/v1/roles/%s",
-		store.api.Endpoint(), url.PathEscape(id))
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
+func (store *Client) GetRole(id string) (role Role, err error) {
+	err = store.client.
+		Get("/role-store/api/v1/roles/%s", url.PathEscape(id)).
+		Recv(&role)
 
-	resp, err := store.api.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return nil, api.ErrorFromResponse(resp, body)
-	}
-
-	result := new(Role)
-	err = json.Unmarshal(body, result)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return
 }
 
 // GetRoleMembers gets all members (users) of the argument role ID.
 func (store *Client) GetRoleMembers(id string) ([]*User, error) {
-	url := fmt.Sprintf("%s/role-store/api/v1/roles/%s/members",
-		store.api.Endpoint(), url.PathEscape(id))
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
+	result := usersResult{}
 
-	resp, err := store.api.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	err := store.client.
+		Get("/role-store/api/v1/roles/%s/members", url.PathEscape(id)).
+		Recv(&result)
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return nil, api.ErrorFromResponse(resp, body)
-	}
-
-	result := &usersResult{}
-	err = json.Unmarshal(body, result)
-	if err != nil {
-		return nil, fmt.Errorf("malformed response: %s", err)
-	}
-
-	return result.Items, nil
+	return result.Items, err
 }

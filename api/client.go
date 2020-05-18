@@ -7,9 +7,12 @@
 package api
 
 import (
+	"bytes"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"time"
@@ -17,9 +20,15 @@ import (
 	"github.com/SSHcom/privx-sdk-go/oauth"
 )
 
+// Connector is HTTP connector for api
+type Connector interface {
+	Get(string, ...interface{}) *CURL
+	Put(string, ...interface{}) *CURL
+}
+
 // Client is an SDK client instance.
 type Client struct {
-	Auth     *oauth.Client
+	auth     oauth.Provider
 	endpoint string
 	http     *http.Client
 }
@@ -35,10 +44,10 @@ func Endpoint(endpoint string) Option {
 	}
 }
 
-// Authenticator setup credential provider for api
-func Authenticator(auth *oauth.Client) Option {
+// AccessToken setup access token provider for api
+func AccessToken(auth oauth.Provider) Option {
 	return func(client *Client) *Client {
-		client.Auth = auth
+		client.auth = auth
 		return client
 	}
 }
@@ -65,7 +74,7 @@ func Verbose() Option {
 }
 
 // NewClient creates an instance of PrivX API client
-func NewClient(opts ...Option) (*Client, error) {
+func NewClient(opts ...Option) *Client {
 	client := &Client{
 		http: &http.Client{
 			Transport: &http.Transport{
@@ -81,24 +90,24 @@ func NewClient(opts ...Option) (*Client, error) {
 		client = opt(client)
 	}
 
-	return client, nil
+	return client
 }
 
-// Endpoint return the REST API endpoint URL.
-func (client *Client) Endpoint() string {
-	return client.endpoint
-}
-
+//
 // Do executes the argument HTTP request and returns it response. The
 // Do function handles the API OAuth2 authentication.
 func (client *Client) Do(req *http.Request) (*http.Response, error) {
 	retryLimit := 2
 	for i := 0; i < retryLimit; i++ {
-		token, err := client.Auth.Token()
-		if err != nil {
-			return nil, err
+
+		if client.auth != nil {
+			token, err := client.auth.Token()
+			if err != nil {
+				return nil, err
+			}
+			req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 		}
-		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+
 		resp, err := client.http.Do(req)
 		if err != nil {
 			return nil, err
@@ -110,4 +119,112 @@ func (client *Client) Do(req *http.Request) (*http.Response, error) {
 		return resp, err
 	}
 	return nil, fmt.Errorf("request failed after %d tries", retryLimit)
+}
+
+// CURL is a builder type, constructs HTTP request
+type CURL struct {
+	client  *Client
+	method  string
+	url     string
+	payload *bytes.Buffer
+	output  *http.Response
+	fail    error
+}
+
+// URL creates URL connector
+func (client *Client) URL(method, url string) *CURL {
+	return &CURL{
+		client:  client,
+		method:  method,
+		url:     client.endpoint + url,
+		payload: bytes.NewBuffer(nil),
+	}
+}
+
+// Get creates URL connector
+func (client *Client) Get(templateURL string, args ...interface{}) *CURL {
+	return client.URL(http.MethodGet, fmt.Sprintf(templateURL, args...))
+}
+
+// Put creates URL connector
+func (client *Client) Put(templateURL string, args ...interface{}) *CURL {
+	return client.URL(http.MethodPut, fmt.Sprintf(templateURL, args...))
+}
+
+// Send payload to destination URL.
+func (curl *CURL) Send(data interface{}) *CURL {
+	return curl.encodeJSON(data)
+}
+
+func (curl *CURL) encodeJSON(data interface{}) *CURL {
+	if curl.fail != nil {
+		return curl
+	}
+
+	encoded, err := json.Marshal(data)
+	if curl.fail = err; err == nil {
+		curl.payload = bytes.NewBuffer(encoded)
+	}
+	return curl
+}
+
+// Recv payload from target URL.
+func (curl *CURL) Recv(data interface{}) error {
+	curl = curl.unsafeIO()
+
+	if curl.fail != nil {
+		return curl.fail
+	}
+
+	defer curl.output.Body.Close()
+	body, err := ioutil.ReadAll(curl.output.Body)
+	if err != nil {
+		return err
+	}
+
+	if curl.output.StatusCode != http.StatusOK {
+		return fmt.Errorf("HTTP error: %s", curl.output.Status)
+	}
+
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// RecvStatus payload from target URL and discards it.
+func (curl *CURL) RecvStatus() error {
+	curl = curl.unsafeIO()
+
+	if curl.fail != nil {
+		return curl.fail
+	}
+
+	defer curl.output.Body.Close()
+	_, err := ioutil.ReadAll(curl.output.Body)
+	if err != nil {
+		return err
+	}
+
+	if curl.output.StatusCode != http.StatusOK {
+		return fmt.Errorf("HTTP error: %s", curl.output.Status)
+	}
+
+	return nil
+}
+
+func (curl *CURL) unsafeIO() *CURL {
+	if curl.fail != nil {
+		return curl
+	}
+
+	req, err := http.NewRequest(curl.method, curl.url, curl.payload)
+	if curl.fail = err; err != nil {
+		return curl
+	}
+
+	curl.output, curl.fail = curl.client.Do(req)
+	return curl
 }

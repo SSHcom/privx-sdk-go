@@ -25,6 +25,11 @@ import (
 	"github.com/SSHcom/privx-sdk-go/pkce"
 )
 
+// Provider is a source for access token to api client
+type Provider interface {
+	Token() (string, error)
+}
+
 const (
 	// UserAgent specifies the HTTP user-agent string for the SDK
 	// clients.
