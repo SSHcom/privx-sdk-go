@@ -51,7 +51,7 @@ func TestGetFails(t *testing.T) {
 	}
 }
 
-func TestSendPut(t *testing.T) {
+func TestSend(t *testing.T) {
 	ts := mockStatus()
 	defer ts.Close()
 
@@ -59,41 +59,23 @@ func TestSendPut(t *testing.T) {
 		ID string `json:"id"`
 	}
 
-	eg := T{ID: "id"}
-	in := T{}
-
-	err := api.NewClient(api.Endpoint(ts.URL)).
-		Put("/echo").Send(eg).Recv(&in)
-
-	if err != nil {
-		t.Errorf("client fails: %w", err)
+	methods := []*api.CURL{
+		api.NewClient(api.Endpoint(ts.URL)).Put("/echo"),
+		api.NewClient(api.Endpoint(ts.URL)).Post("/echo"),
 	}
 
-	if eg.ID != in.ID {
-		t.Errorf("unexpected response: %v", in)
-	}
-}
+	for _, method := range methods {
+		eg := T{ID: "id"}
+		in := T{}
 
-func TestSendPost(t *testing.T) {
-	ts := mockStatus()
-	defer ts.Close()
+		err := method.Send(eg).Recv(&in)
+		if err != nil {
+			t.Errorf("client fails: %w", err)
+		}
 
-	type T struct {
-		ID string `json:"id"`
-	}
-
-	eg := T{ID: "id"}
-	in := T{}
-
-	err := api.NewClient(api.Endpoint(ts.URL)).
-		Post("/echo").Send(eg).Recv(&in)
-
-	if err != nil {
-		t.Errorf("client fails: %w", err)
-	}
-
-	if eg.ID != in.ID {
-		t.Errorf("unexpected response: %v", in)
+		if eg.ID != in.ID {
+			t.Errorf("unexpected response: %v", in)
+		}
 	}
 }
 
