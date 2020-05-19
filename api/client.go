@@ -73,8 +73,8 @@ func Verbose() Option {
 	}
 }
 
-// NewClient creates an instance of PrivX API client
-func NewClient(opts ...Option) *Client {
+// New creates an instance of PrivX API client
+func New(opts ...Option) *Client {
 	client := &Client{
 		http: &http.Client{
 			Transport: &http.Transport{

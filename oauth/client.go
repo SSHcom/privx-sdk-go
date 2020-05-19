@@ -66,8 +66,8 @@ type AccessToken struct {
 	notAfter     time.Time
 }
 
-// NewClient creates a new OAuth2 client instance.
-func NewClient(config Config, endpoint string, cert *x509.Certificate,
+// New creates a new OAuth2 client instance.
+func New(config Config, endpoint string, cert *x509.Certificate,
 	verbose bool) (*Client, error) {
 
 	tlsConfig := &tls.Config{}

@@ -21,12 +21,10 @@ type Client struct {
 	api api.Connector
 }
 
-// NewClient creates a new Vault client instance, using the argument
+// New creates a new Vault client instance, using the argument
 // SDK API client.
-func NewClient(api api.Connector) (*Client, error) {
-	return &Client{
-		api: api,
-	}, nil
+func New(api api.Connector) *Client {
+	return &Client{api: api}
 }
 
 // Get gets the content of the argument secret.

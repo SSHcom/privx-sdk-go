@@ -31,7 +31,7 @@ func TestGet(t *testing.T) {
 	ts := mockStatus()
 	defer ts.Close()
 
-	err := api.NewClient(api.Endpoint(ts.URL)).
+	err := api.New(api.Endpoint(ts.URL)).
 		Get("/users/%v", 1).RecvStatus()
 
 	if err != nil {
@@ -43,7 +43,7 @@ func TestGetFails(t *testing.T) {
 	ts := mockStatus()
 	defer ts.Close()
 
-	err := api.NewClient(api.Endpoint(ts.URL)).
+	err := api.New(api.Endpoint(ts.URL)).
 		Get("/users/%v", 2).RecvStatus()
 
 	if err == nil {
@@ -60,8 +60,8 @@ func TestSend(t *testing.T) {
 	}
 
 	methods := []*api.CURL{
-		api.NewClient(api.Endpoint(ts.URL)).Put("/echo"),
-		api.NewClient(api.Endpoint(ts.URL)).Post("/echo"),
+		api.New(api.Endpoint(ts.URL)).Put("/echo"),
+		api.New(api.Endpoint(ts.URL)).Post("/echo"),
 	}
 
 	for _, method := range methods {
@@ -87,7 +87,7 @@ func TestRecv(t *testing.T) {
 		ID string `json:"id"`
 	}
 
-	err := api.NewClient(access, api.Endpoint(ts.URL)).
+	err := api.New(access, api.Endpoint(ts.URL)).
 		Get("/").
 		Recv(&data)
 
@@ -108,7 +108,7 @@ func TestRecvNoIdP(t *testing.T) {
 		ID string `json:"id"`
 	}
 
-	err := api.NewClient(api.Endpoint(ts.URL)).
+	err := api.New(api.Endpoint(ts.URL)).
 		Get("/").
 		Recv(&data)
 
