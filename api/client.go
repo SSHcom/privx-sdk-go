@@ -23,6 +23,7 @@ import (
 // Connector is HTTP connector for api
 type Connector interface {
 	Get(string, ...interface{}) *CURL
+	Post(string, ...interface{}) *CURL
 	Put(string, ...interface{}) *CURL
 }
 
@@ -188,7 +189,7 @@ func (curl *CURL) Recv(data interface{}) error {
 	}
 
 	if curl.output.StatusCode != http.StatusOK {
-		return fmt.Errorf("HTTP error: %s", curl.output.Status)
+		return ErrorFromResponse(curl.output, body)
 	}
 
 	err = json.Unmarshal(body, &data)
@@ -208,13 +209,13 @@ func (curl *CURL) RecvStatus() error {
 	}
 
 	defer curl.output.Body.Close()
-	_, err := ioutil.ReadAll(curl.output.Body)
+	body, err := ioutil.ReadAll(curl.output.Body)
 	if err != nil {
 		return err
 	}
 
 	if curl.output.StatusCode != http.StatusOK {
-		return fmt.Errorf("HTTP error: %s", curl.output.Status)
+		return ErrorFromResponse(curl.output, body)
 	}
 
 	return nil
