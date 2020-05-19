@@ -51,7 +51,7 @@ func TestGetFails(t *testing.T) {
 	}
 }
 
-func TestSend(t *testing.T) {
+func TestSendPut(t *testing.T) {
 	ts := mockStatus()
 	defer ts.Close()
 
@@ -64,6 +64,29 @@ func TestSend(t *testing.T) {
 
 	err := api.NewClient(api.Endpoint(ts.URL)).
 		Put("/echo").Send(eg).Recv(&in)
+
+	if err != nil {
+		t.Errorf("client fails: %w", err)
+	}
+
+	if eg.ID != in.ID {
+		t.Errorf("unexpected response: %v", in)
+	}
+}
+
+func TestSendPost(t *testing.T) {
+	ts := mockStatus()
+	defer ts.Close()
+
+	type T struct {
+		ID string `json:"id"`
+	}
+
+	eg := T{ID: "id"}
+	in := T{}
+
+	err := api.NewClient(api.Endpoint(ts.URL)).
+		Post("/echo").Send(eg).Recv(&in)
 
 	if err != nil {
 		t.Errorf("client fails: %w", err)
