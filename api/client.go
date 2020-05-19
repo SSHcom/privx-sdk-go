@@ -146,6 +146,11 @@ func (client *Client) Get(templateURL string, args ...interface{}) *CURL {
 	return client.URL(http.MethodGet, fmt.Sprintf(templateURL, args...))
 }
 
+// Post creates URL connector
+func (client *Client) Post(templateURL string, args ...interface{}) *CURL {
+	return client.URL(http.MethodPost, fmt.Sprintf(templateURL, args...))
+}
+
 // Put creates URL connector
 func (client *Client) Put(templateURL string, args ...interface{}) *CURL {
 	return client.URL(http.MethodPut, fmt.Sprintf(templateURL, args...))

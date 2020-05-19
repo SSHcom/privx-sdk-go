@@ -59,18 +59,23 @@ func TestSend(t *testing.T) {
 		ID string `json:"id"`
 	}
 
-	eg := T{ID: "id"}
-	in := T{}
-
-	err := api.New(api.Endpoint(ts.URL)).
-		Put("/echo").Send(eg).Recv(&in)
-
-	if err != nil {
-		t.Errorf("client fails: %w", err)
+	methods := []*api.CURL{
+		api.New(api.Endpoint(ts.URL)).Put("/echo"),
+		api.New(api.Endpoint(ts.URL)).Post("/echo"),
 	}
 
-	if eg.ID != in.ID {
-		t.Errorf("unexpected response: %v", in)
+	for _, method := range methods {
+		eg := T{ID: "id"}
+		in := T{}
+
+		err := method.Send(eg).Recv(&in)
+		if err != nil {
+			t.Errorf("client fails: %w", err)
+		}
+
+		if eg.ID != in.ID {
+			t.Errorf("unexpected response: %v", in)
+		}
 	}
 }
 
