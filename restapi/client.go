@@ -159,24 +159,28 @@ func (curl *tCURL) Recv(data interface{}) error {
 }
 
 // RecvStatus payload from target URL and discards it.
-func (curl *tCURL) RecvStatus() error {
+func (curl *tCURL) RecvStatus(status ...int) (http.Header, error) {
 	curl = curl.unsafeIO()
 
 	if curl.fail != nil {
-		return curl.fail
+		return nil, curl.fail
 	}
 
 	defer curl.output.Body.Close()
 	body, err := ioutil.ReadAll(curl.output.Body)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if curl.output.StatusCode != http.StatusOK {
-		return ErrorFromResponse(curl.output, body)
+	expect := http.StatusOK
+	if len(status) == 1 {
+		expect = status[0]
+	}
+	if curl.output.StatusCode != expect {
+		return nil, ErrorFromResponse(curl.output, body)
 	}
 
-	return nil
+	return curl.output.Header, nil
 }
 
 //

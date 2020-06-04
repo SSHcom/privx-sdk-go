@@ -123,9 +123,11 @@ func (store *Client) RemoveUserRole(userID, roleID string) error {
 }
 
 func (store *Client) setUserRoles(userID string, roles []*Role) error {
-	return store.api.
+	_, err := store.api.
 		Put("/role-store/api/v1/users/%s/roles", url.PathEscape(userID)).
 		RecvStatus()
+
+	return err
 }
 
 // GetRoles gets all configured roles.

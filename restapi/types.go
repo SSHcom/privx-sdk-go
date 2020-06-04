@@ -6,6 +6,8 @@
 
 package restapi
 
+import "net/http"
+
 // Connector is HTTP connector for api
 type Connector interface {
 	URL(string, string) CURL
@@ -18,7 +20,7 @@ type Connector interface {
 type CURL interface {
 	Send(data interface{}) CURL
 	Recv(data interface{}) error
-	RecvStatus() error
+	RecvStatus(...int) (http.Header, error)
 }
 
 // Provider define additional parameters to HTTP request

@@ -34,7 +34,7 @@ func TestGet(t *testing.T) {
 	ts := mockStatus()
 	defer ts.Close()
 
-	err := restapi.New(restapi.Endpoint(ts.URL)).
+	_, err := restapi.New(restapi.Endpoint(ts.URL)).
 		Get("/users/%v", 1).RecvStatus()
 
 	if err != nil {
