@@ -45,6 +45,16 @@ func X509(cert *x509.Certificate) Option {
 	}
 }
 
+// NoRedirect disables redirect
+func NoRedirect() Option {
+	return func(client *tClient) *tClient {
+		client.http.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		}
+		return client
+	}
+}
+
 // Verbose enables debug-level logging
 func Verbose() Option {
 	return func(client *tClient) *tClient {

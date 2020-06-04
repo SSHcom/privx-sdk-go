@@ -128,7 +128,7 @@ func (client *Client) Headers() (map[string]string, error) {
 	}
 
 	return map[string]string{
-		"Authorization": fmt.Sprintf("Bearer %s",client.token.AccessToken)
+		"Authorization": fmt.Sprintf("Bearer %s", client.token.AccessToken),
 	}, nil
 }
 
@@ -198,7 +198,9 @@ func (client *Client) authorizationCodeGrant() (*AccessToken, error) {
 
 	token, err := client.authorizationEndpoint(challenge, method, state)
 	if err != nil {
-		return nil, err
+		return nil, errmap[string]string{
+			"Authorization": fmt.Sprintf("Bearer %s",client.token.AccessToken)
+		}
 	}
 
 	code, st, err := client.login(token)
