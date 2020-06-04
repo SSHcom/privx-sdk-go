@@ -9,7 +9,7 @@ package vault
 import (
 	"net/url"
 
-	"github.com/SSHcom/privx-sdk-go/api"
+	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
 // Bag contains secret data. The secret data is a JSON object and it
@@ -18,12 +18,12 @@ type Bag map[string]interface{}
 
 // Client is a Vault client instance.
 type Client struct {
-	api api.Connector
+	api restapi.Connector
 }
 
 // New creates a new Vault client instance, using the argument
 // SDK API client.
-func New(api api.Connector) *Client {
+func New(api restapi.Connector) *Client {
 	return &Client{api: api}
 }
 

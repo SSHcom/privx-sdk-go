@@ -9,12 +9,12 @@ package rolestore
 import (
 	"net/url"
 
-	"github.com/SSHcom/privx-sdk-go/api"
+	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
 // Client is a role-store client instance.
 type Client struct {
-	api api.Connector
+	api restapi.Connector
 }
 
 type usersResult struct {
@@ -29,7 +29,7 @@ type rolesResult struct {
 
 // New creates a new role-store client instance, using the
 // argument SDK API client.
-func New(api api.Connector) *Client {
+func New(api restapi.Connector) *Client {
 	return &Client{api: api}
 }
 

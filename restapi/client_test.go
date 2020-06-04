@@ -4,7 +4,7 @@
 // All rights reserved.
 //
 
-package api_test
+package restapi_test
 
 import (
 	"io/ioutil"
@@ -13,25 +13,27 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SSHcom/privx-sdk-go/api"
+	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
 //
-type MockAccess struct {
-	string
+type mockIdP struct{ headers map[string]string }
+
+func (idp mockIdP) Headers() (map[string]string, error) {
+	return idp.headers, nil
 }
 
-func (idp MockAccess) Token() (string, error) {
-	return idp.string, nil
-}
-
-var access = api.AccessToken(MockAccess{"trusted"})
+var access = restapi.AccessToken(
+	mockIdP{map[string]string{
+		"Authorization": "Bearer trusted",
+	}},
+)
 
 func TestGet(t *testing.T) {
 	ts := mockStatus()
 	defer ts.Close()
 
-	err := api.New(api.Endpoint(ts.URL)).
+	err := restapi.New(restapi.Endpoint(ts.URL)).
 		Get("/users/%v", 1).RecvStatus()
 
 	if err != nil {
@@ -43,7 +45,7 @@ func TestGetFails(t *testing.T) {
 	ts := mockStatus()
 	defer ts.Close()
 
-	err := api.New(api.Endpoint(ts.URL)).
+	err := restapi.New(restapi.Endpoint(ts.URL)).
 		Get("/users/%v", 2).RecvStatus()
 
 	if err == nil {
@@ -62,7 +64,7 @@ func TestSend(t *testing.T) {
 	eg := T{ID: "id"}
 	in := T{}
 
-	err := api.New(api.Endpoint(ts.URL)).
+	err := restapi.New(restapi.Endpoint(ts.URL)).
 		Put("/echo").Send(eg).Recv(&in)
 
 	if err != nil {
@@ -82,7 +84,7 @@ func TestRecv(t *testing.T) {
 		ID string `json:"id"`
 	}
 
-	err := api.New(access, api.Endpoint(ts.URL)).
+	err := restapi.New(access, restapi.Endpoint(ts.URL)).
 		Get("/").
 		Recv(&data)
 
@@ -103,7 +105,7 @@ func TestRecvNoIdP(t *testing.T) {
 		ID string `json:"id"`
 	}
 
-	err := api.New(api.Endpoint(ts.URL)).
+	err := restapi.New(restapi.Endpoint(ts.URL)).
 		Get("/").
 		Recv(&data)
 
