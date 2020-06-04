@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -86,6 +87,7 @@ func (client *tClient) URL(method, url string) CURL {
 		client:  client,
 		method:  method,
 		url:     client.endpoint + url,
+		header:  http.Header{},
 		payload: bytes.NewBuffer(nil),
 	}
 }
@@ -110,21 +112,33 @@ type tCURL struct {
 	client  *tClient
 	method  string
 	url     string
+	header  http.Header
 	payload *bytes.Buffer
 	output  *http.Response
 	fail    error
 }
 
-// Send payload to destination URL.
-func (curl *tCURL) Send(data interface{}) CURL {
-	return curl.encodeJSON(data)
+// With defines HTTP header
+func (curl *tCURL) With(head, value string) CURL {
+	curl.header.Add(head, value)
+	return curl
 }
 
-func (curl *tCURL) encodeJSON(data interface{}) CURL {
+// Send payload to destination URL.
+func (curl *tCURL) Send(data interface{}) CURL {
 	if curl.fail != nil {
 		return curl
 	}
 
+	switch curl.header.Get("Content-Type") {
+	case "application/x-www-form-urlencoded":
+		return curl.encodeForm(data)
+	}
+
+	return curl.encodeJSON(data)
+}
+
+func (curl *tCURL) encodeJSON(data interface{}) CURL {
 	encoded, err := json.Marshal(data)
 	if curl.fail = err; err == nil {
 		curl.payload = bytes.NewBuffer(encoded)
@@ -132,30 +146,51 @@ func (curl *tCURL) encodeJSON(data interface{}) CURL {
 	return curl
 }
 
+func (curl *tCURL) encodeForm(data interface{}) CURL {
+	bin, err := json.Marshal(data)
+	if curl.fail = err; err != nil {
+		return curl
+	}
+
+	var req map[string]string
+	err = json.Unmarshal(bin, &req)
+	if curl.fail = err; err != nil {
+		return curl
+	}
+
+	var payload url.Values = make(map[string][]string)
+	for key, val := range req {
+		payload[key] = []string{val}
+	}
+
+	curl.payload = bytes.NewBuffer([]byte(payload.Encode()))
+	return curl
+}
+
 // Recv payload from target URL.
-func (curl *tCURL) Recv(data interface{}) error {
+func (curl *tCURL) Recv(data interface{}) (http.Header, error) {
 	curl = curl.unsafeIO()
 
 	if curl.fail != nil {
-		return curl.fail
+		return nil, curl.fail
 	}
 
 	defer curl.output.Body.Close()
 	body, err := ioutil.ReadAll(curl.output.Body)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if curl.output.StatusCode != http.StatusOK {
-		return ErrorFromResponse(curl.output, body)
+		return nil, ErrorFromResponse(curl.output, body)
 	}
 
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return curl.output.Header, nil
 }
 
 // RecvStatus payload from target URL and discards it.
@@ -192,6 +227,10 @@ func (curl *tCURL) unsafeIO() *tCURL {
 	req, err := http.NewRequest(curl.method, curl.url, curl.payload)
 	if curl.fail = err; err != nil {
 		return curl
+	}
+
+	for head := range curl.header {
+		req.Header.Set(head, curl.header.Get(head))
 	}
 
 	curl.output, curl.fail = curl.client.doWithRetry(req)

@@ -46,7 +46,7 @@ func TestGetFails(t *testing.T) {
 	ts := mockStatus()
 	defer ts.Close()
 
-	err := restapi.New(restapi.Endpoint(ts.URL)).
+	_, err := restapi.New(restapi.Endpoint(ts.URL)).
 		Get("/users/%v", 2).RecvStatus()
 
 	if err == nil {
@@ -74,7 +74,7 @@ func TestSend(t *testing.T) {
 		eg := T{ID: "id"}
 		in := T{}
 
-		err := method.Send(eg).Recv(&in)
+		_, err := method.Send(eg).Recv(&in)
 		if err != nil {
 			t.Errorf("client fails: %w", err)
 		}
@@ -93,7 +93,7 @@ func TestRecv(t *testing.T) {
 		ID string `json:"id"`
 	}
 
-	err := restapi.New(access, restapi.Endpoint(ts.URL)).
+	_, err := restapi.New(access, restapi.Endpoint(ts.URL)).
 		Get("/").
 		Recv(&data)
 
@@ -114,7 +114,7 @@ func TestRecvNoIdP(t *testing.T) {
 		ID string `json:"id"`
 	}
 
-	err := restapi.New(restapi.Endpoint(ts.URL)).
+	_, err := restapi.New(restapi.Endpoint(ts.URL)).
 		Get("/").
 		Recv(&data)
 

@@ -29,7 +29,7 @@ func New(api restapi.Connector) *Client {
 
 // Get gets the content of the argument secret.
 func (vault *Client) Get(name string) (bag Bag, err error) {
-	err = vault.api.
+	_, err = vault.api.
 		Get("/vault/api/v1/secrets/%s", url.PathEscape(name)).
 		Recv(&bag)
 

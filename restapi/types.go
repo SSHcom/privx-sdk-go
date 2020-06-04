@@ -18,8 +18,12 @@ type Connector interface {
 
 // CURL is HTTP request
 type CURL interface {
+	// With defines HTTP header
+	With(string, string) CURL
+	// Send payload to HTTP endpoint
 	Send(data interface{}) CURL
-	Recv(data interface{}) error
+	// Recv payload(s) from HTTP endpoint
+	Recv(data interface{}) (http.Header, error)
 	RecvStatus(...int) (http.Header, error)
 }
 

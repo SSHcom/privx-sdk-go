@@ -37,7 +37,7 @@ func New(api restapi.Connector) *Client {
 // criteria.
 func (store *Client) SearchUsers(keywords, source string) ([]*User, error) {
 	result := usersResult{}
-	err := store.api.
+	_, err := store.api.
 		Post("/role-store/api/v1/users/search").
 		Send(map[string]string{
 			"keywords": keywords,
@@ -50,7 +50,7 @@ func (store *Client) SearchUsers(keywords, source string) ([]*User, error) {
 
 // GetUser gets information about the argument user ID.
 func (store *Client) GetUser(id string) (user *User, err error) {
-	err = store.api.
+	_, err = store.api.
 		Get("/role-store/api/v1/users/%s", url.PathEscape(id)).
 		Recv(user)
 
@@ -60,7 +60,7 @@ func (store *Client) GetUser(id string) (user *User, err error) {
 // GetUserRoles gets the roles of the argument user ID.
 func (store *Client) GetUserRoles(id string) ([]*Role, error) {
 	result := rolesResult{}
-	err := store.api.
+	_, err := store.api.
 		Get("/role-store/api/v1/users/%s/roles", url.PathEscape(id)).
 		Recv(&result)
 
@@ -134,7 +134,7 @@ func (store *Client) setUserRoles(userID string, roles []*Role) error {
 func (store *Client) GetRoles() ([]*Role, error) {
 	result := rolesResult{}
 
-	err := store.api.
+	_, err := store.api.
 		Get("/role-store/api/v1/roles").
 		Recv(&result)
 
@@ -143,7 +143,7 @@ func (store *Client) GetRoles() ([]*Role, error) {
 
 // GetRole gets information about the argument role ID.
 func (store *Client) GetRole(id string) (role Role, err error) {
-	err = store.api.
+	_, err = store.api.
 		Get("/role-store/api/v1/roles/%s", url.PathEscape(id)).
 		Recv(&role)
 
@@ -154,7 +154,7 @@ func (store *Client) GetRole(id string) (role Role, err error) {
 func (store *Client) GetRoleMembers(id string) ([]*User, error) {
 	result := usersResult{}
 
-	err := store.api.
+	_, err := store.api.
 		Get("/role-store/api/v1/roles/%s/members", url.PathEscape(id)).
 		Recv(&result)
 
