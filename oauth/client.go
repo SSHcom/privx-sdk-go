@@ -25,11 +25,6 @@ import (
 	"github.com/SSHcom/privx-sdk-go/pkce"
 )
 
-// Provider is a source for access token to api client
-type Provider interface {
-	Token() (string, error)
-}
-
 const (
 	// UserAgent specifies the HTTP user-agent string for the SDK
 	// clients.
@@ -100,9 +95,9 @@ func New(config Config, endpoint string, cert *x509.Certificate,
 	}, nil
 }
 
-// Token returns an OAuth token. If the client does not have a valid
+// Headers returns an OAuth token. If the client does not have a valid
 // token, it will do the authentication flow to get a fresh token.
-func (client *Client) Token() (string, error) {
+func (client *Client) Headers() (map[string]string, error) {
 	client.m.Lock()
 	for client.authPending {
 		client.c.Wait()
@@ -127,11 +122,14 @@ func (client *Client) Token() (string, error) {
 		client.authPending = false
 		client.c.Broadcast()
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 		client.token = token
 	}
-	return client.token.AccessToken, nil
+
+	return map[string]string{
+		"Authorization": fmt.Sprintf("Bearer %s",client.token.AccessToken)
+	}, nil
 }
 
 func (client *Client) resourceOwnerPasswordCredentialsGrant() (
