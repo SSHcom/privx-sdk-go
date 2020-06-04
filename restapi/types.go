@@ -11,6 +11,7 @@ type Connector interface {
 	URL(string, string) CURL
 	Get(string, ...interface{}) CURL
 	Put(string, ...interface{}) CURL
+	Post(string, ...interface{}) CURL
 }
 
 // CURL is HTTP request

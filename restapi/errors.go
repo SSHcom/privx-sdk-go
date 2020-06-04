@@ -4,7 +4,7 @@
 // All rights reserved.
 //
 
-package api
+package restapi
 
 import (
 	"encoding/json"

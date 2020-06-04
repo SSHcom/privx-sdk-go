@@ -38,7 +38,7 @@ func New(api restapi.Connector) *Client {
 func (store *Client) SearchUsers(keywords, source string) ([]*User, error) {
 	result := usersResult{}
 	err := store.api.
-		Get("/role-store/api/v1/users/search").
+		Post("/role-store/api/v1/users/search").
 		Send(map[string]string{
 			"keywords": keywords,
 			"source":   source,

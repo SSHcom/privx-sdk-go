@@ -100,6 +100,11 @@ func (client *tClient) Put(templateURL string, args ...interface{}) CURL {
 	return client.URL(http.MethodPut, fmt.Sprintf(templateURL, args...))
 }
 
+// Post creates URL connector
+func (client *tClient) Post(templateURL string, args ...interface{}) CURL {
+	return client.URL(http.MethodPost, fmt.Sprintf(templateURL, args...))
+}
+
 // CURL is a builder type, constructs HTTP request
 type tCURL struct {
 	client  *tClient
@@ -142,7 +147,7 @@ func (curl *tCURL) Recv(data interface{}) error {
 	}
 
 	if curl.output.StatusCode != http.StatusOK {
-		return fmt.Errorf("HTTP error: %s", curl.output.Status)
+		return ErrorFromResponse(curl.output, body)
 	}
 
 	err = json.Unmarshal(body, &data)
@@ -162,13 +167,13 @@ func (curl *tCURL) RecvStatus() error {
 	}
 
 	defer curl.output.Body.Close()
-	_, err := ioutil.ReadAll(curl.output.Body)
+	body, err := ioutil.ReadAll(curl.output.Body)
 	if err != nil {
 		return err
 	}
 
 	if curl.output.StatusCode != http.StatusOK {
-		return fmt.Errorf("HTTP error: %s", curl.output.Status)
+		return ErrorFromResponse(curl.output, body)
 	}
 
 	return nil

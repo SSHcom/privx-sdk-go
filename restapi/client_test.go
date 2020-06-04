@@ -7,6 +7,7 @@
 package restapi_test
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -50,6 +51,9 @@ func TestGetFails(t *testing.T) {
 
 	if err == nil {
 		t.Errorf("client get is not failing.")
+	} else if err.Error() !=
+		"error: error42, message: borken request, property: mock" {
+		t.Errorf("unexpected error: %s", err)
 	}
 }
 
@@ -61,18 +65,23 @@ func TestSend(t *testing.T) {
 		ID string `json:"id"`
 	}
 
-	eg := T{ID: "id"}
-	in := T{}
-
-	err := restapi.New(restapi.Endpoint(ts.URL)).
-		Put("/echo").Send(eg).Recv(&in)
-
-	if err != nil {
-		t.Errorf("client fails: %w", err)
+	methods := []restapi.CURL{
+		restapi.New(restapi.Endpoint(ts.URL)).Put("/echo"),
+		restapi.New(restapi.Endpoint(ts.URL)).Post("/echo"),
 	}
 
-	if eg.ID != in.ID {
-		t.Errorf("unexpected response: %v", in)
+	for _, method := range methods {
+		eg := T{ID: "id"}
+		in := T{}
+
+		err := method.Send(eg).Recv(&in)
+		if err != nil {
+			t.Errorf("client fails: %w", err)
+		}
+
+		if eg.ID != in.ID {
+			t.Errorf("unexpected response: %v", in)
+		}
 	}
 }
 
@@ -143,6 +152,13 @@ func mockStatus() *httptest.Server {
 				w.WriteHeader(http.StatusOK)
 			case strings.HasPrefix(r.URL.Path, "/users/"):
 				w.WriteHeader(http.StatusBadRequest)
+				body, _ := json.Marshal(map[string]string{
+					"error_code":    "error42",
+					"error_message": "borken request",
+					"property":      "mock",
+				})
+				w.Write(body)
+
 			case r.URL.Path == "/echo":
 				b, _ := ioutil.ReadAll(r.Body)
 				w.Write(b)
