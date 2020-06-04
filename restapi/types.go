@@ -18,6 +18,8 @@ type Connector interface {
 
 // CURL is HTTP request
 type CURL interface {
+	// Params defines query parameters
+	Params(data interface{}) CURL
 	// With defines HTTP header
 	With(string, string) CURL
 	// Send payload to HTTP endpoint

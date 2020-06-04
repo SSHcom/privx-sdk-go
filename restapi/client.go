@@ -118,6 +118,35 @@ type tCURL struct {
 	fail    error
 }
 
+// Params defines query parameters
+func (curl *tCURL) Params(data interface{}) CURL {
+	params, err := curl.encodeURL(data)
+	if curl.fail = err; err != nil {
+		return curl
+	}
+	curl.url = curl.url + "?" + params.Encode()
+	return curl
+}
+
+func (curl *tCURL) encodeURL(query interface{}) (url.Values, error) {
+	bin, err := json.Marshal(query)
+	if err != nil {
+		return nil, err
+	}
+
+	var params map[string]string
+	if err = json.Unmarshal(bin, &params); err != nil {
+		return nil, err
+	}
+
+	var values url.Values = make(map[string][]string)
+	for key, val := range params {
+		values[key] = []string{val}
+	}
+
+	return values, nil
+}
+
 // With defines HTTP header
 func (curl *tCURL) With(head, value string) CURL {
 	curl.header.Add(head, value)
@@ -147,23 +176,12 @@ func (curl *tCURL) encodeJSON(data interface{}) CURL {
 }
 
 func (curl *tCURL) encodeForm(data interface{}) CURL {
-	bin, err := json.Marshal(data)
+	params, err := curl.encodeURL(data)
 	if curl.fail = err; err != nil {
 		return curl
 	}
 
-	var req map[string]string
-	err = json.Unmarshal(bin, &req)
-	if curl.fail = err; err != nil {
-		return curl
-	}
-
-	var payload url.Values = make(map[string][]string)
-	for key, val := range req {
-		payload[key] = []string{val}
-	}
-
-	curl.payload = bytes.NewBuffer([]byte(payload.Encode()))
+	curl.payload = bytes.NewBuffer([]byte(params.Encode()))
 	return curl
 }
 
