@@ -10,23 +10,21 @@ import "net/http"
 
 // Connector is HTTP connector for api
 type Connector interface {
-	URL(string, string) CURL
-	Get(string, ...interface{}) CURL
-	Put(string, ...interface{}) CURL
-	Post(string, ...interface{}) CURL
+	// URL creates a request/response session
+	URL(string, ...interface{}) CURL
 }
 
 // CURL is HTTP request
 type CURL interface {
-	// Params defines query parameters
-	Params(data interface{}) CURL
-	// With defines HTTP header
-	With(string, string) CURL
-	// Send payload to HTTP endpoint
-	Send(data interface{}) CURL
-	// Recv payload(s) from HTTP endpoint
-	Recv(data interface{}) (http.Header, error)
-	RecvStatus(...int) (http.Header, error)
+	// Query defines URI parameters of the request
+	Query(interface{}) CURL
+	// Header defines request header
+	Header(string, string) CURL
+	// Status evalutes the request
+	Status(...int) (http.Header, error)
+	Get(interface{}) (http.Header, error)
+	Put(interface{}, ...interface{}) (http.Header, error)
+	Post(interface{}, ...interface{}) (http.Header, error)
 }
 
 // Authorizer provides access token for REST API client
