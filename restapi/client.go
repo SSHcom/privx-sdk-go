@@ -241,7 +241,6 @@ func (curl *tCURL) unsafeIO() *tCURL {
 		return curl
 	}
 
-	fmt.Println(curl.url)
 	req, err := http.NewRequest(curl.method, curl.url, curl.payload)
 	if curl.fail = err; err != nil {
 		return curl

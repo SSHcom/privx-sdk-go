@@ -18,17 +18,13 @@ import (
 )
 
 //
-type mockIdP struct{ headers map[string]string }
+type mockIdP struct{ string }
 
-func (idp mockIdP) Headers() (map[string]string, error) {
-	return idp.headers, nil
+func (idp mockIdP) AccessToken() (string, error) {
+	return idp.string, nil
 }
 
-var access = restapi.AccessToken(
-	mockIdP{map[string]string{
-		"Authorization": "Bearer trusted",
-	}},
-)
+var access = restapi.Auth(mockIdP{"Bearer trusted"})
 
 func TestGet(t *testing.T) {
 	ts := mockStatus()
