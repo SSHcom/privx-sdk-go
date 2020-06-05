@@ -7,6 +7,8 @@
 package oauth
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/url"
@@ -72,7 +74,7 @@ func (auth *tAuthCode) grantAuthorizationCode() error {
 	}
 
 	challenge, method := cv.ChallengeS256()
-	state, err := cv.Random()
+	state, err := auth.random()
 	if err != nil {
 		return err
 	}
@@ -169,4 +171,15 @@ func (auth *tAuth) authAccessToken(code string, cv pkce.CodeVerifier) (*AccessTo
 	}
 
 	return &token, err
+}
+
+func (auth *tAuth) random() (string, error) {
+	var buf [32]byte
+	_, err := rand.Read(buf[:])
+	if err != nil {
+		return "", err
+	}
+	return base64.RawURLEncoding.
+		WithPadding(base64.NoPadding).
+		EncodeToString(buf[:]), nil
 }
