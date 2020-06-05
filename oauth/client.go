@@ -52,15 +52,6 @@ type Client struct {
 	token          *AccessToken
 }
 
-// AccessToken contains OAuth2 access token information.
-type AccessToken struct {
-	AccessToken  string `json:"access_token"`
-	TokenType    string `json:"token_type"`
-	ExpiresIn    uint   `json:"expires_in"`
-	RefreshToken string `json:"refresh_token"`
-	notAfter     time.Time
-}
-
 // New creates a new OAuth2 client instance.
 func New(config Config, endpoint string, cert *x509.Certificate,
 	verbose bool) (*Client, error) {
@@ -198,9 +189,7 @@ func (client *Client) authorizationCodeGrant() (*AccessToken, error) {
 
 	token, err := client.authorizationEndpoint(challenge, method, state)
 	if err != nil {
-		return nil, errmap[string]string{
-			"Authorization": fmt.Sprintf("Bearer %s",client.token.AccessToken)
-		}
+		return nil, err
 	}
 
 	code, st, err := client.login(token)
@@ -402,7 +391,8 @@ func (client *Client) NewToken() (string, error) {
 	client.token = nil
 	client.m.Unlock()
 
-	return client.Token()
+	//return client.Token(), nil
+	return "", nil
 }
 
 func decodeError(location string, body []byte) error {

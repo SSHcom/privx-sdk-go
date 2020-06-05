@@ -20,7 +20,7 @@ import (
 //
 // tClient is an HTTP client instance.
 type tClient struct {
-	auth     Provider
+	auth     Authorizer
 	endpoint string
 	verbose  bool
 	retry    int
@@ -69,14 +69,13 @@ func (client *tClient) doWithRetry(req *http.Request) (*http.Response, error) {
 
 func (client *tClient) do(req *http.Request) (*http.Response, error) {
 	if client.auth != nil {
-		heads, err := client.auth.Headers()
+		token, err := client.auth.AccessToken()
 		if err != nil {
 			return nil, err
 		}
-		for h, v := range heads {
-			req.Header.Set(h, v)
-		}
+		req.Header.Set("Authorization", token)
 	}
+	req.Header.Set("User-Agent", UserAgent)
 
 	return client.http.Do(req)
 }

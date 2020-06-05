@@ -29,7 +29,13 @@ type CURL interface {
 	RecvStatus(...int) (http.Header, error)
 }
 
-// Provider define additional parameters to HTTP request
-type Provider interface {
-	Headers() (map[string]string, error)
+// Authorizer provides access token for REST API client
+type Authorizer interface {
+	AccessToken() (string, error)
 }
+
+const (
+	// UserAgent specifies the HTTP user-agent string for the SDK
+	// clients.
+	UserAgent = "privx-sdk-go"
+)

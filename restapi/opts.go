@@ -23,8 +23,8 @@ func Endpoint(endpoint string) Option {
 	}
 }
 
-// AccessToken setup access token provider for api
-func AccessToken(auth Provider) Option {
+// Auth setup access token provider for api
+func Auth(auth Authorizer) Option {
 	return func(client *tClient) *tClient {
 		client.auth = auth
 		return client

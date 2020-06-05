@@ -49,10 +49,10 @@ func (store *Client) SearchUsers(keywords, source string) ([]*User, error) {
 }
 
 // GetUser gets information about the argument user ID.
-func (store *Client) GetUser(id string) (user *User, err error) {
+func (store *Client) GetUser(id string) (user User, err error) {
 	_, err = store.api.
 		Get("/role-store/api/v1/users/%s", url.PathEscape(id)).
-		Recv(user)
+		Recv(&user)
 
 	return
 }
