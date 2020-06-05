@@ -197,9 +197,6 @@ func (curl *tCURL) Recv(data interface{}) (http.Header, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("---")
-	fmt.Println(string(body))
-	fmt.Println("---")
 
 	if curl.output.StatusCode != http.StatusOK {
 		return nil, ErrorFromResponse(curl.output, body)
