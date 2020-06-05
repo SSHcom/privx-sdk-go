@@ -15,6 +15,27 @@ The latest version of SDK is available at `master` branch of the repository. All
 
 **Work in Progress**
 
+### Obtain Access Token
+
+Usage of PrivX API requires valid access token. Use one of supported `oauth` strategy:
+* `oauth2.WithClientID` uses client credentials to access api
+* `oauth2.WithCredential` uses access/secret credentials to access api
+
+
+```go
+auth := oauth2.WithCredential(
+	oauth2.Credential{Access: "...", Secret: "..."},
+	restapi.Endpoint("https://privx.example.com"),
+)
+
+client := restapi.New(
+	restapi.Auth(auth),
+	restapi.Endpoint("https://privx.example.com"),
+)
+
+rolestore.New(client)
+```
+
 ## Bugs
 
 If you experience any issues with the library, please let us know via [GitHub issues](https://github.com/SSHcom/privx-sdk-go/issues). We appreciate detailed and accurate reports that help us to identity and replicate the issue.
