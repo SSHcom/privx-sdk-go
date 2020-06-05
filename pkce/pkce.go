@@ -63,3 +63,15 @@ func (v CodeVerifier) Verify(challenge, method string) bool {
 	computed, _ := v.ChallengeS256()
 	return computed == challenge
 }
+
+// Random generates string
+func (v CodeVerifier) Random() (string, error) {
+	var buf [32]byte
+	_, err := rand.Read(buf[:])
+	if err != nil {
+		return "", err
+	}
+	return base64.RawURLEncoding.
+		WithPadding(base64.NoPadding).
+		EncodeToString(buf[:]), nil
+}

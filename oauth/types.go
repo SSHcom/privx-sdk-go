@@ -13,7 +13,8 @@ import (
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-// Credential is access/secret pair
+// Credential is pair of access/secret pair.
+// Use to create authenticators for api
 type Credential struct {
 	Access string
 	Secret string
@@ -41,7 +42,7 @@ type tAuth struct {
 	pending bool
 }
 
-//
+// synchronized closure execution in the context of authorizer
 func (auth *tAuth) synchronized(f func() error) (err error) {
 	auth.L.Lock()
 	for auth.pending {
@@ -60,4 +61,42 @@ func (auth *tAuth) synchronized(f func() error) (err error) {
 	}
 
 	return
+}
+
+// tClientID is a pair of unique client id and redirect uri
+type tClientID struct {
+	ID          string `json:"client_id"`
+	RedirectURI string `json:"redirect_uri"`
+}
+
+// reqAuthSession establishes new auth session
+type reqAuthSession struct {
+	tClientID
+	ResponseType  string `json:"response_type"`
+	State         string `json:"state"`
+	UserAgent     string `json:"user_agent"`
+	CodeChallenge string `json:"code_challenge"`
+	CodeMethod    string `json:"code_challenge_method"`
+}
+
+// reqExchangeCode fetches the code from authorizer
+type reqExchangeCode struct {
+	Access string `json:"username"`
+	Secret string `json:"password"`
+	Token  string `json:"token"`
+}
+
+// reqAccessToken exchanges the code for access token
+type reqAccessToken struct {
+	tClientID
+	GrantType  string `json:"grant_type"`
+	Code       string `json:"code"`
+	CodeVerify string `json:"code_verifier"`
+}
+
+// reqAccessToken
+type reqAccessTokenPassword struct {
+	GrantType string `json:"grant_type"`
+	Access    string `json:"username"`
+	Secret    string `json:"password"`
 }

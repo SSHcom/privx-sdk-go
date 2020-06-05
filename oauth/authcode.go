@@ -7,21 +7,17 @@
 package oauth
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"sync"
 	"time"
 
+	"github.com/SSHcom/privx-sdk-go/pkce"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-// ClientID is a pair of unique client id and redirect uri
-type ClientID struct {
-	ID          string `json:"client_id"`
-	RedirectURI string `json:"redirect_uri"`
-}
-
-var clientID = ClientID{
+var clientID = tClientID{
 	ID:          "privx-ui",
 	RedirectURI: "/privx/oauth-callback",
 }
@@ -31,7 +27,23 @@ type tAuthCode struct {
 	credential Credential
 }
 
-// WithCredential obtains access token using access/secret key pair
+/*
+
+WithCredential executes OAuth2 Authorization Code Grant
+It uses access/secret key pair to authenticate client
+
+  auth := oauth2.WithCredential(
+		oauth2.Credential{Access: "...", Secret: "..."},
+		restapi.Endpoint("https://privx.example.com"),
+	)
+
+	client := restapi.New(
+		restapi.Auth(auth),
+		restapi.Endpoint("https://privx.example.com"),
+	)
+
+	rolestore.New(client)
+*/
 func WithCredential(credential Credential, opts ...restapi.Option) restapi.Authorizer {
 	client := restapi.New(append(opts, restapi.NoRedirect())...)
 
@@ -54,17 +66,28 @@ func (auth *tAuthCode) AccessToken() (token string, err error) {
 func (auth *tAuthCode) grantAuthorizationCode() error {
 	auth.token = nil
 
-	session, err := auth.authSession()
+	cv, err := pkce.NewCodeVerifier()
 	if err != nil {
 		return err
 	}
 
-	exchange, err := auth.authCredential(session)
+	challenge, method := cv.ChallengeS256()
+	state, err := cv.Random()
 	if err != nil {
 		return err
 	}
 
-	token, err := auth.authAccessToken(exchange)
+	session, err := auth.authSession(challenge, method, state)
+	if err != nil {
+		return err
+	}
+
+	exchange, err := auth.authCredential(session, state)
+	if err != nil {
+		return err
+	}
+
+	token, err := auth.authAccessToken(exchange, cv)
 	if err != nil {
 		return err
 	}
@@ -73,15 +96,15 @@ func (auth *tAuthCode) grantAuthorizationCode() error {
 	return nil
 }
 
-func (auth *tAuthCode) authSession() (string, error) {
-	request := struct {
-		ClientID
-		ResponseType string `json:"response_type"`
-		State        string `json:"state"`
-	}{
-		ClientID:     clientID,
-		ResponseType: "code",
-		State:        "",
+//
+func (auth *tAuthCode) authSession(challenge, method, state string) (string, error) {
+	request := reqAuthSession{
+		tClientID:     clientID,
+		ResponseType:  "code",
+		State:         state,
+		UserAgent:     restapi.UserAgent,
+		CodeChallenge: challenge,
+		CodeMethod:    method,
 	}
 
 	head, err := auth.client.
@@ -101,19 +124,17 @@ func (auth *tAuthCode) authSession() (string, error) {
 	return uri.Query().Get("token"), nil
 }
 
-func (auth *tAuthCode) authCredential(session string) (string, error) {
-	request := struct {
-		Access string `json:"username"`
-		Secret string `json:"password"`
-		Token  string `json:"token"`
-	}{
+//
+func (auth *tAuthCode) authCredential(session, state string) (string, error) {
+	request := reqExchangeCode{
 		Access: auth.credential.Access,
 		Secret: auth.credential.Secret,
 		Token:  session,
 	}
 
 	var response struct {
-		Code string `json:"code"`
+		Code  string `json:"code"`
+		State string `json:"state"`
 	}
 
 	_, err := auth.client.
@@ -121,18 +142,20 @@ func (auth *tAuthCode) authCredential(session string) (string, error) {
 		Send(request).
 		Recv(&response)
 
+	if response.State != state {
+		return "", errors.New("invalid response state")
+	}
+
 	return response.Code, err
 }
 
-func (auth *tAuth) authAccessToken(code string) (*AccessToken, error) {
-	request := struct {
-		ClientID
-		GrantType string `json:"grant_type"`
-		Code      string `json:"code"`
-	}{
-		ClientID:  clientID,
-		GrantType: "authorization_code",
-		Code:      code,
+//
+func (auth *tAuth) authAccessToken(code string, cv pkce.CodeVerifier) (*AccessToken, error) {
+	request := reqAccessToken{
+		tClientID:  clientID,
+		GrantType:  "authorization_code",
+		Code:       code,
+		CodeVerify: cv.String(),
 	}
 	var token AccessToken
 
