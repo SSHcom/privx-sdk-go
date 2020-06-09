@@ -20,11 +20,11 @@ import (
 //
 // tClient is an HTTP client instance.
 type tClient struct {
-	auth     Authorizer
-	endpoint string
-	verbose  bool
-	retry    int
-	http     *http.Client
+	auth    Authorizer
+	baseURL string
+	verbose bool
+	retry   int
+	http    *http.Client
 }
 
 //
@@ -80,11 +80,17 @@ func (client *tClient) do(req *http.Request) (*http.Response, error) {
 	return client.http.Do(req)
 }
 
-// URL creates URL connector
-func (client *tClient) URL(templateURL string, args ...interface{}) CURL {
+// URL creates a connector to specified endpoint. It is either absolute
+// URL or relative path to base url
+func (client *tClient) URL(templatePath string, args ...interface{}) CURL {
+	target := fmt.Sprintf(templatePath, args...)
+	if target[0] == '/' {
+		target = client.baseURL + target
+	}
+
 	return &tCURL{
 		client:  client,
-		url:     client.endpoint + fmt.Sprintf(templateURL, args...),
+		url:     target,
 		header:  http.Header{},
 		payload: bytes.NewBuffer(nil),
 	}
