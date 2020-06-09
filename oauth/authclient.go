@@ -72,11 +72,10 @@ func (auth *tAuthPassword) grantPasswordCredentials() error {
 	var token AccessToken
 
 	_, err := auth.client.
-		Post("/auth/api/v1/oauth/token").
-		With("Content-Type", "application/x-www-form-urlencoded").
-		With("Authorization", "Basic "+auth.digest).
-		Send(request).
-		Recv(&token)
+		URL("/auth/api/v1/oauth/token").
+		Header("Content-Type", "application/x-www-form-urlencoded").
+		Header("Authorization", "Basic "+auth.digest).
+		Post(request, &token)
 
 	if err != nil {
 		token.notAfter = time.Now().Add(

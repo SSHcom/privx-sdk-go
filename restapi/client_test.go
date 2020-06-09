@@ -30,8 +30,8 @@ func TestGet(t *testing.T) {
 	ts := mockStatus()
 	defer ts.Close()
 
-	_, err := restapi.New(restapi.Endpoint(ts.URL)).
-		Get("/users/%v", 1).RecvStatus()
+	_, err := restapi.New(restapi.BaseURL(ts.URL)).
+		URL("/users/%v", 1).Status()
 
 	if err != nil {
 		t.Errorf("client get fails: %w", err)
@@ -42,8 +42,8 @@ func TestGetFails(t *testing.T) {
 	ts := mockStatus()
 	defer ts.Close()
 
-	_, err := restapi.New(restapi.Endpoint(ts.URL)).
-		Get("/users/%v", 2).RecvStatus()
+	_, err := restapi.New(restapi.BaseURL(ts.URL)).
+		URL("/users/%v", 2).Status()
 
 	if err == nil {
 		t.Errorf("client get is not failing.")
@@ -53,52 +53,45 @@ func TestGetFails(t *testing.T) {
 	}
 }
 
-func TestSend(t *testing.T) {
+type T struct {
+	ID string `json:"id"`
+}
+
+func TestPut(t *testing.T) {
 	ts := mockStatus()
 	defer ts.Close()
 
-	type T struct {
-		ID string `json:"id"`
-	}
+	eg := T{ID: "id"}
+	in := T{}
 
-	methods := []restapi.CURL{
-		restapi.New(restapi.Endpoint(ts.URL)).Put("/echo"),
-		restapi.New(restapi.Endpoint(ts.URL)).Post("/echo"),
-	}
-
-	for _, method := range methods {
-		eg := T{ID: "id"}
-		in := T{}
-
-		_, err := method.Send(eg).Recv(&in)
-		if err != nil {
-			t.Errorf("client fails: %w", err)
-		}
-
-		if eg.ID != in.ID {
-			t.Errorf("unexpected response: %v", in)
-		}
-	}
-}
-
-func TestRecv(t *testing.T) {
-	ts := mock()
-	defer ts.Close()
-
-	var data struct {
-		ID string `json:"id"`
-	}
-
-	_, err := restapi.New(access, restapi.Endpoint(ts.URL)).
-		Get("/").
-		Recv(&data)
+	_, err := restapi.New(restapi.BaseURL(ts.URL)).
+		URL("/echo").Put(eg, &in)
 
 	if err != nil {
 		t.Errorf("client fails: %w", err)
 	}
 
-	if data.ID != "trusted" {
-		t.Errorf("unexpected response: %v", data)
+	if eg.ID != in.ID {
+		t.Errorf("unexpected response: %v", in)
+	}
+}
+
+func TestPost(t *testing.T) {
+	ts := mockStatus()
+	defer ts.Close()
+
+	eg := T{ID: "id"}
+	in := T{}
+
+	_, err := restapi.New(restapi.BaseURL(ts.URL)).
+		URL("/echo").Post(eg, &in)
+
+	if err != nil {
+		t.Errorf("client fails: %w", err)
+	}
+
+	if eg.ID != in.ID {
+		t.Errorf("unexpected response: %v", in)
 	}
 }
 
@@ -110,9 +103,8 @@ func TestRecvNoIdP(t *testing.T) {
 		ID string `json:"id"`
 	}
 
-	_, err := restapi.New(restapi.Endpoint(ts.URL)).
-		Get("/").
-		Recv(&data)
+	_, err := restapi.New(restapi.BaseURL(ts.URL)).
+		URL("/").Get(&data)
 
 	if err != nil {
 		t.Errorf("client fails: %w", err)

@@ -110,9 +110,9 @@ func (auth *tAuthCode) authSession(challenge, method, state string) (string, err
 	}
 
 	head, err := auth.client.
-		Get("/auth/api/v1/oauth/authorize").
-		Params(request).
-		RecvStatus(307)
+		URL("/auth/api/v1/oauth/authorize").
+		Query(request).
+		Status(307)
 
 	if err != nil {
 		return "", err
@@ -140,9 +140,8 @@ func (auth *tAuthCode) authCredential(session, state string) (string, error) {
 	}
 
 	_, err := auth.client.
-		Post("/auth/api/v1/login").
-		Send(request).
-		Recv(&response)
+		URL("/auth/api/v1/login").
+		Post(request, &response)
 
 	if response.State != state {
 		return "", errors.New("invalid response state")
@@ -162,10 +161,9 @@ func (auth *tAuth) authAccessToken(code string, cv pkce.CodeVerifier) (*AccessTo
 	var token AccessToken
 
 	_, err := auth.client.
-		Post("/auth/api/v1/oauth/token").
-		With("Content-Type", "application/x-www-form-urlencoded").
-		Send(request).
-		Recv(&token)
+		URL("/auth/api/v1/oauth/token").
+		Header("Content-Type", "application/x-www-form-urlencoded").
+		Post(request, &token)
 
 	if err != nil {
 		token.notAfter = time.Now().Add(

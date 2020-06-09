@@ -15,10 +15,10 @@ import (
 // Option is configuration applied to the client
 type Option func(*tClient) *tClient
 
-// Endpoint defines a target PrivX API endpoint
-func Endpoint(endpoint string) Option {
+// BaseURL defines a target PrivX server and possible path prefix
+func BaseURL(endpoint string) Option {
 	return func(client *tClient) *tClient {
-		client.endpoint = endpoint
+		client.baseURL = endpoint
 		return client
 	}
 }

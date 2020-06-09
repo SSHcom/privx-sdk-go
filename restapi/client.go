@@ -20,11 +20,11 @@ import (
 //
 // tClient is an HTTP client instance.
 type tClient struct {
-	auth     Authorizer
-	endpoint string
-	verbose  bool
-	retry    int
-	http     *http.Client
+	auth    Authorizer
+	baseURL string
+	verbose bool
+	retry   int
+	http    *http.Client
 }
 
 //
@@ -80,30 +80,20 @@ func (client *tClient) do(req *http.Request) (*http.Response, error) {
 	return client.http.Do(req)
 }
 
-// URL creates URL connector
-func (client *tClient) URL(method, url string) CURL {
+// URL creates a connector to specified endpoint. It is either absolute
+// URL or relative path to base url
+func (client *tClient) URL(templatePath string, args ...interface{}) CURL {
+	target := fmt.Sprintf(templatePath, args...)
+	if target[0] == '/' {
+		target = client.baseURL + target
+	}
+
 	return &tCURL{
 		client:  client,
-		method:  method,
-		url:     client.endpoint + url,
+		url:     target,
 		header:  http.Header{},
 		payload: bytes.NewBuffer(nil),
 	}
-}
-
-// Get creates URL connector
-func (client *tClient) Get(templateURL string, args ...interface{}) CURL {
-	return client.URL(http.MethodGet, fmt.Sprintf(templateURL, args...))
-}
-
-// Put creates URL connector
-func (client *tClient) Put(templateURL string, args ...interface{}) CURL {
-	return client.URL(http.MethodPut, fmt.Sprintf(templateURL, args...))
-}
-
-// Post creates URL connector
-func (client *tClient) Post(templateURL string, args ...interface{}) CURL {
-	return client.URL(http.MethodPost, fmt.Sprintf(templateURL, args...))
 }
 
 // CURL is a builder type, constructs HTTP request
@@ -117,8 +107,9 @@ type tCURL struct {
 	fail    error
 }
 
-// Params defines query parameters
-func (curl *tCURL) Params(data interface{}) CURL {
+//
+// Query defines URI parameters of the request
+func (curl *tCURL) Query(data interface{}) CURL {
 	params, err := curl.encodeURL(data)
 	if curl.fail = err; err != nil {
 		return curl
@@ -146,14 +137,74 @@ func (curl *tCURL) encodeURL(query interface{}) (url.Values, error) {
 	return values, nil
 }
 
-// With defines HTTP header
-func (curl *tCURL) With(head, value string) CURL {
+//
+// Header defines request header
+func (curl *tCURL) Header(head, value string) CURL {
 	curl.header.Add(head, value)
 	return curl
 }
 
-// Send payload to destination URL.
-func (curl *tCURL) Send(data interface{}) CURL {
+//
+// Status payload from target URL and discards it.
+func (curl *tCURL) Status(status ...int) (http.Header, error) {
+	curl.method = http.MethodGet
+	curl = curl.unsafeIO()
+	if curl.fail != nil {
+		return nil, curl.fail
+	}
+
+	defer curl.output.Body.Close()
+	body, err := ioutil.ReadAll(curl.output.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	expect := http.StatusOK
+	if len(status) == 1 {
+		expect = status[0]
+	}
+	if curl.output.StatusCode != expect {
+		return nil, ErrorFromResponse(curl.output, body)
+	}
+
+	return curl.output.Header, nil
+}
+
+//
+// Get fetches content from endpoint
+func (curl *tCURL) Get(in interface{}) (http.Header, error) {
+	curl.method = http.MethodGet
+	return curl.recv(in)
+}
+
+//
+// Put sends content to endpoint
+func (curl *tCURL) Put(eg interface{}, in ...interface{}) (http.Header, error) {
+	curl.method = http.MethodPut
+	curl.send(eg)
+
+	if len(in) > 0 {
+		return curl.recv(in[0])
+	}
+
+	return curl.Status()
+}
+
+//
+// Post sends content to endpoint
+func (curl *tCURL) Post(eg interface{}, in ...interface{}) (http.Header, error) {
+	curl.method = http.MethodPost
+	curl.send(eg)
+
+	if len(in) > 0 {
+		return curl.recv(in[0])
+	}
+
+	return curl.Status()
+}
+
+// send payload to destination URL.
+func (curl *tCURL) send(data interface{}) CURL {
 	if curl.fail != nil {
 		return curl
 	}
@@ -184,8 +235,8 @@ func (curl *tCURL) encodeForm(data interface{}) CURL {
 	return curl
 }
 
-// Recv payload from target URL.
-func (curl *tCURL) Recv(data interface{}) (http.Header, error) {
+// recv payload from target URL.
+func (curl *tCURL) recv(data interface{}) (http.Header, error) {
 	curl = curl.unsafeIO()
 
 	if curl.fail != nil {
@@ -205,31 +256,6 @@ func (curl *tCURL) Recv(data interface{}) (http.Header, error) {
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return nil, err
-	}
-
-	return curl.output.Header, nil
-}
-
-// RecvStatus payload from target URL and discards it.
-func (curl *tCURL) RecvStatus(status ...int) (http.Header, error) {
-	curl = curl.unsafeIO()
-
-	if curl.fail != nil {
-		return nil, curl.fail
-	}
-
-	defer curl.output.Body.Close()
-	body, err := ioutil.ReadAll(curl.output.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	expect := http.StatusOK
-	if len(status) == 1 {
-		expect = status[0]
-	}
-	if curl.output.StatusCode != expect {
-		return nil, ErrorFromResponse(curl.output, body)
 	}
 
 	return curl.output.Header, nil
