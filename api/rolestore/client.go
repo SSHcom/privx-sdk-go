@@ -9,12 +9,12 @@ package rolestore
 import (
 	"net/url"
 
-	"github.com/SSHcom/privx-sdk-go/api"
+	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
 // Client is a role-store client instance.
 type Client struct {
-	api api.Connector
+	api restapi.Connector
 }
 
 type usersResult struct {
@@ -29,7 +29,7 @@ type rolesResult struct {
 
 // New creates a new role-store client instance, using the
 // argument SDK API client.
-func New(api api.Connector) *Client {
+func New(api restapi.Connector) *Client {
 	return &Client{api: api}
 }
 
@@ -37,7 +37,7 @@ func New(api api.Connector) *Client {
 // criteria.
 func (store *Client) SearchUsers(keywords, source string) ([]*User, error) {
 	result := usersResult{}
-	err := store.api.
+	_, err := store.api.
 		Post("/role-store/api/v1/users/search").
 		Send(map[string]string{
 			"keywords": keywords,
@@ -49,10 +49,10 @@ func (store *Client) SearchUsers(keywords, source string) ([]*User, error) {
 }
 
 // GetUser gets information about the argument user ID.
-func (store *Client) GetUser(id string) (user *User, err error) {
-	err = store.api.
+func (store *Client) GetUser(id string) (user User, err error) {
+	_, err = store.api.
 		Get("/role-store/api/v1/users/%s", url.PathEscape(id)).
-		Recv(user)
+		Recv(&user)
 
 	return
 }
@@ -60,7 +60,7 @@ func (store *Client) GetUser(id string) (user *User, err error) {
 // GetUserRoles gets the roles of the argument user ID.
 func (store *Client) GetUserRoles(id string) ([]*Role, error) {
 	result := rolesResult{}
-	err := store.api.
+	_, err := store.api.
 		Get("/role-store/api/v1/users/%s/roles", url.PathEscape(id)).
 		Recv(&result)
 
@@ -123,16 +123,18 @@ func (store *Client) RemoveUserRole(userID, roleID string) error {
 }
 
 func (store *Client) setUserRoles(userID string, roles []*Role) error {
-	return store.api.
+	_, err := store.api.
 		Put("/role-store/api/v1/users/%s/roles", url.PathEscape(userID)).
 		RecvStatus()
+
+	return err
 }
 
 // GetRoles gets all configured roles.
 func (store *Client) GetRoles() ([]*Role, error) {
 	result := rolesResult{}
 
-	err := store.api.
+	_, err := store.api.
 		Get("/role-store/api/v1/roles").
 		Recv(&result)
 
@@ -141,7 +143,7 @@ func (store *Client) GetRoles() ([]*Role, error) {
 
 // GetRole gets information about the argument role ID.
 func (store *Client) GetRole(id string) (role Role, err error) {
-	err = store.api.
+	_, err = store.api.
 		Get("/role-store/api/v1/roles/%s", url.PathEscape(id)).
 		Recv(&role)
 
@@ -152,7 +154,7 @@ func (store *Client) GetRole(id string) (role Role, err error) {
 func (store *Client) GetRoleMembers(id string) ([]*User, error) {
 	result := usersResult{}
 
-	err := store.api.
+	_, err := store.api.
 		Get("/role-store/api/v1/roles/%s/members", url.PathEscape(id)).
 		Recv(&result)
 
