@@ -148,6 +148,10 @@ func (curl *tCURL) Header(head, value string) CURL {
 // Status payload from target URL and discards it.
 func (curl *tCURL) Status(status ...int) (http.Header, error) {
 	curl.method = http.MethodGet
+	return curl.status()
+}
+
+func (curl *tCURL) status(status ...int) (http.Header, error) {
 	curl = curl.unsafeIO()
 	if curl.fail != nil {
 		return nil, curl.fail
@@ -189,7 +193,7 @@ func (curl *tCURL) Put(eg interface{}, in ...interface{}) (http.Header, error) {
 		return curl.recv(in[0])
 	}
 
-	return curl.Status()
+	return curl.status()
 }
 
 //
@@ -202,7 +206,7 @@ func (curl *tCURL) Post(eg interface{}, in ...interface{}) (http.Header, error) 
 		return curl.recv(in[0])
 	}
 
-	return curl.Status()
+	return curl.status()
 }
 
 // send payload to destination URL.
@@ -251,7 +255,7 @@ func (curl *tCURL) recv(data interface{}) (http.Header, error) {
 		return nil, err
 	}
 
-	if curl.output.StatusCode != http.StatusOK {
+	if curl.output.StatusCode >= http.StatusBadRequest {
 		return nil, ErrorFromResponse(curl.output, body)
 	}
 

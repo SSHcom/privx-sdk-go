@@ -42,10 +42,9 @@ type Service struct {
 
 // Principal of the target host
 type Principal struct {
-	ID         string             `json:"principal"`
-	Passphrase string             `json:"passphrase"`
-	Source     Source             `json:"source"`
-	Roles      []rolestore.RoleID `json:"roles"`
+	ID     string              `json:"principal"`
+	Roles  []rolestore.RoleRef `json:"roles"`
+	Source Source              `json:"source"`
 }
 
 // Host defines PrivX target
@@ -65,5 +64,14 @@ func (scheme Scheme) Service(addr Address, port int) Service {
 		Address: addr,
 		Port:    port,
 		Source:  UI,
+	}
+}
+
+// NewPrincipal creates a corresponding definition from roles
+func NewPrincipal(id string, role ...rolestore.RoleRef) Principal {
+	return Principal{
+		ID:     id,
+		Roles:  role,
+		Source: UI,
 	}
 }

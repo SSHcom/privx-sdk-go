@@ -22,10 +22,14 @@ func New(api restapi.Connector) *Client {
 }
 
 // Register target host to PrivX
-func (hosts Client) Register(host Host) error {
+func (hosts Client) Register(host Host) (string, error) {
+	var id struct {
+		ID string `json:"id"`
+	}
+
 	_, err := hosts.api.
 		URL("/host-store/api/v1/hosts").
-		Post(&host)
+		Post(&host, &id)
 
-	return err
+	return id.ID, err
 }

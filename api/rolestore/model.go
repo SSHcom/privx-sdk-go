@@ -33,6 +33,12 @@ type Role struct {
 	MemberCount int      `json:"member_count"`
 }
 
+// RoleRef is a reference to role object
+type RoleRef struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 // Context defines the context information for a role.
 type Context struct {
 	Enabled   bool   `json:"enabled"`
