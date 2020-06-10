@@ -159,12 +159,14 @@ func (curl *tCURL) Status(status ...int) (http.Header, error) {
 		return nil, err
 	}
 
-	expect := http.StatusOK
 	if len(status) == 1 {
-		expect = status[0]
-	}
-	if curl.output.StatusCode != expect {
-		return nil, ErrorFromResponse(curl.output, body)
+		if curl.output.StatusCode != status[0] {
+			return nil, ErrorFromResponse(curl.output, body)
+		}
+	} else {
+		if curl.output.StatusCode >= http.StatusBadRequest {
+			return nil, ErrorFromResponse(curl.output, body)
+		}
 	}
 
 	return curl.output.Header, nil
