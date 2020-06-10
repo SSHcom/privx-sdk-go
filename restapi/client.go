@@ -163,17 +163,22 @@ func (curl *tCURL) status(status ...int) (http.Header, error) {
 		return nil, err
 	}
 
+	curl.fail = curl.isSuccess(body, status...)
+	return curl.unWrap()
+}
+
+func (curl *tCURL) isSuccess(body []byte, status ...int) error {
 	if len(status) == 1 {
 		if curl.output.StatusCode != status[0] {
-			return nil, ErrorFromResponse(curl.output, body)
+			return ErrorFromResponse(curl.output, body)
 		}
 	} else {
 		if curl.output.StatusCode >= http.StatusBadRequest {
-			return nil, ErrorFromResponse(curl.output, body)
+			return ErrorFromResponse(curl.output, body)
 		}
 	}
 
-	return curl.output.Header, nil
+	return nil
 }
 
 //
@@ -255,16 +260,8 @@ func (curl *tCURL) recv(data interface{}) (http.Header, error) {
 		return nil, err
 	}
 
-	if curl.output.StatusCode >= http.StatusBadRequest {
-		return nil, ErrorFromResponse(curl.output, body)
-	}
-
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		return nil, err
-	}
-
-	return curl.output.Header, nil
+	curl.fail = curl.isSuccess(body)
+	return curl.unWrapWithData(body, data)
 }
 
 //
@@ -284,4 +281,27 @@ func (curl *tCURL) unsafeIO() *tCURL {
 
 	curl.output, curl.fail = curl.client.doWithRetry(req)
 	return curl
+}
+
+// unWrap tCURL object to results
+func (curl *tCURL) unWrap() (http.Header, error) {
+	if curl.fail != nil {
+		return nil, curl.fail
+	}
+
+	return curl.output.Header, nil
+}
+
+// unWrap tCURL object to results and decodes JSON
+func (curl *tCURL) unWrapWithData(body []byte, data interface{}) (http.Header, error) {
+	if curl.fail != nil {
+		return nil, curl.fail
+	}
+
+	err := json.Unmarshal(body, &data)
+	if err != nil {
+		return nil, err
+	}
+
+	return curl.output.Header, nil
 }
