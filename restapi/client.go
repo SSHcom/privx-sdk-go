@@ -214,6 +214,18 @@ func (curl *tCURL) Post(eg interface{}, in ...interface{}) (http.Header, error) 
 	return curl.status()
 }
 
+//
+// Delete removes content behind url
+func (curl *tCURL) Delete(in ...interface{}) (http.Header, error) {
+	curl.method = http.MethodDelete
+
+	if len(in) > 0 {
+		return curl.recv(in[0])
+	}
+
+	return curl.status()
+}
+
 // send payload to destination URL.
 func (curl *tCURL) send(data interface{}) CURL {
 	if curl.fail != nil {
@@ -262,6 +274,24 @@ func (curl *tCURL) recv(data interface{}) (http.Header, error) {
 
 	curl.fail = curl.isSuccess(body)
 	return curl.unWrapWithData(body, data)
+}
+
+// Fetch receive raw content
+func (curl *tCURL) Fetch() ([]byte, error) {
+	curl.method = http.MethodGet
+	curl = curl.unsafeIO()
+
+	if curl.fail != nil {
+		return nil, curl.fail
+	}
+
+	defer curl.output.Body.Close()
+	body, err := ioutil.ReadAll(curl.output.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
 }
 
 //
