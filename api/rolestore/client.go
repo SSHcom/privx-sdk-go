@@ -18,13 +18,13 @@ type Client struct {
 }
 
 type usersResult struct {
-	Count int     `json:"count"`
-	Items []*User `json:"items"`
+	Count int    `json:"count"`
+	Items []User `json:"items"`
 }
 
 type rolesResult struct {
-	Count int     `json:"count"`
-	Items []*Role `json:"items"`
+	Count int    `json:"count"`
+	Items []Role `json:"items"`
 }
 
 // New creates a new role-store client instance, using the
@@ -35,7 +35,7 @@ func New(api restapi.Connector) *Client {
 
 // SearchUsers searches for users, matching the keywords and source
 // criteria.
-func (store *Client) SearchUsers(keywords, source string) ([]*User, error) {
+func (store *Client) SearchUsers(keywords, source string) ([]User, error) {
 	result := usersResult{}
 	_, err := store.api.
 		URL("/role-store/api/v1/users/search").
@@ -48,16 +48,18 @@ func (store *Client) SearchUsers(keywords, source string) ([]*User, error) {
 }
 
 // GetUser gets information about the argument user ID.
-func (store *Client) GetUser(id string) (user User, err error) {
+func (store *Client) GetUser(id string) (user *User, err error) {
+	user = new(User)
+
 	_, err = store.api.
 		URL("/role-store/api/v1/users/%s", url.PathEscape(id)).
-		Get(&user)
+		Get(user)
 
 	return
 }
 
 // GetUserRoles gets the roles of the argument user ID.
-func (store *Client) GetUserRoles(id string) ([]*Role, error) {
+func (store *Client) GetUserRoles(id string) ([]Role, error) {
 	result := rolesResult{}
 	_, err := store.api.
 		URL("/role-store/api/v1/users/%s/roles", url.PathEscape(id)).
@@ -89,7 +91,7 @@ func (store *Client) AddUserRole(userID, roleID string) error {
 	}
 
 	// Add an explicit role grant request.
-	roles = append(roles, &Role{
+	roles = append(roles, Role{
 		ID:       role.ID,
 		Explicit: true,
 	})
@@ -106,7 +108,7 @@ func (store *Client) RemoveUserRole(userID, roleID string) error {
 		return err
 	}
 	// Remove role from user's roles.
-	var newRoles []*Role
+	var newRoles []Role
 	for _, role := range roles {
 		if role.ID != roleID {
 			newRoles = append(newRoles, role)
@@ -121,7 +123,7 @@ func (store *Client) RemoveUserRole(userID, roleID string) error {
 	return store.setUserRoles(userID, newRoles)
 }
 
-func (store *Client) setUserRoles(userID string, roles []*Role) error {
+func (store *Client) setUserRoles(userID string, roles []Role) error {
 	_, err := store.api.
 		URL("/role-store/api/v1/users/%s/roles", url.PathEscape(userID)).
 		Put(roles)
@@ -130,7 +132,7 @@ func (store *Client) setUserRoles(userID string, roles []*Role) error {
 }
 
 // GetRoles gets all configured roles.
-func (store *Client) GetRoles() ([]*Role, error) {
+func (store *Client) GetRoles() ([]Role, error) {
 	result := rolesResult{}
 
 	_, err := store.api.
@@ -141,16 +143,18 @@ func (store *Client) GetRoles() ([]*Role, error) {
 }
 
 // GetRole gets information about the argument role ID.
-func (store *Client) GetRole(id string) (role Role, err error) {
+func (store *Client) GetRole(id string) (role *Role, err error) {
+	role = new(Role)
+
 	_, err = store.api.
 		URL("/role-store/api/v1/roles/%s", url.PathEscape(id)).
-		Get(&role)
+		Get(role)
 
 	return
 }
 
 // GetRoleMembers gets all members (users) of the argument role ID.
-func (store *Client) GetRoleMembers(id string) ([]*User, error) {
+func (store *Client) GetRoleMembers(id string) ([]User, error) {
 	result := usersResult{}
 
 	_, err := store.api.
