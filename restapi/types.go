@@ -25,6 +25,8 @@ type CURL interface {
 	Get(interface{}) (http.Header, error)
 	Put(interface{}, ...interface{}) (http.Header, error)
 	Post(interface{}, ...interface{}) (http.Header, error)
+	Delete(...interface{}) (http.Header, error)
+	Fetch() ([]byte, error)
 }
 
 // Authorizer provides access token for REST API client
