@@ -20,7 +20,7 @@ func New(api restapi.Connector) *Client {
 	return &Client{api: api}
 }
 
-// ConfigExtender fetches configugartion file
+// ConfigExtender fetches configuration file
 func (files Client) ConfigExtender(id string) ([]byte, error) {
 	var session struct {
 		ID string `json:"session_id"`
