@@ -21,7 +21,7 @@ func New(api restapi.Connector) *Client {
 }
 
 // ConfigExtender fetches configuration file
-func (files Client) ConfigExtender(id string) ([]byte, error) {
+func (files *Client) ConfigExtender(id string) ([]byte, error) {
 	var session struct {
 		ID string `json:"session_id"`
 	}
@@ -38,3 +38,4 @@ func (files Client) ConfigExtender(id string) ([]byte, error) {
 		URL("/authorizer/api/v1/extender/conf/%s/%s", id, session.ID).
 		Fetch()
 }
+
