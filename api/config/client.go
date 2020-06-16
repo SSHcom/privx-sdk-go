@@ -10,18 +10,18 @@ import (
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-// ConfigStore is a role-store client instance.
-type ConfigStore struct {
+// ConfFileStore is a role-store client instance.
+type ConfFileStore struct {
 	api restapi.Connector
 }
 
 // New creates a new client instance to fetch config files from PrivX
-func New(api restapi.Connector) *ConfigStore {
-	return &ConfigStore{api: api}
+func New(api restapi.Connector) *ConfFileStore {
+	return &ConfFileStore{api: api}
 }
 
 // ConfigExtender fetches configuration file
-func (store *ConfigStore) ConfigExtender(id string) ([]byte, error) {
+func (store *ConfFileStore) ConfigExtender(id string) ([]byte, error) {
 	var session struct {
 		ID string `json:"session_id"`
 	}

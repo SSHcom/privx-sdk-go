@@ -12,7 +12,7 @@ import (
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-// Client is a role-store client instance.
+// RoleStore is a role-store client instance.
 type RoleStore struct {
 	api restapi.Connector
 }
