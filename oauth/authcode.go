@@ -12,7 +12,6 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"sync"
 	"time"
 
 	"github.com/SSHcom/privx-sdk-go/pkce"
@@ -46,15 +45,7 @@ It uses access/secret key pair to authenticate client
 
 */
 func WithCredential(client restapi.Connector, opts ...Option) restapi.Authorizer {
-	auth := &tAuth{
-		Cond:   sync.NewCond(new(sync.Mutex)),
-		client: client,
-	}
-
-	for _, opt := range opts {
-		auth = opt(auth)
-	}
-	return &tAuthCode{tAuth: auth}
+	return &tAuthCode{tAuth: newAuth(client, opts...)}
 }
 
 func (auth *tAuthCode) AccessToken() (token string, err error) {

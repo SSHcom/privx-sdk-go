@@ -8,7 +8,6 @@ package oauth
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/SSHcom/privx-sdk-go/restapi"
@@ -35,15 +34,7 @@ It uses access/secret key pair to authenticate client
 	rolestore.New(client)
 */
 func WithClientID(client restapi.Connector, opts ...Option) restapi.Authorizer {
-	auth := &tAuth{
-		Cond:   sync.NewCond(new(sync.Mutex)),
-		client: client,
-	}
-
-	for _, opt := range opts {
-		auth = opt(auth)
-	}
-	return &tAuthPassword{tAuth: auth}
+	return &tAuthPassword{tAuth: newAuth(client, opts...)}
 }
 
 func (auth *tAuthPassword) AccessToken() (token string, err error) {

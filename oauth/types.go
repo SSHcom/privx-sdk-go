@@ -38,6 +38,19 @@ type tAuth struct {
 	pending bool
 }
 
+//
+func newAuth(client restapi.Connector, opts ...Option) *tAuth {
+	auth := &tAuth{
+		Cond:   sync.NewCond(new(sync.Mutex)),
+		client: client,
+	}
+
+	for _, opt := range opts {
+		auth = opt(auth)
+	}
+	return auth
+}
+
 // synchronized closure execution in the context of authorizer
 func (auth *tAuth) synchronized(f func() error) (err error) {
 	auth.L.Lock()
