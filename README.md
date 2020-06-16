@@ -15,25 +15,122 @@ The latest version of SDK is available at `master` branch of the repository. All
 
 **Work in Progress**
 
-### Obtain Access Token
+### Instantiate SDK Client
 
-Usage of PrivX API requires valid access token. Use one of supported `oauth` strategy:
-* `oauth2.WithClientID` uses client credentials to access api
-* `oauth2.WithCredential` uses access/secret credentials to access api
+PrivX SDK composes API client from three independent layers:
+* `restapi` generic HTTPS transport layer
+* `oauth` implements OAuth2 access token grant flows
+* `api/...` type-safe implementation of PrivX API 
 
+Here is a typical workflow required to setup the client:
 
 ```go
-auth := oauth2.WithCredential(
-	oauth2.Credential{Access: "...", Secret: "..."},
-	restapi.Endpoint("https://privx.example.com"),
+// 1. Create Authorizer and Access Token Provider
+auth := oauth2.WithClientID(
+	restapi.New(/* use restapi options to config http */),
+
+	// Use oauth2 options to config authorizer
+	oauth2.Access(/* ... */),
+	oauth2.Secret(/* ... */),
 )
 
-client := restapi.New(
-	restapi.Auth(auth),
-	restapi.Endpoint("https://privx.example.com"),
+// 2. Create HTTP transport for PrivX API
+curl := restapi.New(
+	restapi.Auth(provider),
+
+  // Use other transport options
 )
 
-rolestore.New(client)
+// 3. Create API client of rolestore feature
+client := rolestore.New(curl)
+```
+
+### SDK Configuration providers
+
+As application developers you have three options to configure PrivX SDK
+* explicitly
+* using config files
+* using environment variable
+
+It is possible to cascade configurations.
+
+```go
+// 1. Explicit configuration
+curl := restapi.New(restapi.BaseURL(/* value */))
+
+// 2. Use config files
+curl := restapi.New(restapi.UseConfigFile(/* path to file */))
+
+// 3. Environment variable
+curl := restapi.New(restapi.UseEnvironment())
+
+// 4. Cascade the configuration
+curl := restapi.New(
+	// attempt to read data from config file
+	restapi.UseConfigFile(/* path to file */),
+	// attempt to read environment
+	restapi.UseEnvironment(),
+	// attempt to fetch data from command line flags 
+	restapi.BaseURL(/* command line value */)
+)
+```
+
+Please see available config option for [restapi](restapi/opts.go) and [oauth](oauth/opts.go).
+
+PrivX SDK `UseConfigFile` support following config file format
+
+```conf
+[api]
+
+# restapi.BaseURL(...)
+base_url="https://your-instance.privx.io"
+
+# restapi.X509(...)
+api_ca_crt=""" PEM certificate chain """
+
+[auth]
+
+# oauth.Access(...)
+api_client_id="00000000-0000-0000-0000-000000000000"
+
+# oauth.Secret(...)
+api_client_secret="some-random-base64"
+
+# oauth.Digest(...)
+oauth_client_id="privx-external"
+oauth_client_secret="another-random-base64"
+```
+
+PrivX SDK `UseEnvironment` support following environment variables
+
+```bash
+# restapi.BaseURL(...)
+export PRIVX_API_BASE_URL=https://your-instance.privx.io
+
+# oauth.Access(...)
+export PRIVX_API_CLIENT_ID=00000000-0000-0000-0000-000000000000
+
+# oauth.Secret(...)
+export PRIVX_API_CLIENT_SECRET=some-random-base64
+
+# oauth.Digest(...)
+export PRIVX_API_OAUTH_CLIENT_ID=privx-external
+export PRIVX_API_OAUTH_CLIENT_SECRET=another-random-base64
+```
+
+### Identity and Access Management
+
+Usage of PrivX SDK requires API credential, which are available from your PrivX
+deployment: Settings > API Clients > Add API Client.
+
+```go
+auth := oauth.WithClientID(/* ... */)
+```
+
+Alternatively, you can use api client on behalf of existing user using its credentials.
+
+```go
+auth := oauth.WithCredential(/* ... */)
 ```
 
 ## Bugs

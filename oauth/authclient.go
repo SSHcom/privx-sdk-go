@@ -7,7 +7,6 @@
 package oauth
 
 import (
-	"encoding/base64"
 	"fmt"
 	"sync"
 	"time"
@@ -15,11 +14,7 @@ import (
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-type tAuthPassword struct {
-	tAuth
-	apiClient Credential
-	digest    string
-}
+type tAuthPassword struct{ *tAuth }
 
 /*
 
@@ -27,11 +22,9 @@ WithClientID executes OAuth2 Resource Owner Password Grant
 It uses access/secret key pair to authenticate client
 
   auth := oauth2.WithClientID(
-		// API client API
-		oauth2.Credential{Access: "...", Secret: "..."},
-		// OAuth client digest
-		oauth2.Credential{Access: "...", Secret: "..."},
-		restapi.Endpoint("https://privx.example.com"),
+		restapi.New(...),
+		oauth2.Access(...),
+		oauth2.Secret(...),
 	)
 
 	client := restapi.New(
@@ -41,17 +34,16 @@ It uses access/secret key pair to authenticate client
 
 	rolestore.New(client)
 */
-func WithClientID(apiClient, digest Credential, opts ...restapi.Option) restapi.Authorizer {
-	client := restapi.New(append(opts, restapi.NoRedirect())...)
-
-	return &tAuthPassword{
-		tAuth: tAuth{
-			Cond:   sync.NewCond(new(sync.Mutex)),
-			client: client,
-		},
-		apiClient: apiClient,
-		digest:    base64.StdEncoding.EncodeToString([]byte(digest.Access + ":" + digest.Secret)),
+func WithClientID(client restapi.Connector, opts ...Option) restapi.Authorizer {
+	auth := &tAuth{
+		Cond:   sync.NewCond(new(sync.Mutex)),
+		client: client,
 	}
+
+	for _, opt := range opts {
+		auth = opt(auth)
+	}
+	return &tAuthPassword{tAuth: auth}
 }
 
 func (auth *tAuthPassword) AccessToken() (token string, err error) {
@@ -66,8 +58,8 @@ func (auth *tAuthPassword) grantPasswordCredentials() error {
 
 	request := reqAccessTokenPassword{
 		GrantType: "password",
-		Access:    auth.apiClient.Access,
-		Secret:    auth.apiClient.Secret,
+		Access:    auth.access,
+		Secret:    auth.secret,
 	}
 	var token AccessToken
 
