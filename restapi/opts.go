@@ -20,10 +20,10 @@ import (
 type Option func(*tClient) *tClient
 
 // BaseURL defines a target PrivX server and possible path prefix
-func BaseURL(endpoint *string) Option {
+func BaseURL(endpoint string) Option {
 	return func(client *tClient) *tClient {
-		if endpoint != nil {
-			client.baseURL = *endpoint
+		if endpoint != "" {
+			client.baseURL = endpoint
 		}
 		return client
 	}
@@ -98,14 +98,8 @@ func UseConfigFile(path *string) Option {
 			return client
 		}
 
-		if file.API.BaseURL != "" {
-			client = BaseURL(&file.API.BaseURL)(client)
-		}
-
-		if file.API.Certificate != nil {
-			client = X509(file.API.Certificate.X509)(client)
-		}
-
+		client = BaseURL(file.API.BaseURL)(client)
+		client = X509(file.API.Certificate.X509)(client)
 		return client
 	}
 }
@@ -114,7 +108,7 @@ func UseConfigFile(path *string) Option {
 func UseEnvironment() Option {
 	return func(client *tClient) *tClient {
 		if url, ok := os.LookupEnv("PRIVX_API_BASE_URL"); ok {
-			client = BaseURL(&url)(client)
+			client = BaseURL(url)(client)
 		}
 
 		return client

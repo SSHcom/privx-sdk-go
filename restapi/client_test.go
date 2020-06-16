@@ -30,7 +30,7 @@ func TestGet(t *testing.T) {
 	ts := mockStatus()
 	defer ts.Close()
 
-	_, err := restapi.New(restapi.BaseURL(&ts.URL)).
+	_, err := restapi.New(restapi.BaseURL(ts.URL)).
 		URL("/users/%v", 1).Status()
 
 	if err != nil {
@@ -42,7 +42,7 @@ func TestGetFails(t *testing.T) {
 	ts := mockStatus()
 	defer ts.Close()
 
-	_, err := restapi.New(restapi.BaseURL(&ts.URL)).
+	_, err := restapi.New(restapi.BaseURL(ts.URL)).
 		URL("/users/%v", 2).Status()
 
 	if err == nil {
@@ -64,7 +64,7 @@ func TestPut(t *testing.T) {
 	eg := T{ID: "id"}
 	in := T{}
 
-	_, err := restapi.New(restapi.BaseURL(&ts.URL)).
+	_, err := restapi.New(restapi.BaseURL(ts.URL)).
 		URL("/echo").Put(eg, &in)
 
 	if err != nil {
@@ -83,7 +83,7 @@ func TestPost(t *testing.T) {
 	eg := T{ID: "id"}
 	in := T{}
 
-	_, err := restapi.New(restapi.BaseURL(&ts.URL)).
+	_, err := restapi.New(restapi.BaseURL(ts.URL)).
 		URL("/echo").Post(eg, &in)
 
 	if err != nil {
@@ -103,7 +103,7 @@ func TestRecvNoIdP(t *testing.T) {
 		ID string `json:"id"`
 	}
 
-	_, err := restapi.New(restapi.BaseURL(&ts.URL)).
+	_, err := restapi.New(restapi.BaseURL(ts.URL)).
 		URL("/").Get(&data)
 
 	if err != nil {

@@ -18,30 +18,30 @@ import (
 type Option func(*tAuth) *tAuth
 
 // Access setups client access key
-func Access(access *string) Option {
+func Access(access string) Option {
 	return func(auth *tAuth) *tAuth {
-		if access != nil {
-			auth.access = *access
+		if access != "" {
+			auth.access = access
 		}
 		return auth
 	}
 }
 
 // Secret setups clients secret key
-func Secret(secret *string) Option {
+func Secret(secret string) Option {
 	return func(auth *tAuth) *tAuth {
-		if secret != nil {
-			auth.secret = *secret
+		if secret != "" {
+			auth.secret = secret
 		}
 		return auth
 	}
 }
 
 // Digest setups client secret digest
-func Digest(oauthAccess, oauthSecret *string) Option {
+func Digest(oauthAccess, oauthSecret string) Option {
 	return func(auth *tAuth) *tAuth {
-		if oauthAccess != nil && oauthSecret != nil {
-			auth.digest = base64.StdEncoding.EncodeToString([]byte(*oauthAccess + ":" + *oauthSecret))
+		if oauthAccess != "" && oauthSecret != "" {
+			auth.digest = base64.StdEncoding.EncodeToString([]byte(oauthAccess + ":" + oauthSecret))
 		}
 		return auth
 	}
@@ -80,18 +80,9 @@ func UseConfigFile(path *string) Option {
 			return auth
 		}
 
-		if file.Auth.ClientID != "" {
-			auth.access = file.Auth.ClientID
-		}
-
-		if file.Auth.ClientSecret != "" {
-			auth.secret = file.Auth.ClientSecret
-		}
-
-		if file.Auth.AuthClientID != "" && file.Auth.AuthClientSecret != "" {
-			auth = Digest(&file.Auth.AuthClientID, &file.Auth.AuthClientSecret)(auth)
-		}
-
+		auth = Access(file.Auth.ClientID)(auth)
+		auth = Secret(file.Auth.ClientSecret)(auth)
+		auth = Digest(file.Auth.AuthClientID, file.Auth.AuthClientSecret)(auth)
 		return auth
 	}
 }
@@ -100,16 +91,16 @@ func UseConfigFile(path *string) Option {
 func UseEnvironment() Option {
 	return func(auth *tAuth) *tAuth {
 		if access, ok := os.LookupEnv("PRIVX_API_CLIENT_ID"); ok {
-			auth.access = access
+			auth = Access(access)(auth)
 		}
 
 		if secret, ok := os.LookupEnv("PRIVX_API_CLIENT_SECRET"); ok {
-			auth.secret = secret
+			auth = Secret(secret)(auth)
 		}
 
 		if authAccess, ok := os.LookupEnv("PRIVX_API_OAUTH_CLIENT_ID"); ok {
 			if authSecret, ok := os.LookupEnv("PRIVX_API_OAUTH_CLIENT_SECRET"); ok {
-				auth = Digest(&authAccess, &authSecret)(auth)
+				auth = Digest(authAccess, authSecret)(auth)
 			}
 		}
 
