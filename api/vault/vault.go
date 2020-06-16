@@ -16,19 +16,19 @@ import (
 // can have nested values and objects.
 type Bag map[string]interface{}
 
-// Client is a Vault client instance.
-type Client struct {
+// Vault is client instance.
+type Vault struct {
 	api restapi.Connector
 }
 
 // New creates a new Vault client instance, using the argument
 // SDK API client.
-func New(api restapi.Connector) *Client {
-	return &Client{api: api}
+func New(api restapi.Connector) *Vault {
+	return &Vault{api: api}
 }
 
 // Get gets the content of the argument secret.
-func (vault *Client) Get(name string) (bag *Bag, err error) {
+func (vault *Vault) Get(name string) (bag *Bag, err error) {
 	bag = new(Bag)
 	_, err = vault.api.
 		URL("/vault/api/v1/secrets/%s", url.PathEscape(name)).
