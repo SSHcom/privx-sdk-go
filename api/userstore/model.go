@@ -4,7 +4,7 @@
 // All rights reserved.
 //
 
-package clients
+package userstore
 
 // ClientType is a type of trusted clients
 type ClientType string

@@ -4,29 +4,29 @@
 // All rights reserved.
 //
 
-package clients
+package userstore
 
 import (
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-// Client is a role-store client instance.
-type Client struct {
+// UserStore is a role-store client instance.
+type UserStore struct {
 	api restapi.Connector
 }
 
 // New creates a new user-store client instance
-func New(api restapi.Connector) *Client {
-	return &Client{api: api}
+func New(api restapi.Connector) *UserStore {
+	return &UserStore{api: api}
 }
 
 // CreateTrustedClient registers new client to PrivX
-func (clients *Client) CreateTrustedClient(client TrustedClient) (string, error) {
+func (store *UserStore) CreateTrustedClient(client TrustedClient) (string, error) {
 	var id struct {
 		ID string `json:"id"`
 	}
 
-	_, err := clients.api.
+	_, err := store.api.
 		URL("/local-user-store/api/v1/trusted-clients").
 		Post(client, &id)
 
@@ -34,12 +34,12 @@ func (clients *Client) CreateTrustedClient(client TrustedClient) (string, error)
 }
 
 // TrustedClients fetches all known trusted clients
-func (clients *Client) TrustedClients() ([]TrustedClient, error) {
+func (store *UserStore) TrustedClients() ([]TrustedClient, error) {
 	var seq struct {
 		Items []TrustedClient
 	}
 
-	_, err := clients.api.
+	_, err := store.api.
 		URL("/local-user-store/api/v1/trusted-clients").
 		Get(&seq)
 
@@ -47,10 +47,10 @@ func (clients *Client) TrustedClients() ([]TrustedClient, error) {
 }
 
 // TrustedClient returns details about the client
-func (clients *Client) TrustedClient(id string) (*TrustedClient, error) {
+func (store *UserStore) TrustedClient(id string) (*TrustedClient, error) {
 	client := new(TrustedClient)
 
-	_, err := clients.api.
+	_, err := store.api.
 		URL("/local-user-store/api/v1/trusted-clients/%s", id).
 		Get(client)
 
@@ -62,8 +62,8 @@ func (clients *Client) TrustedClient(id string) (*TrustedClient, error) {
 }
 
 // DeleteTrustedClient removes the client
-func (clients *Client) DeleteTrustedClient(id string) error {
-	_, err := clients.api.
+func (store *UserStore) DeleteTrustedClient(id string) error {
+	_, err := store.api.
 		URL("/local-user-store/api/v1/trusted-clients/%s", id).
 		Delete()
 
