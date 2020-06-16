@@ -4,30 +4,30 @@
 // All rights reserved.
 //
 
-package hosts
+package hoststore
 
 import (
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-// Client is a role-store client instance.
-type Client struct {
+// HostStore is a role-store client instance.
+type HostStore struct {
 	api restapi.Connector
 }
 
 // New creates a new host-store client instance
 // See http://apispecs.ssh.com/#swagger-ui-4 for details about api
-func New(api restapi.Connector) *Client {
-	return &Client{api: api}
+func New(api restapi.Connector) *HostStore {
+	return &HostStore{api: api}
 }
 
-// Register target host to PrivX
-func (hosts Client) Register(host Host) (string, error) {
+// RegisterHost append a target to PrivX
+func (store *HostStore) RegisterHost(host Host) (string, error) {
 	var id struct {
 		ID string `json:"id"`
 	}
 
-	_, err := hosts.api.
+	_, err := store.api.
 		URL("/host-store/api/v1/hosts").
 		Post(&host, &id)
 

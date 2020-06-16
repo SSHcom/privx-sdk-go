@@ -4,7 +4,7 @@
 // All rights reserved.
 //
 
-package hosts
+package hoststore
 
 import "github.com/SSHcom/privx-sdk-go/api/rolestore"
 
