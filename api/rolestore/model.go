@@ -31,6 +31,7 @@ type Role struct {
 	Permissions []string `json:"permissions"`
 	Context     *Context `json:"context"`
 	MemberCount int      `json:"member_count"`
+	PublicKey   []string `json:"principal_public_key_strings,omitempty"`
 }
 
 // RoleRef is a reference to role object
