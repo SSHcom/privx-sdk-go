@@ -13,13 +13,6 @@ import (
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-// Credential is pair of access/secret pair.
-// Use to create authenticators for api
-type Credential struct {
-	Access string
-	Secret string
-}
-
 // AccessToken contains OAuth2 access token information.
 type AccessToken struct {
 	AccessToken  string `json:"access_token"`
@@ -37,9 +30,25 @@ func (token *AccessToken) isInvalid() bool {
 // tAuth authorizer client
 type tAuth struct {
 	*sync.Cond
+	access  string
+	secret  string
+	digest  string
 	client  restapi.Connector
 	token   *AccessToken
 	pending bool
+}
+
+//
+func newAuth(client restapi.Connector, opts ...Option) *tAuth {
+	auth := &tAuth{
+		Cond:   sync.NewCond(new(sync.Mutex)),
+		client: client,
+	}
+
+	for _, opt := range opts {
+		auth = opt(auth)
+	}
+	return auth
 }
 
 // synchronized closure execution in the context of authorizer

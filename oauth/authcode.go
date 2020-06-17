@@ -12,7 +12,6 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"sync"
 	"time"
 
 	"github.com/SSHcom/privx-sdk-go/pkce"
@@ -24,10 +23,7 @@ var clientID = tClientID{
 	RedirectURI: "/privx/oauth-callback",
 }
 
-type tAuthCode struct {
-	tAuth
-	credential Credential
-}
+type tAuthCode struct{ *tAuth }
 
 /*
 
@@ -35,8 +31,9 @@ WithCredential executes OAuth2 Authorization Code Grant
 It uses access/secret key pair to authenticate client
 
   auth := oauth2.WithCredential(
-		oauth2.Credential{Access: "...", Secret: "..."},
-		restapi.Endpoint("https://privx.example.com"),
+		oauth2.Access(...),
+		oauth2.Secret(...),
+		oauth2.Transport(...),
 	)
 
 	client := restapi.New(
@@ -45,17 +42,10 @@ It uses access/secret key pair to authenticate client
 	)
 
 	rolestore.New(client)
-*/
-func WithCredential(credential Credential, opts ...restapi.Option) restapi.Authorizer {
-	client := restapi.New(append(opts, restapi.NoRedirect())...)
 
-	return &tAuthCode{
-		tAuth: tAuth{
-			Cond:   sync.NewCond(new(sync.Mutex)),
-			client: client,
-		},
-		credential: credential,
-	}
+*/
+func WithCredential(client restapi.Connector, opts ...Option) restapi.Authorizer {
+	return &tAuthCode{tAuth: newAuth(client, opts...)}
 }
 
 func (auth *tAuthCode) AccessToken() (token string, err error) {
@@ -129,8 +119,8 @@ func (auth *tAuthCode) authSession(challenge, method, state string) (string, err
 //
 func (auth *tAuthCode) authCredential(session, state string) (string, error) {
 	request := reqExchangeCode{
-		Access: auth.credential.Access,
-		Secret: auth.credential.Secret,
+		Access: auth.access,
+		Secret: auth.secret,
 		Token:  session,
 	}
 

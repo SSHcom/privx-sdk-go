@@ -38,6 +38,9 @@ func New(opts ...Option) Connector {
 					Timeout: 10 * time.Second,
 				}).Dial,
 			},
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
 		},
 		retry: 2,
 	}
