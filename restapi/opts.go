@@ -37,8 +37,8 @@ func Auth(auth Authorizer) Option {
 	}
 }
 
-// X509 setup trust certificate
-func X509(cert *x509.Certificate) Option {
+// TrustAnchor setups X509 certificates to trust TLS connections
+func TrustAnchor(cert *x509.Certificate) Option {
 	return func(client *tClient) *tClient {
 		if cert != nil {
 			tlsConfig := &tls.Config{}
@@ -68,7 +68,7 @@ func Retry(n int) Option {
 }
 
 // UseConfigFile setup rest client from toml file
-func UseConfigFile(path *string) Option {
+func UseConfigFile(path string) Option {
 	return func(client *tClient) *tClient {
 		type config struct {
 			BaseURL     string       `toml:"base_url"`
@@ -78,11 +78,11 @@ func UseConfigFile(path *string) Option {
 			API config
 		}
 
-		if path == nil {
+		if path == "" {
 			return client
 		}
 
-		f, err := os.Open(*path)
+		f, err := os.Open(path)
 		if err != nil {
 			panic(err)
 		}
@@ -93,13 +93,12 @@ func UseConfigFile(path *string) Option {
 			panic(err)
 		}
 
-		err = toml.Unmarshal(data, &file)
-		if err != nil {
-			return client
+		if err = toml.Unmarshal(data, &file); err != nil {
+			panic(err)
 		}
 
 		client = BaseURL(file.API.BaseURL)(client)
-		client = X509(file.API.Certificate.X509)(client)
+		client = TrustAnchor(file.API.Certificate.X509)(client)
 		return client
 	}
 }

@@ -48,7 +48,7 @@ func Digest(oauthAccess, oauthSecret string) Option {
 }
 
 // UseConfigFile setup credential from tol file
-func UseConfigFile(path *string) Option {
+func UseConfigFile(path string) Option {
 	return func(auth *tAuth) *tAuth {
 		type config struct {
 			AuthClientID     string `toml:"oauth_client_id"`
@@ -60,11 +60,11 @@ func UseConfigFile(path *string) Option {
 			Auth config
 		}
 
-		if path == nil {
+		if path == "" {
 			return auth
 		}
 
-		f, err := os.Open(*path)
+		f, err := os.Open(path)
 		if err != nil {
 			panic(err)
 		}
@@ -75,9 +75,8 @@ func UseConfigFile(path *string) Option {
 			panic(err)
 		}
 
-		err = toml.Unmarshal(data, &file)
-		if err != nil {
-			return auth
+		if err = toml.Unmarshal(data, &file); err != nil {
+			panic(err)
 		}
 
 		auth = Access(file.Auth.ClientID)(auth)
