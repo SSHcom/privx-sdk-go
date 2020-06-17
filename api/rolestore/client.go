@@ -47,8 +47,8 @@ func (store *RoleStore) SearchUsers(keywords, source string) ([]User, error) {
 	return result.Items, err
 }
 
-// GetUser gets information about the argument user ID.
-func (store *RoleStore) GetUser(id string) (user *User, err error) {
+// User gets information about the argument user ID.
+func (store *RoleStore) User(id string) (user *User, err error) {
 	user = new(User)
 
 	_, err = store.api.
@@ -58,8 +58,8 @@ func (store *RoleStore) GetUser(id string) (user *User, err error) {
 	return
 }
 
-// GetUserRoles gets the roles of the argument user ID.
-func (store *RoleStore) GetUserRoles(id string) ([]Role, error) {
+// UserRoles gets the roles of the argument user ID.
+func (store *RoleStore) UserRoles(id string) ([]Role, error) {
 	result := rolesResult{}
 	_, err := store.api.
 		URL("/role-store/api/v1/users/%s/roles", url.PathEscape(id)).
@@ -72,7 +72,7 @@ func (store *RoleStore) GetUserRoles(id string) ([]Role, error) {
 // already has the role, this function does nothing.
 func (store *RoleStore) AddUserRole(userID, roleID string) error {
 	// Get user's current roles.
-	roles, err := store.GetUserRoles(userID)
+	roles, err := store.UserRoles(userID)
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func (store *RoleStore) AddUserRole(userID, roleID string) error {
 	}
 
 	// Get new role.
-	role, err := store.GetRole(roleID)
+	role, err := store.Role(roleID)
 	if err != nil {
 		return err
 	}
@@ -103,7 +103,7 @@ func (store *RoleStore) AddUserRole(userID, roleID string) error {
 // user does not have the role, this function does nothing.
 func (store *RoleStore) RemoveUserRole(userID, roleID string) error {
 	// Get user's current roles.
-	roles, err := store.GetUserRoles(userID)
+	roles, err := store.UserRoles(userID)
 	if err != nil {
 		return err
 	}
@@ -131,8 +131,8 @@ func (store *RoleStore) setUserRoles(userID string, roles []Role) error {
 	return err
 }
 
-// GetRoles gets all configured roles.
-func (store *RoleStore) GetRoles() ([]Role, error) {
+// Roles gets all configured roles.
+func (store *RoleStore) Roles() ([]Role, error) {
 	result := rolesResult{}
 
 	_, err := store.api.
@@ -142,8 +142,8 @@ func (store *RoleStore) GetRoles() ([]Role, error) {
 	return result.Items, err
 }
 
-// GetRole gets information about the argument role ID.
-func (store *RoleStore) GetRole(id string) (role *Role, err error) {
+// Role gets information about the argument role ID.
+func (store *RoleStore) Role(id string) (role *Role, err error) {
 	role = new(Role)
 
 	_, err = store.api.
@@ -160,6 +160,33 @@ func (store *RoleStore) GetRoleMembers(id string) ([]User, error) {
 	_, err := store.api.
 		URL("/role-store/api/v1/roles/%s/members", url.PathEscape(id)).
 		Get(&result)
+
+	return result.Items, err
+}
+
+// CreateRole creates new role
+func (store *RoleStore) CreateRole(role Role) (string, error) {
+	var id struct {
+		ID string `json:"id"`
+	}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/roles").
+		Post(&role, &id)
+
+	return id.ID, err
+}
+
+// ResolveRoles searches give role name and returns corresponding ids
+func (store *RoleStore) ResolveRoles(names []string) ([]RoleRef, error) {
+	var result struct {
+		Count int       `json:"count"`
+		Items []RoleRef `json:"items"`
+	}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/roles/resolve").
+		Post(&names, &result)
 
 	return result.Items, err
 }
