@@ -1,6 +1,10 @@
 package oauth
 
-import "github.com/SSHcom/privx-sdk-go/restapi"
+import (
+	"strings"
+
+	"github.com/SSHcom/privx-sdk-go/restapi"
+)
 
 /*
 
@@ -23,6 +27,10 @@ of access/secret key is provided. It allows usage of username and password
 */
 func With(client restapi.Connector, opts ...Option) restapi.Authorizer {
 	auth := newAuth(client, opts...)
+
+	if strings.HasPrefix(auth.secret, "Bearer") {
+		return &tAuthExplicit{auth.secret}
+	}
 
 	if auth.access != "" && auth.secret != "" && auth.digest != "" {
 		return &tAuthPassword{tAuth: auth}
