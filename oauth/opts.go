@@ -92,8 +92,14 @@ func UseEnvironment() Option {
 		if access, ok := os.LookupEnv("PRIVX_API_CLIENT_ID"); ok {
 			auth = Access(access)(auth)
 		}
+		if access, ok := os.LookupEnv("PRIVX_API_ACCESS_KEY"); ok {
+			auth = Access(access)(auth)
+		}
 
 		if secret, ok := os.LookupEnv("PRIVX_API_CLIENT_SECRET"); ok {
+			auth = Secret(secret)(auth)
+		}
+		if secret, ok := os.LookupEnv("PRIVX_API_SECRET_KEY"); ok {
 			auth = Secret(secret)(auth)
 		}
 
