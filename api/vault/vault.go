@@ -13,8 +13,6 @@ import (
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-type Bag map[string]interface{}
-
 // Vault is client instance.
 type Vault struct {
 	api restapi.Connector
@@ -75,7 +73,7 @@ func (vault *Vault) Create(
 
 	_, err := vault.api.
 		URL("/vault/api/v1/secrets").
-		Put(req)
+		Post(req)
 
 	return err
 }
@@ -83,11 +81,11 @@ func (vault *Vault) Create(
 // Update existing secret at PrivX Vault
 func (vault *Vault) Update(
 	name string,
-	allowReadBy []string,
-	allowWriteBy []string,
+	allowReadTo []string,
+	allowWriteTo []string,
 	secret interface{},
 ) error {
-	req := vault.mkVaultReq(allowReadBy, allowWriteBy, secret)
+	req := vault.mkVaultReq(allowReadTo, allowWriteTo, secret)
 
 	_, err := vault.api.
 		URL("/vault/api/v1/secrets/%s", name).
@@ -101,5 +99,6 @@ func (vault *Vault) Remove(name string) error {
 	_, err := vault.api.
 		URL("/vault/api/v1/secrets/%s", name).
 		Delete()
+
 	return err
 }
