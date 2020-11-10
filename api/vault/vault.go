@@ -13,8 +13,6 @@ import (
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-// Bag contains secret data. The secret data is a JSON object and it
-// can have nested values and objects.
 type Bag map[string]interface{}
 
 // Vault is client instance.
@@ -29,8 +27,8 @@ func New(api restapi.Connector) *Vault {
 }
 
 // Get gets the content of the argument secret.
-func (vault *Vault) Get(name string) (bag *Bag, err error) {
-	bag = new(Bag)
+func (vault *Vault) Get(name string) (bag *Secret, err error) {
+	bag = new(Secret)
 	_, err = vault.api.
 		URL("/vault/api/v1/secrets/%s", url.PathEscape(name)).
 		Get(bag)
