@@ -120,17 +120,21 @@ export PRIVX_API_OAUTH_CLIENT_SECRET=another-random-base64
 
 ### Identity and Access Management
 
-Usage of PrivX SDK requires API credential, which are available from your PrivX
-deployment: Settings > API Clients > Add API Client.
+Usage of PrivX SDK requires API credential, which are available from your PrivX deployment: Settings > API Clients > Add API Client. Authorizer implement OAuth2 Resource Owner Password Grant
 
 ```go
 auth := oauth.WithClientID(/* ... */)
 ```
 
-Alternatively, you can use api client on behalf of existing user using its credentials.
+Alternatively, you can use api client on behalf of existing user using its credentials. Authorizer implements OAuth2 Authorization Code Grant
 
 ```go
 auth := oauth.WithCredential(/* ... */)
+```
+
+If your app needs to implement a flexible auth strategy that supports both. Use following method, it dynamically chooses a right strategy depending of available credentials  
+```go
+auth := oauth.With(/* ... */)
 ```
 
 ## Bugs
