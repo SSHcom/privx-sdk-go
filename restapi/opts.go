@@ -98,7 +98,9 @@ func UseConfigFile(path string) Option {
 		}
 
 		client = BaseURL(file.API.BaseURL)(client)
-		client = TrustAnchor(file.API.Certificate.X509)(client)
+		if file.API.Certificate != nil {
+			client = TrustAnchor(file.API.Certificate.X509)(client)
+		}
 		return client
 	}
 }
