@@ -6,6 +6,8 @@
 
 package userstore
 
+import "github.com/SSHcom/privx-sdk-go/api/rolestore"
+
 // ClientType is a type of trusted clients
 type ClientType string
 
@@ -32,4 +34,16 @@ func Extender(name string) TrustedClient {
 		Permissions: []string{"privx-extender"},
 		Name:        name,
 	}
+}
+
+// APIClient definition
+type APIClient struct {
+	ID               string              `json:"id,omitempty"`
+	Name             string              `json:"name,omitempty"`
+	Secret           string              `json:"secret,omitempty"`
+	AuthClientID     string              `json:"oauth_client_id"`
+	AuthClientSecret string              `json:"oauth_client_secret"`
+	Roles            []rolestore.RoleRef `json:"roles,omitempty"`
+	Created          string              `json:"created,omitempty"`
+	Author           string              `json:"author,omitempty"`
 }
