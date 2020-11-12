@@ -10,9 +10,10 @@ PrivX is a lean and modern privileged access management solution to automate you
 
 \
 **Jump To**:
-PrivX >= 15.0 |
 [PrivX REST API Reference](https://apispecs.ssh.com)
 
+\
+**Supports**: PrivX v15 or greater 
 
 ## Getting Started
 
