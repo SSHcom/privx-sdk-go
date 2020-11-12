@@ -9,6 +9,11 @@ PrivX is a lean and modern privileged access management solution to automate you
 [![Coverage Status](https://coveralls.io/repos/github/SSHcom/privx-sdk-go/badge.svg?branch=master)](https://coveralls.io/github/SSHcom/privx-sdk-go?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/SSHcom/privx-sdk-go)](https://goreportcard.com/report/github.com/SSHcom/privx-sdk-go)
 
+\
+**Jump To**:
+PrivX >= 15.0 |
+[PrivX REST API Reference](https://apispecs.ssh.com)
+
 
 \
 **Jump To**:
