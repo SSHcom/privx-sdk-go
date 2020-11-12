@@ -7,6 +7,7 @@
 package userstore
 
 import (
+	"github.com/SSHcom/privx-sdk-go/api/rolestore"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -65,6 +66,65 @@ func (store *UserStore) TrustedClient(id string) (*TrustedClient, error) {
 func (store *UserStore) DeleteTrustedClient(id string) error {
 	_, err := store.api.
 		URL("/local-user-store/api/v1/trusted-clients/%s", id).
+		Delete()
+
+	return err
+}
+
+// APIClients returns list of all registered api clients
+func (store *UserStore) APIClients() ([]APIClient, error) {
+	var seq struct {
+		Items []APIClient
+	}
+
+	_, err := store.api.
+		URL("/local-user-store/api/v1/api-clients").
+		Get(&seq)
+
+	return seq.Items, err
+}
+
+// APIClient returns details about API client
+func (store *UserStore) APIClient(id string) (*APIClient, error) {
+	client := new(APIClient)
+
+	_, err := store.api.
+		URL("/local-user-store/api/v1/api-clients/%s", id).
+		Get(client)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
+}
+
+// CreateAPIClient creates new API client
+func (store *UserStore) CreateAPIClient(name string, roles []string) (string, error) {
+	var id struct {
+		ID string `json:"id"`
+	}
+
+	req := struct {
+		Name  string              `json:"name"`
+		Roles []rolestore.RoleRef `json:"roles"`
+	}{Name: name, Roles: []rolestore.RoleRef{}}
+
+	for _, role := range roles {
+		req.Roles = append(req.Roles, rolestore.RoleRef{ID: role})
+	}
+
+	_, err := store.api.
+		URL("/local-user-store/api/v1/api-clients").
+		Post(req, &id)
+
+	return id.ID, err
+}
+
+// DeleteAPIClient removes existing API client
+func (store *UserStore) DeleteAPIClient(id string) error {
+	_, err := store.api.
+		URL("/local-user-store/api/v1/api-clients/%s", id).
 		Delete()
 
 	return err
