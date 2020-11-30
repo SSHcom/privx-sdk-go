@@ -16,3 +16,11 @@ type CA struct {
 	PublicKey string `json:"public_key"`
 	X509      string `json:"x509_certificate"`
 }
+
+//
+//
+type AccessGroup struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Default bool   `json:"default,omitempty"`
+}

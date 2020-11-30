@@ -13,7 +13,8 @@ type ClientType string
 
 // ClientType supported values
 const (
-	EXTENDER = ClientType("EXTENDER")
+	ClientExtender         = ClientType("EXTENDER")
+	ClientHostProvisioning = ClientType("HOST_PROVISIONING")
 )
 
 // TrustedClient definition
@@ -30,8 +31,17 @@ type TrustedClient struct {
 // Extender creates new trusted client
 func Extender(name string) TrustedClient {
 	return TrustedClient{
-		Type:        EXTENDER,
+		Type:        ClientExtender,
 		Permissions: []string{"privx-extender"},
+		Name:        name,
+	}
+}
+
+// HostProvisioning creates new trusted client
+func HostProvisioning(name string) TrustedClient {
+	return TrustedClient{
+		Type:        ClientHostProvisioning,
+		Permissions: []string{"privx-host-provisioning"},
 		Name:        name,
 	}
 }
