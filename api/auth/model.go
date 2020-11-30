@@ -18,7 +18,7 @@ type CA struct {
 }
 
 //
-//
+// AccessGroup structure
 type AccessGroup struct {
 	ID      string `json:"id"`
 	Name    string `json:"name"`
