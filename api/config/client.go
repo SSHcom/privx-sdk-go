@@ -15,6 +15,10 @@ type ConfFileStore struct {
 	api restapi.Connector
 }
 
+type tSession struct {
+	ID string `json:"session_id"`
+}
+
 // New creates a new client instance to fetch config files from PrivX
 func New(api restapi.Connector) *ConfFileStore {
 	return &ConfFileStore{api: api}
@@ -22,12 +26,19 @@ func New(api restapi.Connector) *ConfFileStore {
 
 // ConfigExtender fetches configuration file
 func (store *ConfFileStore) ConfigExtender(id string) ([]byte, error) {
-	var session struct {
-		ID string `json:"session_id"`
-	}
+	return store.config("extender/conf", id)
+}
+
+// ConfigDeploy fetches deployment script
+func (store *ConfFileStore) ConfigDeploy(id string) ([]byte, error) {
+	return store.config("deploy", id)
+}
+
+func (store *ConfFileStore) config(config, id string) ([]byte, error) {
+	var session tSession
 
 	_, err := store.api.
-		URL("/authorizer/api/v1/extender/conf/%s", id).
+		URL("/authorizer/api/v1/%s/%s", config, id).
 		Post("", &session)
 
 	if err != nil {
@@ -35,6 +46,6 @@ func (store *ConfFileStore) ConfigExtender(id string) ([]byte, error) {
 	}
 
 	return store.api.
-		URL("/authorizer/api/v1/extender/conf/%s/%s", id, session.ID).
+		URL("/authorizer/api/v1/%s/%s/%s", config, id, session.ID).
 		Fetch()
 }

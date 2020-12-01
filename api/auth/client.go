@@ -28,3 +28,17 @@ func (auth *Client) RootCertificate() (ca []CA, err error) {
 
 	return
 }
+
+// AccessGroups lists all access group
+func (auth *Client) AccessGroups() ([]AccessGroup, error) {
+	var result struct {
+		Count int           `json:"count"`
+		Items []AccessGroup `json:"items"`
+	}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/accessgroups").
+		Get(&result)
+
+	return result.Items, err
+}
