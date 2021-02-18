@@ -27,17 +27,12 @@ func New(api restapi.Connector) *UserStore {
 }
 
 // GetLocalUsers get a local user with details
-func (store *UserStore) GetLocalUsers(filters ...string) ([]User, error) {
+func (store *UserStore) GetLocalUsers(offset, limit, userID, username string) ([]User, error) {
 	result := usersResult{}
-	offset := filters[0]
-	limit := filters[1]
-	id := filters[2]
-	name := filters[3]
 
 	_, err := store.api.
-		URL("/local-user-store/api/v1/users?offset=%s&limit=%s&username=%s&id=%s", offset, limit, name, id).
+		URL("/local-user-store/api/v1/users?offset=%s&limit=%s&username=%s&id=%s", offset, limit, username, userID).
 		Get(&result)
-
 	return result.Items, err
 }
 
