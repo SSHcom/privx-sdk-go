@@ -16,9 +16,29 @@ type UserStore struct {
 	api restapi.Connector
 }
 
+type usersResult struct {
+	Count int    `json:"count"`
+	Items []User `json:"items"`
+}
+
 // New creates a new user-store client instance
 func New(api restapi.Connector) *UserStore {
 	return &UserStore{api: api}
+}
+
+// GetLocalUsers get a local user with details
+func (store *UserStore) GetLocalUsers(filters ...string) ([]User, error) {
+	result := usersResult{}
+	offset := filters[0]
+	limit := filters[1]
+	id := filters[2]
+	name := filters[3]
+
+	_, err := store.api.
+		URL("/local-user-store/api/v1/users?offset=%s&limit=%s&username=%s&id=%s", offset, limit, name, id).
+		Get(&result)
+
+	return result.Items, err
 }
 
 // CreateTrustedClient registers new client to PrivX

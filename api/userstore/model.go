@@ -57,3 +57,23 @@ type APIClient struct {
 	Created          string              `json:"created,omitempty"`
 	Author           string              `json:"author,omitempty"`
 }
+
+// User definition
+type User struct {
+	ID         string   `json:"id,omnitempty"`
+	Created    string   `json:"created,omitempty"`
+	Updated    string   `json:"updated,omitempty"`
+	UpdatedBy  string   `json:"updated_by,omitempty"`
+	Author     string   `json:"author,omitempty"`
+	Comment    string   `json:"comment,omitempty"`
+	Tags       []string `json:"tags,omitempty"`
+	Username   string   `json:"username,omitempty"`
+	GivenName  string   `json:"given_name,omitempty"`
+	FullName   string   `json:"full_name,omitempty"`
+	JobTitle   string   `json:"job_title,omitempty"`
+	Company    string   `json:"company,omitempty"`
+	Department string   `json:"department,omitempty"`
+	Email      string   `json:"email,omitempty"`
+	Telephone  string   `json:"telephone,omitempty"`
+	Locale     string   `json:"locale,omitempty"`
+}
