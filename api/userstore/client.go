@@ -17,8 +17,8 @@ type UserStore struct {
 }
 
 type usersResult struct {
-	Count int    `json:"count"`
-	Items []User `json:"items"`
+	Count int         `json:"count"`
+	Items []LocalUser `json:"items"`
 }
 
 // New creates a new user-store client instance
@@ -27,12 +27,22 @@ func New(api restapi.Connector) *UserStore {
 }
 
 // GetLocalUsers get a local user with details
-func (store *UserStore) GetLocalUsers(offset, limit, userID, username string) ([]User, error) {
+func (store *UserStore) GetLocalUsers(offset, limit, userID, username string) ([]LocalUser, error) {
 	result := usersResult{}
+	filters := FilterUser{
+		Params: Params{
+			Offset: offset,
+			Limit:  limit,
+		},
+		UserID:   userID,
+		Username: username,
+	}
 
 	_, err := store.api.
-		URL("/local-user-store/api/v1/users?offset=%s&limit=%s&username=%s&id=%s", offset, limit, username, userID).
+		URL("/local-user-store/api/v1/users").
+		Query(&filters).
 		Get(&result)
+
 	return result.Items, err
 }
 

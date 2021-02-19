@@ -17,6 +17,19 @@ const (
 	ClientHostProvisioning = ClientType("HOST_PROVISIONING")
 )
 
+// Params struct for pagination queries.
+type Params struct {
+	Offset string `json:"offset,omitempty"`
+	Limit  string `json:"limit,omitempty"`
+}
+
+// FilterUser struct for local users queries.
+type FilterUser struct {
+	Params
+	UserID   string `json:"id,omitempty"`
+	Username string `json:"username,omitempty"`
+}
+
 // TrustedClient definition
 type TrustedClient struct {
 	ID          string     `json:"id,omitempty"`
@@ -58,8 +71,8 @@ type APIClient struct {
 	Author           string              `json:"author,omitempty"`
 }
 
-// User definition
-type User struct {
+// LocalUser definition
+type LocalUser struct {
 	ID         string   `json:"id,omnitempty"`
 	Created    string   `json:"created,omitempty"`
 	Updated    string   `json:"updated,omitempty"`
