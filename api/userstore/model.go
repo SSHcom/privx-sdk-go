@@ -17,6 +17,19 @@ const (
 	ClientHostProvisioning = ClientType("HOST_PROVISIONING")
 )
 
+// Params struct for pagination queries.
+type Params struct {
+	Offset string `json:"offset,omitempty"`
+	Limit  string `json:"limit,omitempty"`
+}
+
+// FilterUser struct for local users queries.
+type FilterUser struct {
+	Params
+	UserID   string `json:"id,omitempty"`
+	Username string `json:"username,omitempty"`
+}
+
 // TrustedClient definition
 type TrustedClient struct {
 	ID          string     `json:"id,omitempty"`
@@ -56,4 +69,24 @@ type APIClient struct {
 	Roles            []rolestore.RoleRef `json:"roles,omitempty"`
 	Created          string              `json:"created,omitempty"`
 	Author           string              `json:"author,omitempty"`
+}
+
+// LocalUser definition
+type LocalUser struct {
+	ID         string   `json:"id,omnitempty"`
+	Created    string   `json:"created,omitempty"`
+	Updated    string   `json:"updated,omitempty"`
+	UpdatedBy  string   `json:"updated_by,omitempty"`
+	Author     string   `json:"author,omitempty"`
+	Comment    string   `json:"comment,omitempty"`
+	Tags       []string `json:"tags,omitempty"`
+	Username   string   `json:"username,omitempty"`
+	GivenName  string   `json:"given_name,omitempty"`
+	FullName   string   `json:"full_name,omitempty"`
+	JobTitle   string   `json:"job_title,omitempty"`
+	Company    string   `json:"company,omitempty"`
+	Department string   `json:"department,omitempty"`
+	Email      string   `json:"email,omitempty"`
+	Telephone  string   `json:"telephone,omitempty"`
+	Locale     string   `json:"locale,omitempty"`
 }
