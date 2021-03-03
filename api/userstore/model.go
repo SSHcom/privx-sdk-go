@@ -19,8 +19,10 @@ const (
 
 // Params struct for pagination queries.
 type Params struct {
-	Offset string `json:"offset,omitempty"`
-	Limit  string `json:"limit,omitempty"`
+	Offset  string `json:"offset,omitempty"`
+	Limit   string `json:"limit,omitempty"`
+	Sortdir string `json:"sortdir,omitempty"`
+	Query   string `json:"query,omitempty"`
 }
 
 // FilterUser struct for local users queries.
@@ -89,4 +91,10 @@ type LocalUser struct {
 	Email      string   `json:"email,omitempty"`
 	Telephone  string   `json:"telephone,omitempty"`
 	Locale     string   `json:"locale,omitempty"`
+	Password   Password `json:"password,omitempty"`
+}
+
+// Password definition
+type Password struct {
+	Password string `json:"password,omitempty"`
 }
