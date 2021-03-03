@@ -26,6 +26,19 @@ func New(api restapi.Connector) *UserStore {
 	return &UserStore{api: api}
 }
 
+// CreateLocalUser create a new local PrivX user
+func (store *UserStore) CreateLocalUser(newUser LocalUser) (string, error) {
+	var id struct {
+		ID string `json:"id"`
+	}
+
+	_, err := store.api.
+		URL("/local-user-store/api/v1/users").
+		Post(newUser, &id)
+
+	return id.ID, err
+}
+
 // GetLocalUsers get a local user with details
 func (store *UserStore) GetLocalUsers(offset, limit, userID, username string) ([]LocalUser, error) {
 	result := usersResult{}

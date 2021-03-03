@@ -89,4 +89,10 @@ type LocalUser struct {
 	Email      string   `json:"email,omitempty"`
 	Telephone  string   `json:"telephone,omitempty"`
 	Locale     string   `json:"locale,omitempty"`
+	Password   Password `json:"password,omitempty"`
+}
+
+// Password definition
+type Password struct {
+	Password string `json:"password,omitempty"`
 }
