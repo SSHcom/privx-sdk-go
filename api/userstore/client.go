@@ -28,8 +28,8 @@ func New(api restapi.Connector) *UserStore {
 	return &UserStore{api: api}
 }
 
-// GetUser get user details by user ID
-func (store *UserStore) GetUser(id string) (user *LocalUser, err error) {
+// LocalUser returns details about the local user
+func (store *UserStore) LocalUser(id string) (user *LocalUser, err error) {
 	user = new(LocalUser)
 
 	_, err = store.api.
@@ -52,8 +52,8 @@ func (store *UserStore) CreateLocalUser(newUser LocalUser) (string, error) {
 	return id.ID, err
 }
 
-// GetLocalUsers get a local user with details
-func (store *UserStore) GetLocalUsers(offset, limit, userID, username string) ([]LocalUser, error) {
+// LocalUsers returns user details from all known local users
+func (store *UserStore) LocalUsers(offset, limit, userID, username string) ([]LocalUser, error) {
 	result := usersResult{}
 	filters := FilterUser{
 		Params: Params{
