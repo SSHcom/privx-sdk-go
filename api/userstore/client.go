@@ -7,6 +7,8 @@
 package userstore
 
 import (
+	"net/url"
+
 	"github.com/SSHcom/privx-sdk-go/api/rolestore"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
@@ -24,6 +26,17 @@ type usersResult struct {
 // New creates a new user-store client instance
 func New(api restapi.Connector) *UserStore {
 	return &UserStore{api: api}
+}
+
+// GetUser get user details by user ID
+func (store *UserStore) GetUser(id string) (user *LocalUser, err error) {
+	user = new(LocalUser)
+
+	_, err = store.api.
+		URL("/local-user-store/api/v1/users/%s", url.PathEscape(id)).
+		Get(user)
+
+	return user, err
 }
 
 // CreateLocalUser create a new local PrivX user
