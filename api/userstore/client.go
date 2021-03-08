@@ -29,7 +29,7 @@ func New(api restapi.Connector) *UserStore {
 }
 
 // UpdateLocalUser update existing local user
-func (store *UserStore) UpdateLocalUser(id string, localUser LocalUser) error {
+func (store *UserStore) UpdateLocalUser(id string, localUser *LocalUser) error {
 	_, err := store.api.
 		URL("/local-user-store/api/v1/users/%s", url.PathEscape(id)).
 		Put(localUser)
