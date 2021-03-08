@@ -28,6 +28,15 @@ func New(api restapi.Connector) *UserStore {
 	return &UserStore{api: api}
 }
 
+// DeleteLocalUser delete a local user
+func (store *UserStore) DeleteLocalUser(id string) error {
+	_, err := store.api.
+		URL("/local-user-store/api/v1/users/%s", id).
+		Delete()
+
+	return err
+}
+
 // LocalUser returns details about the local user
 func (store *UserStore) LocalUser(id string) (user *LocalUser, err error) {
 	user = new(LocalUser)
