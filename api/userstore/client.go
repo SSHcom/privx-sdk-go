@@ -28,6 +28,15 @@ func New(api restapi.Connector) *UserStore {
 	return &UserStore{api: api}
 }
 
+// UpdateLocalUser update existing local user
+func (store *UserStore) UpdateLocalUser(id string, localUser *LocalUser) error {
+	_, err := store.api.
+		URL("/local-user-store/api/v1/users/%s", url.PathEscape(id)).
+		Put(localUser)
+
+	return err
+}
+
 // DeleteLocalUser delete a local user
 func (store *UserStore) DeleteLocalUser(id string) error {
 	_, err := store.api.
