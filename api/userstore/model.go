@@ -19,8 +19,10 @@ const (
 
 // Params struct for pagination queries.
 type Params struct {
-	Offset string `json:"offset,omitempty"`
-	Limit  string `json:"limit,omitempty"`
+	Offset  string `json:"offset,omitempty"`
+	Limit   string `json:"limit,omitempty"`
+	Sortdir string `json:"sortdir,omitempty"`
+	Query   string `json:"query,omitempty"`
 }
 
 // FilterUser struct for local users queries.

@@ -23,9 +23,34 @@ type usersResult struct {
 	Items []LocalUser `json:"items"`
 }
 
+type tagsResult struct {
+	Count int      `json:"count"`
+	Items []string `json:"items"`
+}
+
 // New creates a new user-store client instance
 func New(api restapi.Connector) *UserStore {
 	return &UserStore{api: api}
+}
+
+// LocalUserTags returns local user tags
+func (store *UserStore) LocalUserTags(offset, limit, sortdir, query string) ([]string, error) {
+	result := tagsResult{}
+	filters := FilterUser{
+		Params: Params{
+			Offset:  offset,
+			Limit:   limit,
+			Sortdir: sortdir,
+			Query:   query,
+		},
+	}
+
+	_, err := store.api.
+		URL("/local-user-store/api/v1/users/tags").
+		Query(&filters).
+		Get(&result)
+
+	return result.Items, err
 }
 
 // UpdateLocalUserPassword update existing local user password
