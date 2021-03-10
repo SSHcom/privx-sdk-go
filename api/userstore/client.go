@@ -28,6 +28,15 @@ func New(api restapi.Connector) *UserStore {
 	return &UserStore{api: api}
 }
 
+// UpdateLocalUserPassword update existing local user password
+func (store *UserStore) UpdateLocalUserPassword(id string, password *Password) error {
+	_, err := store.api.
+		URL("/local-user-store/api/v1/users/%s/password", url.PathEscape(id)).
+		Put(password)
+
+	return err
+}
+
 // UpdateLocalUser update existing local user
 func (store *UserStore) UpdateLocalUser(id string, localUser *LocalUser) error {
 	_, err := store.api.
