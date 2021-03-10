@@ -165,6 +165,15 @@ func (store *UserStore) TrustedClient(id string) (*TrustedClient, error) {
 	return client, nil
 }
 
+// UpdateTrustedClient update existing trusted client
+func (store *UserStore) UpdateTrustedClient(id string, client *TrustedClient) error {
+	_, err := store.api.
+		URL("/local-user-store/api/v1/trusted-clients/%s", url.PathEscape(id)).
+		Put(client)
+
+	return err
+}
+
 // DeleteTrustedClient removes the client
 func (store *UserStore) DeleteTrustedClient(id string) error {
 	_, err := store.api.
