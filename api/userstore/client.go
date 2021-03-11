@@ -28,6 +28,11 @@ type tagsResult struct {
 	Items []string `json:"items"`
 }
 
+type clientsResult struct {
+	Count int             `json:"count"`
+	Items []TrustedClient `json:"items"`
+}
+
 // New creates a new user-store client instance
 func New(api restapi.Connector) *UserStore {
 	return &UserStore{api: api}
@@ -181,6 +186,17 @@ func (store *UserStore) DeleteTrustedClient(id string) error {
 		Delete()
 
 	return err
+}
+
+// ExtenderClients returns a list of extender client names and types
+func (store *UserStore) ExtenderClients() ([]TrustedClient, error) {
+	result := clientsResult{}
+
+	_, err := store.api.
+		URL("/local-user-store/api/v1/extender-clients").
+		Get(&result)
+
+	return result.Items, err
 }
 
 // APIClients returns list of all registered api clients
