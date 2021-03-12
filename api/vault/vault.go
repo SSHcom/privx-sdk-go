@@ -18,14 +18,35 @@ type Vault struct {
 	api restapi.Connector
 }
 
+type secretResult struct {
+	Count int      `json:"count"`
+	Items []Secret `json:"items"`
+}
+
 // New creates a new Vault client instance, using the argument
 // SDK API client.
 func New(api restapi.Connector) *Vault {
 	return &Vault{api: api}
 }
 
-// Get gets the content of the argument secret.
-func (vault *Vault) Get(name string) (bag *Secret, err error) {
+// Secrets returns secrets client has access to
+func (vault *Vault) Secrets(offset, limit string) ([]Secret, error) {
+	result := secretResult{}
+	filters := Params{
+		Offset: offset,
+		Limit:  limit,
+	}
+
+	_, err := vault.api.
+		URL("/vault/api/v1/secrets").
+		Query(&filters).
+		Get(&result)
+
+	return result.Items, err
+}
+
+// Secret gets the content of the argument secret.
+func (vault *Vault) Secret(name string) (bag *Secret, err error) {
 	bag = new(Secret)
 	_, err = vault.api.
 		URL("/vault/api/v1/secrets/%s", url.PathEscape(name)).

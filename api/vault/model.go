@@ -12,6 +12,12 @@ import (
 	"github.com/SSHcom/privx-sdk-go/api/rolestore"
 )
 
+// Params struct for pagination queries.
+type Params struct {
+	Offset string `json:"offset,omitempty"`
+	Limit  string `json:"limit,omitempty"`
+}
+
 // Secret contains PrivX metadata about secret and its vault
 type Secret struct {
 	ID         string              `json:"name"`
