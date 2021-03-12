@@ -249,6 +249,15 @@ func (store *UserStore) CreateAPIClient(name string, roles []string) (string, er
 	return id.ID, err
 }
 
+// UpdateAPIClient update existing api client
+func (store *UserStore) UpdateAPIClient(id string, client *APIClient) error {
+	_, err := store.api.
+		URL("/local-user-store/api/v1/api-clients/%s", url.PathEscape(id)).
+		Put(client)
+
+	return err
+}
+
 // DeleteAPIClient removes existing API client
 func (store *UserStore) DeleteAPIClient(id string) error {
 	_, err := store.api.
