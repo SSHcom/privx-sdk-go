@@ -29,6 +29,17 @@ func New(api restapi.Connector) *Vault {
 	return &Vault{api: api}
 }
 
+// SecretMetadata returns secret metadata
+func (vault *Vault) SecretMetadata(name string) (metadata *Secret, err error) {
+	metadata = new(Secret)
+
+	_, err = vault.api.
+		URL("/vault/api/v1/metadata/secrets/%s", url.PathEscape(name)).
+		Get(metadata)
+
+	return
+}
+
 // Secrets returns secrets client has access to
 func (vault *Vault) Secrets(offset, limit string) ([]Secret, error) {
 	result := secretResult{}
