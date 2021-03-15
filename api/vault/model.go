@@ -14,8 +14,10 @@ import (
 
 // Params struct for pagination queries.
 type Params struct {
-	Offset string `json:"offset,omitempty"`
-	Limit  string `json:"limit,omitempty"`
+	Offset  string `json:"offset,omitempty"`
+	Limit   string `json:"limit,omitempty"`
+	Sortkey string `json:"sortkey,omitempty"`
+	Sortdir string `json:"sortdir,omitempty"`
 }
 
 // Secret contains PrivX metadata about secret and its vault
