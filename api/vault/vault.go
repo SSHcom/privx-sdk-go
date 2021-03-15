@@ -29,6 +29,26 @@ func New(api restapi.Connector) *Vault {
 	return &Vault{api: api}
 }
 
+// SearchSecrets search for existing secrets
+func (vault *Vault) SearchSecrets(keywords, offset, limit, sortkey, sortdir string) ([]Secret, error) {
+	result := secretResult{}
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
+	}
+
+	_, err := vault.api.
+		URL("/vault/api/v1/search/secrets").
+		Query(&filters).
+		Post(map[string]string{
+			"keywords": keywords,
+		}, &result)
+
+	return result.Items, err
+}
+
 // SecretMetadata returns secret metadata
 func (vault *Vault) SecretMetadata(name string) (metadata *Secret, err error) {
 	metadata = new(Secret)
