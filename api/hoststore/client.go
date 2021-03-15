@@ -7,6 +7,8 @@
 package hoststore
 
 import (
+	"net/url"
+
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -15,10 +17,26 @@ type HostStore struct {
 	api restapi.Connector
 }
 
+type hostResult struct {
+	Count int    `json:"count"`
+	Items []Host `json:"items"`
+}
+
 // New creates a new host-store client instance
 // See http://apispecs.ssh.com/#swagger-ui-4 for details about api
 func New(api restapi.Connector) *HostStore {
 	return &HostStore{api: api}
+}
+
+// Host returns existing single host
+func (store *HostStore) Host(id string) (host *Host, err error) {
+	host = new(Host)
+
+	_, err = store.api.
+		URL("/host-store/api/v1/hosts/%s", url.PathEscape(id)).
+		Get(host)
+
+	return
 }
 
 // RegisterHost append a target to PrivX
