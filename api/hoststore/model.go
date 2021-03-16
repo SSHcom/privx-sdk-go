@@ -32,6 +32,15 @@ const (
 	HTTPS = Scheme("HTTPS")
 )
 
+// Params struct for pagination queries.
+type Params struct {
+	Offset  string `json:"offset,omitempty"`
+	Limit   string `json:"limit,omitempty"`
+	Sortdir string `json:"sortdir,omitempty"`
+	Sortkey string `json:"sortkey,omitempty"`
+	Filter  string `json:"filter,omitempty"`
+}
+
 // Service specify the service available on target host
 type Service struct {
 	Scheme  Scheme  `json:"service"`

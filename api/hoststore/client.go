@@ -28,6 +28,25 @@ func New(api restapi.Connector) *HostStore {
 	return &HostStore{api: api}
 }
 
+// Hosts returns existing hosts
+func (store *HostStore) Hosts(offset, limit, sortkey, sortdir, filter string) ([]Host, error) {
+	result := hostResult{}
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
+		Filter:  filter,
+	}
+
+	_, err := store.api.
+		URL("/host-store/api/v1/hosts").
+		Query(&filters).
+		Get(&result)
+
+	return result.Items, err
+}
+
 // Host returns existing single host
 func (store *HostStore) Host(id string) (host *Host, err error) {
 	host = new(Host)
