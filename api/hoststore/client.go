@@ -28,7 +28,16 @@ func New(api restapi.Connector) *HostStore {
 	return &HostStore{api: api}
 }
 
-// SearchHost search for hosts
+// UpdateHost update existing host
+func (store *HostStore) UpdateHost(id string, host *Host) error {
+	_, err := store.api.
+		URL("/host-store/api/v1/hosts/%s", url.PathEscape(id)).
+		Put(host)
+
+	return err
+}
+
+// SearchHost search for existing hosts
 func (store *HostStore) SearchHost(keywords, offset, limit, sortkey, sortdir, filter string) ([]Host, error) {
 	result := hostResult{}
 	filters := Params{
