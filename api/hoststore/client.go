@@ -28,6 +28,15 @@ func New(api restapi.Connector) *HostStore {
 	return &HostStore{api: api}
 }
 
+// DeleteHost delete a host
+func (store *HostStore) DeleteHost(id string) error {
+	_, err := store.api.
+		URL("/host-store/api/v1/hosts/%s", id).
+		Delete()
+
+	return err
+}
+
 // UpdateHost update existing host
 func (store *HostStore) UpdateHost(id string, host *Host) error {
 	_, err := store.api.
