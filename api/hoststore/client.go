@@ -22,10 +22,24 @@ type hostResult struct {
 	Items []Host `json:"items"`
 }
 
+type tagsResult struct {
+	Count int      `json:"count"`
+	Items []string `json:"items"`
+}
+
 // New creates a new host-store client instance
 // See http://apispecs.ssh.com/#swagger-ui-4 for details about api
 func New(api restapi.Connector) *HostStore {
 	return &HostStore{api: api}
+}
+
+// UpdateHost update existing host
+func (store *HostStore) UpdateDeployStatus(id string, host *Host) error {
+	_, err := store.api.
+		URL("/host-store/api/v1/hosts/%s/deployable", url.PathEscape(id)).
+		Put(host)
+
+	return err
 }
 
 // DeleteHost delete a host
