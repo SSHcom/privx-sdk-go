@@ -22,10 +22,33 @@ type hostResult struct {
 	Items []Host `json:"items"`
 }
 
+type tagsResult struct {
+	Count int      `json:"count"`
+	Items []string `json:"items"`
+}
+
 // New creates a new host-store client instance
 // See http://apispecs.ssh.com/#swagger-ui-4 for details about api
 func New(api restapi.Connector) *HostStore {
 	return &HostStore{api: api}
+}
+
+// HostTags returns hosts tags
+func (store *HostStore) HostTags(offset, limit, sortdir, query string) ([]string, error) {
+	result := tagsResult{}
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortdir: sortdir,
+		Query:   query,
+	}
+
+	_, err := store.api.
+		URL("/host-store/api/v1/hosts/tags").
+		Query(&filters).
+		Get(&result)
+
+	return result.Items, err
 }
 
 // UpdateDeployStatus update host to be deployable or undeployable

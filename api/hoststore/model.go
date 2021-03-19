@@ -39,6 +39,7 @@ type Params struct {
 	Sortdir string `json:"sortdir,omitempty"`
 	Sortkey string `json:"sortkey,omitempty"`
 	Filter  string `json:"filter,omitempty"`
+	Query   string `json:"query,omitempty"`
 }
 
 // Service specify the service available on target host
