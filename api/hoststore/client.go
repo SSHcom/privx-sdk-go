@@ -28,6 +28,19 @@ func New(api restapi.Connector) *HostStore {
 	return &HostStore{api: api}
 }
 
+// UpdateDeployStatus update host to be deployable or undeployable
+func (store *HostStore) UpdateDeployStatus(id string, status bool) error {
+	deployStatus := Host{
+		Deployable: status,
+	}
+
+	_, err := store.api.
+		URL("/host-store/api/v1/hosts/%s/deployable", url.PathEscape(id)).
+		Put(deployStatus)
+
+	return err
+}
+
 // DeleteHost delete a host
 func (store *HostStore) DeleteHost(id string) error {
 	_, err := store.api.
