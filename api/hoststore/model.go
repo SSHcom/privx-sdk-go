@@ -130,7 +130,7 @@ type WebService struct {
 	Clipboard    bool `json:"clipboard"`
 }
 
-// ServiceOptions default service options
+// DefaultServiceOptions default service options
 type DefaultServiceOptions struct {
 	SSH SSHService `json:"ssh"`
 	RDP RDPService `json:"rdp"`
