@@ -27,11 +27,6 @@ type tagsResult struct {
 	Items []string `json:"items"`
 }
 
-type serviceResult struct {
-	Count int                   `json:"count"`
-	Items DefaultServiceOptions `json:"items"`
-}
-
 // New creates a new host-store client instance
 // See http://apispecs.ssh.com/#swagger-ui-4 for details about api
 func New(api restapi.Connector) *HostStore {
@@ -39,14 +34,14 @@ func New(api restapi.Connector) *HostStore {
 }
 
 // ServiceOptions returns default serivce options
-func (store *HostStore) ServiceOptions() (DefaultServiceOptions, error) {
-	result := serviceResult{}
+func (store *HostStore) ServiceOptions() (options *DefaultServiceOptions, err error) {
+	options = new(DefaultServiceOptions)
 
-	_, err := store.api.
+	_, err = store.api.
 		URL("/host-store/api/v1/settings/default_service_options").
-		Get(&result)
+		Get(options)
 
-	return result.Items, err
+	return
 }
 
 // HostTags returns hosts tags
