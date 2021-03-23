@@ -106,6 +106,37 @@ type Host struct {
 	Status              []Status       `json:"status,omitempty"`
 }
 
+// SSHService default options
+type SSHService struct {
+	Shell        bool `json:"shell"`
+	FileTransfer bool `json:"file_transfer"`
+	Exec         bool `json:"exec"`
+	Tunnels      bool `json:"tunnels"`
+	Xeleven      bool `json:"x11"`
+	Other        bool `json:"other"`
+}
+
+// RDPService default options
+type RDPService struct {
+	FileTransfer bool `json:"file_transfer"`
+	Audio        bool `json:"audio"`
+	Clipboard    bool `json:"clipboard"`
+}
+
+// WebService default options
+type WebService struct {
+	FileTransfer bool `json:"file_transfer"`
+	Audio        bool `json:"audio"`
+	Clipboard    bool `json:"clipboard"`
+}
+
+// DefaultServiceOptions default service options
+type DefaultServiceOptions struct {
+	SSH SSHService `json:"ssh"`
+	RDP RDPService `json:"rdp"`
+	Web WebService `json:"web"`
+}
+
 // Service creates a corresponding service definition
 //   hosts.SSH.Service(...)
 func (scheme Scheme) Service(addr Address, port int) Service {

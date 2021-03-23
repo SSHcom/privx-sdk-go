@@ -33,6 +33,17 @@ func New(api restapi.Connector) *HostStore {
 	return &HostStore{api: api}
 }
 
+// ServiceOptions returns default serivce options
+func (store *HostStore) ServiceOptions() (options *DefaultServiceOptions, err error) {
+	options = new(DefaultServiceOptions)
+
+	_, err = store.api.
+		URL("/host-store/api/v1/settings/default_service_options").
+		Get(options)
+
+	return
+}
+
 // HostTags returns hosts tags
 func (store *HostStore) HostTags(offset, limit, sortdir, query string) ([]string, error) {
 	result := tagsResult{}
