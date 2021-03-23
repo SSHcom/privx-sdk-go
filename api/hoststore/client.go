@@ -33,6 +33,17 @@ func New(api restapi.Connector) *HostStore {
 	return &HostStore{api: api}
 }
 
+// ResolveHost resolve service and address to a single host in host store
+func (store *HostStore) ResolveHost(service Service) (host *Host, err error) {
+	host = new(Host)
+
+	_, err = store.api.
+		URL("/host-store/api/v1/hosts/resolve").
+		Post(service, &host)
+
+	return
+}
+
 // ServiceOptions returns default serivce options
 func (store *HostStore) ServiceOptions() (options *DefaultServiceOptions, err error) {
 	options = new(DefaultServiceOptions)
