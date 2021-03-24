@@ -39,7 +39,7 @@ func (store *HostStore) ResolveHost(service Service) (host *Host, err error) {
 
 	_, err = store.api.
 		URL("/host-store/api/v1/hosts/resolve").
-		Post(service, &host)
+		Post(service, host)
 
 	return
 }
