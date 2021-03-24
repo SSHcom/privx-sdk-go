@@ -27,10 +27,26 @@ type rolesResult struct {
 	Items []Role `json:"items"`
 }
 
+type sourcesResult struct {
+	Count int       `json:"count"`
+	Items []Sources `json:"items"`
+}
+
 // New creates a new role-store client instance, using the
 // argument SDK API client.
 func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
+}
+
+// Sources get all sources.
+func (store *RoleStore) Sources() ([]Sources, error) {
+	result := sourcesResult{}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/sources").
+		Get(&result)
+
+	return result.Items, err
 }
 
 // SearchUsers searches for users, matching the keywords and source
