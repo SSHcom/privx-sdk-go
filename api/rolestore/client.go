@@ -46,7 +46,7 @@ func (store *RoleStore) CreateSource(source Sources) (string, error) {
 
 	_, err := store.api.
 		URL("/role-store/api/v1/sources").
-		Post(source, &id)
+		Post(&source, &id)
 
 	return id.ID, err
 }
