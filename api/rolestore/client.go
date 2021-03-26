@@ -38,6 +38,17 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// Source returns a source
+func (store *RoleStore) Source(id string) (source *Sources, err error) {
+	source = new(Sources)
+
+	_, err = store.api.
+		URL("/role-store/api/v1/sources/%s", url.PathEscape(id)).
+		Get(source)
+
+	return source, err
+}
+
 // CreateSource create a new source
 func (store *RoleStore) CreateSource(source Sources) (string, error) {
 	var id struct {
