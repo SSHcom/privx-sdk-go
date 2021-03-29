@@ -28,8 +28,8 @@ type rolesResult struct {
 }
 
 type sourcesResult struct {
-	Count int       `json:"count"`
-	Items []Sources `json:"items"`
+	Count int         `json:"count"`
+	Items []Directory `json:"items"`
 }
 
 // New creates a new role-store client instance, using the
@@ -39,18 +39,18 @@ func New(api restapi.Connector) *RoleStore {
 }
 
 // Source returns a source
-func (store *RoleStore) Source(id string) (source *Sources, err error) {
-	source = new(Sources)
+func (store *RoleStore) Source(id string) (source *Directory, err error) {
+	source = new(Directory)
 
 	_, err = store.api.
 		URL("/role-store/api/v1/sources/%s", url.PathEscape(id)).
 		Get(source)
 
-	return source, err
+	return
 }
 
 // CreateSource create a new source
-func (store *RoleStore) CreateSource(source Sources) (string, error) {
+func (store *RoleStore) CreateSource(source Directory) (string, error) {
 	var id struct {
 		ID string `json:"id"`
 	}
@@ -63,7 +63,7 @@ func (store *RoleStore) CreateSource(source Sources) (string, error) {
 }
 
 // Sources get all sources.
-func (store *RoleStore) Sources() ([]Sources, error) {
+func (store *RoleStore) Sources() ([]Directory, error) {
 	result := sourcesResult{}
 
 	_, err := store.api.
