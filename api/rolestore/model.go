@@ -67,8 +67,8 @@ type EUM struct {
 	SourceSeaerchField string `json:"source_search_field,omitempty"`
 }
 
-// Sources source definitions - user and host directories
-type Sources struct {
+// Source definitions - user and host directories
+type Source struct {
 	ID                  string     `json:"id,omitempty"`
 	Created             string     `json:"created,omitempty"`
 	Updated             string     `json:"updated,omitempty"`
