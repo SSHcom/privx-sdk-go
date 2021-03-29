@@ -38,6 +38,15 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// DeleteSource delete a source
+func (store *RoleStore) DeleteSource(id string) error {
+	_, err := store.api.
+		URL("/role-store/api/v1/sources/%s", id).
+		Delete()
+
+	return err
+}
+
 // Source returns a source
 func (store *RoleStore) Source(id string) (source *Source, err error) {
 	source = new(Source)
