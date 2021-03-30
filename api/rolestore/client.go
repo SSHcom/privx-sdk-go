@@ -32,10 +32,30 @@ type sourcesResult struct {
 	Items []Source `json:"items"`
 }
 
+type awsrolesResult struct {
+	Count int       `json:"count"`
+	Items []AWSRole `json:"items"`
+}
+
 // New creates a new role-store client instance, using the
 // argument SDK API client.
 func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
+}
+
+// AWSRoles returns all aws roles.
+func (store *RoleStore) AWSRoles(refresh string) ([]AWSRole, error) {
+	result := awsrolesResult{}
+	filters := Params{
+		Refresh: refresh,
+	}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/awsroles").
+		Query(&filters).
+		Get(&result)
+
+	return result.Items, err
 }
 
 // UpdateSource update existing source
