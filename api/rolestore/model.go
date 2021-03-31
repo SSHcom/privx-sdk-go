@@ -6,6 +6,23 @@
 
 package rolestore
 
+// Params struct for pagination queries.
+type Params struct {
+	Refresh string `json:"refresh,omitempty"`
+}
+
+// AWSRole aws role definition.
+type AWSRole struct {
+	ID          string    `json:"id,omitempty"`
+	Name        string    `json:"name,omitempty"`
+	ARN         string    `json:"arn,omitempty"`
+	Updated     string    `json:"updated,omitempty"`
+	Description string    `json:"description,omitempty"`
+	Source      string    `json:"source,omitempty"`
+	Status      string    `json:"status,omitempty"`
+	Roles       []RoleRef `json:"roles,omitempty"`
+}
+
 // Connection source connection definition
 type Connection struct {
 	Type                   string   `json:"type,omitempty"`
