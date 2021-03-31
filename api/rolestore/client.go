@@ -43,6 +43,15 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// DeleteAWSRole delete a aws role
+func (store *RoleStore) DeleteAWSRole(id string) error {
+	_, err := store.api.
+		URL("/role-store/api/v1/awsroles/%s", id).
+		Delete()
+
+	return err
+}
+
 // AWSRole returns existing single aws role
 func (store *RoleStore) AWSRole(id string) (role *AWSRole, err error) {
 	role = new(AWSRole)
