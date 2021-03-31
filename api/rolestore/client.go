@@ -43,6 +43,17 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// AWSRole returns existing single aws role
+func (store *RoleStore) AWSRole(id string) (role *AWSRole, err error) {
+	role = new(AWSRole)
+
+	_, err = store.api.
+		URL("/role-store/api/v1/awsroles/%s", url.PathEscape(id)).
+		Get(role)
+
+	return
+}
+
 // AWSRoles returns all aws roles.
 func (store *RoleStore) AWSRoles(refresh string) ([]AWSRole, error) {
 	result := awsrolesResult{}
