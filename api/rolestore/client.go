@@ -43,6 +43,17 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// AWSGrantedRoles return AWS role granting PrivX roles
+func (store *RoleStore) AWSGrantedRoles(id string) ([]AWSRole, error) {
+	result := awsrolesResult{}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/awsroles/%s/roles", url.PathEscape(id)).
+		Get(&result)
+
+	return result.Items, err
+}
+
 // DeleteAWSRole delete a aws role
 func (store *RoleStore) DeleteAWSRole(id string) error {
 	_, err := store.api.
