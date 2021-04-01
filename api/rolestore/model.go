@@ -105,31 +105,76 @@ type Source struct {
 
 // User contains PrivX user information.
 type User struct {
-	ID                string   `json:"id"`
-	SourceUserID      string   `json:"source_user_id"`
-	Tags              []string `json:"tags"`
-	Principal         string   `json:"principal"`
-	Source            string   `json:"source"`
-	FullName          string   `json:"full_name"`
-	Email             string   `json:"email"`
-	DistinguishedName string   `json:"distinguished_name"`
-	Roles             []Role   `json:"roles"`
+	ID                string          `json:"id,omitempty"`
+	SourceUserID      string          `json:"source_user_id,omitempty"`
+	Principal         string          `json:"principal,omitempty"`
+	Source            string          `json:"source,omitempty"`
+	FullName          string          `json:"full_name,omitempty"`
+	Email             string          `json:"email,omitempty"`
+	DistinguishedName string          `json:"distinguished_name,omitempty"`
+	Created           string          `json:"created,omitempty"`
+	Updated           string          `json:"updated,omitempty"`
+	UpdatedBy         string          `json:"updated_by,omitempty"`
+	Author            string          `json:"author,omitempty"`
+	Comment           string          `json:"comment,omitempty"`
+	GivenName         string          `json:"given_name,omitempty"`
+	Job               string          `json:"job_title,omitempty"`
+	Company           string          `json:"company,omitempty"`
+	Department        string          `json:"department,omitempty"`
+	Telephone         string          `json:"telephone,omitempty"`
+	Locale            string          `json:"locale,omitempty"`
+	StaleAccessToken  bool            `json:"stale_access_token,omitempty"`
+	Permissions       []string        `json:"permissions,omitempty"`
+	Tags              []string        `json:"tags"`
+	MFA               MFA             `json:"mfa"`
+	Roles             []Role          `json:"roles"`
+	AuthorizedKeys    []AuthorizedKey `json:"authorized_keys,omitempty"`
+}
+
+// AuthorizedKey authorizednal key definition
+type AuthorizedKey struct {
+	ID            string   `json:"id,omitempty"`
+	Username      string   `json:"username,omitempty"`
+	UserID        string   `json:"user_id,omitempty"`
+	Name          string   `json:"name,omitempty"`
+	Comment       string   `json:"comment,omitempty"`
+	PublicKey     string   `json:"public_key,omitempty"`
+	NotBefore     string   `json:"not_before,omitempty"`
+	NotAfter      string   `json:"not_after,omitempty"`
+	SourceAddress []string `json:"source_address,omitempty"`
+}
+
+// MFA multifactor authentication definition
+type MFA struct {
+	Status string `json:"status,omitempty"`
+	Seed   Seed   `json:"seed,omitempty"`
+}
+
+// Seed seed definition
+type Seed struct {
+	SeedString string `json:"seed_string,omitempty"`
+	SeedQRCode string `json:"seed_qr_code,omitempty"`
 }
 
 // Role contains PrivX role information.
 type Role struct {
-	ID          string     `json:"id"`
-	Name        string     `json:"name"`
-	Explicit    bool       `json:"explicit" tabulate:"@userCtx"`
-	Implicit    bool       `json:"implicit" tabulate:"@userCtx"`
-	System      bool       `json:"system"`
-	GrantType   string     `json:"grant_type"`
-	Comment     string     `json:"comment"`
-	SourceRule  SourceRule `json:"source_rules"`
-	Permissions []string   `json:"permissions"`
-	Context     *Context   `json:"context"`
-	MemberCount int        `json:"member_count"`
-	PublicKey   []string   `json:"principal_public_key_strings,omitempty"`
+	ID             string     `json:"id"`
+	Name           string     `json:"name"`
+	GrantType      string     `json:"grant_type"`
+	Comment        string     `json:"comment"`
+	AccessGroupID  string     `json:"access_group_id"`
+	GrantStart     string     `json:"grant_start"`
+	GrantEnd       string     `json:"grant_end"`
+	Permissions    []string   `json:"permissions"`
+	PublicKey      []string   `json:"principal_public_key_strings"`
+	MemberCount    int        `json:"member_count"`
+	FloatingLength int        `json:"floating_length"`
+	Explicit       bool       `json:"explicit" tabulate:"@userCtx"`
+	Implicit       bool       `json:"implicit" tabulate:"@userCtx"`
+	System         bool       `json:"system"`
+	PermitAgent    bool       `json:"permit_agent"`
+	Context        *Context   `json:"context"`
+	SourceRule     SourceRule `json:"source_rules"`
 }
 
 // RoleRef is a reference to role object

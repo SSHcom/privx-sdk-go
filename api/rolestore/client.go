@@ -43,6 +43,20 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// EvaluateRole evaluate a new role definition
+func (store *RoleStore) EvaluateRole(role *Role) ([]User, error) {
+	var result struct {
+		Count int    `json:"count"`
+		Items []User `json:"items"`
+	}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/roles/evaluate").
+		Post(role, &result)
+
+	return result.Items, err
+}
+
 // AWSGrantedRoles return AWS role granting PrivX roles
 func (store *RoleStore) AWSGrantedRoles(id string) ([]AWSRole, error) {
 	result := awsrolesResult{}
