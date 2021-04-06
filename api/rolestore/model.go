@@ -11,6 +11,12 @@ type Params struct {
 	Refresh string `json:"refresh,omitempty"`
 }
 
+// PrincipalKey principal key definition
+type PrincipalKey struct {
+	ID        string `json:"id,omitempty"`
+	PublicKey string `json:"public_key,omitempty"`
+}
+
 // AWSRole aws role definition.
 type AWSRole struct {
 	ID          string    `json:"id,omitempty"`
