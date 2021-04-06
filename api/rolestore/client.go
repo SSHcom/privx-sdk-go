@@ -43,6 +43,15 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// DeleteRole delete a role
+func (store *RoleStore) DeleteRole(id string) error {
+	_, err := store.api.
+		URL("/role-store/api/v1/roles/%s", id).
+		Delete()
+
+	return err
+}
+
 // EvaluateRole evaluate a new role definition
 func (store *RoleStore) EvaluateRole(role *Role) ([]User, error) {
 	var result struct {
