@@ -37,10 +37,26 @@ type awsrolesResult struct {
 	Items []AWSRole `json:"items"`
 }
 
+type principalkeysResult struct {
+	Count int            `json:"count"`
+	Items []PrincipalKey `json:"items"`
+}
+
 // New creates a new role-store client instance, using the
 // argument SDK API client.
 func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
+}
+
+// PrincipalKeys returns all principal keys
+func (store *RoleStore) PrincipalKeys(id string) ([]PrincipalKey, error) {
+	result := principalkeysResult{}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/roles/%s/principalkeys", url.PathEscape(id)).
+		Get(&result)
+
+	return result.Items, err
 }
 
 // UpdateRole update existing role
