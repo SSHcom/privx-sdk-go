@@ -48,8 +48,8 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
-// GenerateKey generate new principal key for existing role
-func (store *RoleStore) GenerateKey(id string) (string, error) {
+// GeneratePrincipalKey generate new principal key for existing role
+func (store *RoleStore) GeneratePrincipalKey(id string) (string, error) {
 	var keyID struct {
 		ID string `json:"id"`
 	}
