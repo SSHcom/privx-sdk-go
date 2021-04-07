@@ -11,6 +11,12 @@ type Params struct {
 	Refresh string `json:"refresh,omitempty"`
 }
 
+// PrivateKey principal privat key definition
+type PrivateKey struct {
+	ID         string `json:"id,omitempty"`
+	PrivateKey string `json:"private_key,omitempty"`
+}
+
 // PrincipalKey principal key definition
 type PrincipalKey struct {
 	ID        string `json:"id,omitempty"`
