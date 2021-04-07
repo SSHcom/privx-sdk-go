@@ -48,6 +48,19 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// GeneratePrincipalKey generate new principal key for existing role
+func (store *RoleStore) GeneratePrincipalKey(id string) (string, error) {
+	var keyID struct {
+		ID string `json:"id"`
+	}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/roles/%s/principalkeys/generate", url.PathEscape(id)).
+		Post(id, &keyID)
+
+	return keyID.ID, err
+}
+
 // PrincipalKeys returns all principal keys
 func (store *RoleStore) PrincipalKeys(id string) ([]PrincipalKey, error) {
 	result := principalkeysResult{}
