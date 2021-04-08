@@ -57,8 +57,8 @@ func (store *RoleStore) DeletePrincipalKey(roleID, keyID string) error {
 	return err
 }
 
-// PrincipalKeyObject returns a role's principal key object.
-func (store *RoleStore) PrincipalKeyObject(roleID, keyID string) (key *PrincipalKey, err error) {
+// PrincipalKey returns a role's principal key object.
+func (store *RoleStore) PrincipalKey(roleID, keyID string) (key *PrincipalKey, err error) {
 	key = new(PrincipalKey)
 
 	_, err = store.api.
