@@ -48,6 +48,39 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// DeletePrincipalKey delete a role's principal key
+func (store *RoleStore) DeletePrincipalKey(roleID, keyID string) error {
+	_, err := store.api.
+		URL("/role-store/api/v1/roles/%s/principalkeys/%s", roleID, keyID).
+		Delete()
+
+	return err
+}
+
+// PrincipalKey returns a role's principal key object.
+func (store *RoleStore) PrincipalKey(roleID, keyID string) (key *PrincipalKey, err error) {
+	key = new(PrincipalKey)
+
+	_, err = store.api.
+		URL("/role-store/api/v1/roles/%s/principalkeys/%s", url.PathEscape(roleID), url.PathEscape(keyID)).
+		Get(key)
+
+	return
+}
+
+// ImportPrincipalKey import new principal key for existing role
+func (store *RoleStore) ImportPrincipalKey(key PrivateKey, id string) (string, error) {
+	var keyID struct {
+		ID string `json:"id"`
+	}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/roles/%s/principalkeys/import", url.PathEscape(id)).
+		Post(&key, &keyID)
+
+	return keyID.ID, err
+}
+
 // GeneratePrincipalKey generate new principal key for existing role
 func (store *RoleStore) GeneratePrincipalKey(id string) (string, error) {
 	var keyID struct {
