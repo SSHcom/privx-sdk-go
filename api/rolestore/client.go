@@ -48,6 +48,27 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// ResolveUserRole resolve users role
+func (store *RoleStore) ResolveUserRole(id string) (user *User, err error) {
+	user = new(User)
+
+	_, err = store.api.
+		URL("/role-store/api/v1/users/%s/resolve", url.PathEscape(id)).
+		Get(user)
+
+	return
+}
+
+// UsersAWSRoles returns current user's AWS roles
+func (store *RoleStore) UsersAWSRoles() ([]AWSRole, error) {
+	result := awsrolesResult{}
+	_, err := store.api.
+		URL("/role-store/api/v1/users/current/awsroles").
+		Get(&result)
+
+	return result.Items, err
+}
+
 // DeletePrincipalKey delete a role's principal key
 func (store *RoleStore) DeletePrincipalKey(roleID, keyID string) error {
 	_, err := store.api.
@@ -181,6 +202,15 @@ func (store *RoleStore) AWSRoles(refresh string) ([]AWSRole, error) {
 		Get(&result)
 
 	return result.Items, err
+}
+
+// RefreshSource fetch hosts from local host directory, or users from any user directory
+func (store *RoleStore) RefreshSource(id []string) error {
+	_, err := store.api.
+		URL("/role-store/api/v1/sources/refresh").
+		Post(&id)
+
+	return err
 }
 
 // UpdateSource update existing source
