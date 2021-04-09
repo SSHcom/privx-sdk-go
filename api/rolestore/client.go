@@ -204,8 +204,8 @@ func (store *RoleStore) AWSRoles(refresh string) ([]AWSRole, error) {
 	return result.Items, err
 }
 
-// RefreshSource fetch hosts from local host directory, or users from any user directory
-func (store *RoleStore) RefreshSource(id []string) error {
+// RefreshSources refresh all host and user sources
+func (store *RoleStore) RefreshSources(id []string) error {
 	_, err := store.api.
 		URL("/role-store/api/v1/sources/refresh").
 		Post(&id)
