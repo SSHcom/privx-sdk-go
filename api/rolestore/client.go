@@ -42,6 +42,11 @@ type principalkeysResult struct {
 	Items []PrincipalKey `json:"items"`
 }
 
+type awsTokenResult struct {
+	Count int        `json:"count"`
+	Items []AWSToken `json:"items"`
+}
+
 // New creates a new role-store client instance, using the
 // argument SDK API client.
 func New(api restapi.Connector) *RoleStore {
@@ -49,28 +54,28 @@ func New(api restapi.Connector) *RoleStore {
 }
 
 // ResetMFA reset multifactor authentication
-func (store *RoleStore) ResetMFA(userID []string) error {
+func (store *RoleStore) ResetMFA(userIDs []string) error {
 	_, err := store.api.
 		URL("/role-store/api/v1/users/mfa/reset").
-		Post(&userID)
+		Post(&userIDs)
 
 	return err
 }
 
 // DisableMFA disable multifactor authentication
-func (store *RoleStore) DisableMFA(userID []string) error {
+func (store *RoleStore) DisableMFA(userIDs []string) error {
 	_, err := store.api.
 		URL("/role-store/api/v1/users/mfa/disable").
-		Post(&userID)
+		Post(&userIDs)
 
 	return err
 }
 
 // EnableMFA enable multifactor authentication
-func (store *RoleStore) EnableMFA(userID []string) error {
+func (store *RoleStore) EnableMFA(userIDs []string) error {
 	_, err := store.api.
 		URL("/role-store/api/v1/users/mfa/enable").
-		Post(&userID)
+		Post(&userIDs)
 
 	return err
 }
