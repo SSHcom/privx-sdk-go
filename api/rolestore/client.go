@@ -42,11 +42,6 @@ type principalkeysResult struct {
 	Items []PrincipalKey `json:"items"`
 }
 
-type awsTokenResult struct {
-	Count int        `json:"count"`
-	Items []AWSToken `json:"items"`
-}
-
 // New creates a new role-store client instance, using the
 // argument SDK API client.
 func New(api restapi.Connector) *RoleStore {
