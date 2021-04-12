@@ -48,6 +48,33 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// ResetMFA reset multifactor authentication
+func (store *RoleStore) ResetMFA(userIDs []string) error {
+	_, err := store.api.
+		URL("/role-store/api/v1/users/mfa/reset").
+		Post(&userIDs)
+
+	return err
+}
+
+// DisableMFA disable multifactor authentication
+func (store *RoleStore) DisableMFA(userIDs []string) error {
+	_, err := store.api.
+		URL("/role-store/api/v1/users/mfa/disable").
+		Post(&userIDs)
+
+	return err
+}
+
+// EnableMFA enable multifactor authentication
+func (store *RoleStore) EnableMFA(userIDs []string) error {
+	_, err := store.api.
+		URL("/role-store/api/v1/users/mfa/enable").
+		Post(&userIDs)
+
+	return err
+}
+
 // ResolveUserRole resolve users role
 func (store *RoleStore) ResolveUserRole(id string) (user *User, err error) {
 	user = new(User)
