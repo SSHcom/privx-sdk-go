@@ -213,7 +213,7 @@ func (store *RoleStore) EvaluateRole(role *Role) ([]User, error) {
 	return result.Items, err
 }
 
-// Source returns a source
+// AWSToken returns AWS token for a specified role
 func (store *RoleStore) AWSToken(roleID, tokencode string, ttl int) ([]AWSToken, error) {
 	result := awsTokenResult{}
 	filters := Params{

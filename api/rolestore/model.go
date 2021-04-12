@@ -40,14 +40,14 @@ type AWSToken struct {
 
 // AWSRole aws role definition.
 type AWSRole struct {
-	ID          string    `json:"id"`
-	Name        string    `json:"name"`
-	ARN         string    `json:"arn"`
-	Updated     string    `json:"updated"`
-	Description string    `json:"description"`
-	Source      string    `json:"source"`
-	Status      string    `json:"status"`
-	Roles       []RoleRef `json:"roles"`
+	ID          string    `json:"id,omitempty"`
+	Name        string    `json:"name,omitempty"`
+	ARN         string    `json:"arn,omitempty"`
+	Updated     string    `json:"updated,omitempty"`
+	Description string    `json:"description,omitempty"`
+	Source      string    `json:"source,omitempty"`
+	Status      string    `json:"status,omitempty"`
+	Roles       []RoleRef `json:"roles,omitempty"`
 }
 
 // Connection source connection definition
