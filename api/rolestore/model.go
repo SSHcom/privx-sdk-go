@@ -8,7 +8,13 @@ package rolestore
 
 // Params struct for pagination queries.
 type Params struct {
-	Refresh string `json:"refresh,omitempty"`
+	Refresh   string `json:"refresh,omitempty"`
+	Offset    string `json:"offset,omitempty"`
+	Limit     string `json:"limit,omitempty"`
+	Sortdir   string `json:"sortdir,omitempty"`
+	Sortkey   string `json:"sortkey,omitempty"`
+	Tokencode string `json:"tokencode,omitempty"`
+	TTL       int    `json:"ttl,omitempty"`
 }
 
 // PrivateKey principal privat key definition
@@ -23,16 +29,25 @@ type PrincipalKey struct {
 	PublicKey string `json:"public_key,omitempty"`
 }
 
+// AWSToken aws token definition
+type AWSToken struct {
+	AccessKeyID     string   `json:"access_key_id,omitempty"`
+	SecretAccessKey string   `json:"secret_access_key,omitempty"`
+	SessionToken    string   `json:"session_token,omitempty"`
+	Expires         string   `json:"expires,omitempty"`
+	Descriptions    []string `json:"descriptions,omitempty"`
+}
+
 // AWSRole aws role definition.
 type AWSRole struct {
-	ID          string    `json:"id,omitempty"`
-	Name        string    `json:"name,omitempty"`
-	ARN         string    `json:"arn,omitempty"`
-	Updated     string    `json:"updated,omitempty"`
-	Description string    `json:"description,omitempty"`
-	Source      string    `json:"source,omitempty"`
-	Status      string    `json:"status,omitempty"`
-	Roles       []RoleRef `json:"roles,omitempty"`
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	ARN         string    `json:"arn"`
+	Updated     string    `json:"updated"`
+	Description string    `json:"description"`
+	Source      string    `json:"source"`
+	Status      string    `json:"status"`
+	Roles       []RoleRef `json:"roles"`
 }
 
 // Connection source connection definition

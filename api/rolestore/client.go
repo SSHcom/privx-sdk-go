@@ -37,6 +37,11 @@ type awsrolesResult struct {
 	Items []AWSRole `json:"items"`
 }
 
+type awsTokenResult struct {
+	Count int        `json:"count"`
+	Items []AWSToken `json:"items"`
+}
+
 type principalkeysResult struct {
 	Count int            `json:"count"`
 	Items []PrincipalKey `json:"items"`
@@ -46,6 +51,29 @@ type principalkeysResult struct {
 // argument SDK API client.
 func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
+}
+
+// UserAndUserSettings returns current user and user's settings
+func (store *RoleStore) UserAndUserSettings() ([]User, error) {
+	result := usersResult{}
+	_, err := store.api.
+		URL("/role-store/api/v1/users/current").
+		Get(&result)
+
+	return result.Items, err
+}
+
+// SearchUsersExternal searche users with user search parameters.
+func (store *RoleStore) SearchUsersExternal(keywords, source string) ([]User, error) {
+	result := usersResult{}
+	_, err := store.api.
+		URL("/role-store/api/v1/users/search/external").
+		Post(map[string]string{
+			"keywords": keywords,
+			"source":   source,
+		}, &result)
+
+	return result.Items, err
 }
 
 // ResetMFA reset multifactor authentication
@@ -181,6 +209,22 @@ func (store *RoleStore) EvaluateRole(role *Role) ([]User, error) {
 	_, err := store.api.
 		URL("/role-store/api/v1/roles/evaluate").
 		Post(role, &result)
+
+	return result.Items, err
+}
+
+// Source returns a source
+func (store *RoleStore) AWSToken(roleID, tokencode string, ttl int) ([]AWSToken, error) {
+	result := awsTokenResult{}
+	filters := Params{
+		Tokencode: tokencode,
+		TTL:       ttl,
+	}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/roles/%s/awstoken", url.PathEscape(roleID)).
+		Query(&filters).
+		Get(&result)
 
 	return result.Items, err
 }
