@@ -53,8 +53,8 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
-// UserAndUserSettings returns current user and user's settings
-func (store *RoleStore) UserAndUserSettings() ([]User, error) {
+// CurrentUser returns current user and user's settings
+func (store *RoleStore) CurrentUser() ([]User, error) {
 	result := usersResult{}
 	_, err := store.api.
 		URL("/role-store/api/v1/users/current").
@@ -64,13 +64,13 @@ func (store *RoleStore) UserAndUserSettings() ([]User, error) {
 }
 
 // SearchUsersExternal searche users with user search parameters.
-func (store *RoleStore) SearchUsersExternal(keywords, source string) ([]User, error) {
+func (store *RoleStore) SearchUsersExternal(keywords, sourceID string) ([]User, error) {
 	result := usersResult{}
 	_, err := store.api.
 		URL("/role-store/api/v1/users/search/external").
 		Post(map[string]string{
 			"keywords": keywords,
-			"source":   source,
+			"source":   sourceID,
 		}, &result)
 
 	return result.Items, err
