@@ -8,7 +8,13 @@ package rolestore
 
 // Params struct for pagination queries.
 type Params struct {
-	Refresh string `json:"refresh,omitempty"`
+	Refresh   string `json:"refresh,omitempty"`
+	Offset    string `json:"offset,omitempty"`
+	Limit     string `json:"limit,omitempty"`
+	Sortdir   string `json:"sortdir,omitempty"`
+	Sortkey   string `json:"sortkey,omitempty"`
+	Tokencode string `json:"tokencode,omitempty"`
+	TTL       int    `json:"ttl,omitempty"`
 }
 
 // PrivateKey principal privat key definition
@@ -21,6 +27,15 @@ type PrivateKey struct {
 type PrincipalKey struct {
 	ID        string `json:"id,omitempty"`
 	PublicKey string `json:"public_key,omitempty"`
+}
+
+// AWSToken aws token definition
+type AWSToken struct {
+	AccessKeyID     string   `json:"access_key_id,omitempty"`
+	SecretAccessKey string   `json:"secret_access_key,omitempty"`
+	SessionToken    string   `json:"session_token,omitempty"`
+	Expires         string   `json:"expires,omitempty"`
+	Descriptions    []string `json:"descriptions,omitempty"`
 }
 
 // AWSRole aws role definition.
