@@ -47,10 +47,50 @@ type principalkeysResult struct {
 	Items []PrincipalKey `json:"items"`
 }
 
+type authorizedkeysResult struct {
+	Count int             `json:"count"`
+	Items []AuthorizedKey `json:"items"`
+}
+
 // New creates a new role-store client instance, using the
 // argument SDK API client.
 func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
+}
+
+// AuthorizedKey return user's authorized key
+func (store *RoleStore) AuthorizedKey(uid, keyID string) (key *AuthorizedKey, err error) {
+	key = new(AuthorizedKey)
+
+	_, err = store.api.
+		URL("/role-store/api/v1/users/%s/authorizedkeys/%s", url.PathEscape(uid), url.PathEscape(keyID)).
+		Get(key)
+
+	return
+}
+
+// CreateAuthorizedKey register an authorized key for user
+func (store *RoleStore) CreateAuthorizedKey(key AuthorizedKey, uid string) (string, error) {
+	var id struct {
+		ID string `json:"id"`
+	}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/users/%s/authorizedkeys", url.PathEscape(uid)).
+		Post(&key, &id)
+
+	return id.ID, err
+}
+
+// AuthorizedKeys return user's authorized keys
+func (store *RoleStore) AuthorizedKeys(uid string) ([]AuthorizedKey, error) {
+	result := authorizedkeysResult{}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/users/%s/authorizedkeys", url.PathEscape(uid)).
+		Get(&result)
+
+	return result.Items, err
 }
 
 // CurrentUser returns current user and user's settings
