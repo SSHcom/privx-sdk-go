@@ -7,6 +7,7 @@
 package rolestore
 
 import (
+	"encoding/json"
 	"net/url"
 
 	"github.com/SSHcom/privx-sdk-go/restapi"
@@ -56,6 +57,33 @@ type authorizedkeysResult struct {
 // argument SDK API client.
 func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
+}
+
+// UserSettings get specific user settings
+func (store *RoleStore) UserSettings(uid string) (settings json.RawMessage, err error) {
+	_, err = store.api.
+		URL("/role-store/api/v1/users/%s/settings", url.PathEscape(uid)).
+		Get(&settings)
+
+	return
+}
+
+// DeleteAuthorizedKey delete a user's authorized key
+func (store *RoleStore) DeleteAuthorizedKey(uid, keyID string) error {
+	_, err := store.api.
+		URL("/role-store/api/v1/users/%s/authorizedkeys/%s", uid, keyID).
+		Delete()
+
+	return err
+}
+
+// UpdateAuthorizedKey update authorized key for user
+func (store *RoleStore) UpdateAuthorizedKey(key *AuthorizedKey, uid, keyID string) error {
+	_, err := store.api.
+		URL("/role-store/api/v1/users/%s/authorizedkeys/%s", url.PathEscape(uid), url.PathEscape(keyID)).
+		Put(key)
+
+	return err
 }
 
 // AuthorizedKey return user's authorized key
