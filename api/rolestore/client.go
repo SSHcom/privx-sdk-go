@@ -59,6 +59,15 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// UpdateUserSettings update specific user's settings
+func (store *RoleStore) UpdateUserSettings(settings *json.RawMessage, uid string) error {
+	_, err := store.api.
+		URL("/role-store/api/v1/users/%s/settings", url.PathEscape(uid)).
+		Put(settings)
+
+	return err
+}
+
 // UserSettings get specific user settings
 func (store *RoleStore) UserSettings(uid string) (settings json.RawMessage, err error) {
 	_, err = store.api.
@@ -66,6 +75,37 @@ func (store *RoleStore) UserSettings(uid string) (settings json.RawMessage, err 
 		Get(&settings)
 
 	return
+}
+
+// CreateCurrentAuthorizedKey register an authorized key for current user
+func (store *RoleStore) CreateCurrentAuthorizedKey(key AuthorizedKey) (string, error) {
+	var id struct {
+		ID string `json:"id"`
+	}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/users/current/authorizedkeys").
+		Post(&key, &id)
+
+	return id.ID, err
+}
+
+// CurrentAuthorizedKeys returns current user's authorized keys
+func (store *RoleStore) CurrentAuthorizedKeys(offset, limit, sortdir, sortkey string) ([]AuthorizedKey, error) {
+	result := authorizedkeysResult{}
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortdir: sortdir,
+		Sortkey: sortkey,
+	}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/users/current/authorizedkeys").
+		Query(&filters).
+		Get(&result)
+
+	return result.Items, err
 }
 
 // DeleteAuthorizedKey delete a user's authorized key
