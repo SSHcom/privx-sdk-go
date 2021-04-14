@@ -59,6 +59,15 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// UpdateUserSettings update specific user's settings
+func (store *RoleStore) UpdateUserSettings(settings *json.RawMessage, uid string) error {
+	_, err := store.api.
+		URL("/role-store/api/v1/users/%s/settings", url.PathEscape(uid)).
+		Put(settings)
+
+	return err
+}
+
 // UserSettings get specific user settings
 func (store *RoleStore) UserSettings(uid string) (settings json.RawMessage, err error) {
 	_, err = store.api.
@@ -121,16 +130,6 @@ func (store *RoleStore) AuthorizedKeys(uid string) ([]AuthorizedKey, error) {
 	return result.Items, err
 }
 
-// CurrentUser returns current user and user's settings
-func (store *RoleStore) CurrentUser() ([]User, error) {
-	result := usersResult{}
-	_, err := store.api.
-		URL("/role-store/api/v1/users/current").
-		Get(&result)
-
-	return result.Items, err
-}
-
 // SearchUsersExternal searche users with user search parameters.
 func (store *RoleStore) SearchUsersExternal(keywords, sourceID string) ([]User, error) {
 	result := usersResult{}
@@ -180,16 +179,6 @@ func (store *RoleStore) ResolveUserRole(id string) (user *User, err error) {
 		Get(user)
 
 	return
-}
-
-// UsersAWSRoles returns current user's AWS roles
-func (store *RoleStore) UsersAWSRoles() ([]AWSRole, error) {
-	result := awsrolesResult{}
-	_, err := store.api.
-		URL("/role-store/api/v1/users/current/awsroles").
-		Get(&result)
-
-	return result.Items, err
 }
 
 // DeletePrincipalKey delete a role's principal key
