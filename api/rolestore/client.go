@@ -77,37 +77,6 @@ func (store *RoleStore) UserSettings(uid string) (settings json.RawMessage, err 
 	return
 }
 
-// CreateCurrentAuthorizedKey register an authorized key for current user
-func (store *RoleStore) CreateCurrentAuthorizedKey(key AuthorizedKey) (string, error) {
-	var id struct {
-		ID string `json:"id"`
-	}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/users/current/authorizedkeys").
-		Post(&key, &id)
-
-	return id.ID, err
-}
-
-// CurrentAuthorizedKeys returns current user's authorized keys
-func (store *RoleStore) CurrentAuthorizedKeys(offset, limit, sortdir, sortkey string) ([]AuthorizedKey, error) {
-	result := authorizedkeysResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortdir: sortdir,
-		Sortkey: sortkey,
-	}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/users/current/authorizedkeys").
-		Query(&filters).
-		Get(&result)
-
-	return result.Items, err
-}
-
 // DeleteAuthorizedKey delete a user's authorized key
 func (store *RoleStore) DeleteAuthorizedKey(uid, keyID string) error {
 	_, err := store.api.
@@ -156,16 +125,6 @@ func (store *RoleStore) AuthorizedKeys(uid string) ([]AuthorizedKey, error) {
 
 	_, err := store.api.
 		URL("/role-store/api/v1/users/%s/authorizedkeys", url.PathEscape(uid)).
-		Get(&result)
-
-	return result.Items, err
-}
-
-// CurrentUser returns current user and user's settings
-func (store *RoleStore) CurrentUser() ([]User, error) {
-	result := usersResult{}
-	_, err := store.api.
-		URL("/role-store/api/v1/users/current").
 		Get(&result)
 
 	return result.Items, err
@@ -220,16 +179,6 @@ func (store *RoleStore) ResolveUserRole(id string) (user *User, err error) {
 		Get(user)
 
 	return
-}
-
-// UsersAWSRoles returns current user's AWS roles
-func (store *RoleStore) UsersAWSRoles() ([]AWSRole, error) {
-	result := awsrolesResult{}
-	_, err := store.api.
-		URL("/role-store/api/v1/users/current/awsroles").
-		Get(&result)
-
-	return result.Items, err
 }
 
 // DeletePrincipalKey delete a role's principal key
