@@ -65,12 +65,12 @@ func New(api restapi.Connector) *RoleStore {
 }
 
 // LogconfCollector returns existing single logconf collector
-func (store *RoleStore) LogconfCollector(id string) (role *LogconfCollector, err error) {
-	role = new(LogconfCollector)
+func (store *RoleStore) LogconfCollector(id string) (conf *LogconfCollector, err error) {
+	conf = new(LogconfCollector)
 
 	_, err = store.api.
 		URL("/role-store/api/v1/logconf/collectors/%s", url.PathEscape(id)).
-		Get(role)
+		Get(conf)
 
 	return
 }
