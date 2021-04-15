@@ -29,7 +29,7 @@ type PrincipalKey struct {
 	PublicKey string `json:"public_key,omitempty"`
 }
 
-// Logconf logconf collectors definition
+// LogconfCollector logconf collectors definition
 type LogconfCollector struct {
 	ID                       string `json:"id,omitempty"`
 	Name                     string `json:"name,omitempty"`
