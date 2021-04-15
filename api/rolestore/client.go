@@ -53,10 +53,50 @@ type authorizedkeysResult struct {
 	Items []AuthorizedKey `json:"items"`
 }
 
+type collectorsResult struct {
+	Count int                `json:"count"`
+	Items []LogconfCollector `json:"items"`
+}
+
 // New creates a new role-store client instance, using the
 // argument SDK API client.
 func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
+}
+
+// LogconfCollector returns existing single logconf collector
+func (store *RoleStore) LogconfCollector(id string) (role *LogconfCollector, err error) {
+	role = new(LogconfCollector)
+
+	_, err = store.api.
+		URL("/role-store/api/v1/logconf/collectors/%s", url.PathEscape(id)).
+		Get(role)
+
+	return
+}
+
+// CreateLogconfCollector create a logconf collector
+func (store *RoleStore) CreateLogconfCollector(conf LogconfCollector) (string, error) {
+	var id struct {
+		ID string `json:"id"`
+	}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/logconf/collectors").
+		Post(&conf, &id)
+
+	return id.ID, err
+}
+
+// LogconfCollectors returns all logconf collectors
+func (store *RoleStore) LogconfCollectors() ([]LogconfCollector, error) {
+	result := collectorsResult{}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/logconf/collectors").
+		Get(&result)
+
+	return result.Items, err
 }
 
 // UpdateUserSettings update specific user's settings

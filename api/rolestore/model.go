@@ -29,6 +29,29 @@ type PrincipalKey struct {
 	PublicKey string `json:"public_key,omitempty"`
 }
 
+// Logconf logconf collectors definition
+type LogconfCollector struct {
+	ID                       string `json:"id,omitempty"`
+	Name                     string `json:"name,omitempty"`
+	Type                     string `json:"type,omitempty"`
+	Updated                  string `json:"updated,omitempty"`
+	StatusCode               string `json:"status_code,omitempty"`
+	StatusText               string `json:"status_text,omitempty"`
+	AWSLogRegion             string `json:"aws_log_region,omitempty"`
+	IAMAccessKeyID           string `json:"iam_access_key_id,omitempty"`
+	IAMSecretAccessKey       string `json:"iam_secret_access_key,omitempty"`
+	IAMSessionToken          string `json:"iam_session_token,omitempty"`
+	AzureEventHubsNamespace  string `json:"azure_event_hubs_namespace,omitempty"`
+	AzureResourceGroupName   string `json:"azure_resource_group_name,omitempty"`
+	AzureSubscriptionID      string `json:"azure_subscription_id,omitempty"`
+	AzureEventHubName        string `json:"azure_event_hub_name,omitempty"`
+	AzureTenantID            string `json:"azure_tenant_id,omitempty"`
+	AzureClientID            string `json:"azure_client_id,omitempty"`
+	AzureClientSecret        string `json:"azure_client_secret,omitempty"`
+	AzureSasConnectionString string `json:"azure_sas_connection_string,omitempty"`
+	Enabled                  bool   `json:"enabled,omitempty"`
+}
+
 // AWSToken aws token definition
 type AWSToken struct {
 	AccessKeyID     string   `json:"access_key_id,omitempty"`
