@@ -64,6 +64,24 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// DeleteLogconfCollector delete a logconf collector
+func (store *RoleStore) DeleteLogconfCollector(id string) error {
+	_, err := store.api.
+		URL("/role-store/api/v1/logconf/collectors/%s", id).
+		Delete()
+
+	return err
+}
+
+// UpdateLogconfCollector update existing logconf collector
+func (store *RoleStore) UpdateLogconfCollector(id string, conf *LogconfCollector) error {
+	_, err := store.api.
+		URL("/role-store/api/v1/logconf/collectors/%s", url.PathEscape(id)).
+		Put(conf)
+
+	return err
+}
+
 // LogconfCollector returns existing single logconf collector
 func (store *RoleStore) LogconfCollector(id string) (conf *LogconfCollector, err error) {
 	conf = new(LogconfCollector)
@@ -308,6 +326,21 @@ func (store *RoleStore) EvaluateRole(role *Role) ([]User, error) {
 		Post(role, &result)
 
 	return result.Items, err
+}
+
+// UpdateAWSRole update existing aws role
+func (store *RoleStore) UpdateAWSRole(awsRoleID, roleID string) error {
+	res := []RoleRef{
+		{
+			ID: roleID,
+		},
+	}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/awsroles/%s/roles", url.PathEscape(awsRoleID)).
+		Put(&res)
+
+	return err
 }
 
 // AWSToken returns AWS token for a specified role
