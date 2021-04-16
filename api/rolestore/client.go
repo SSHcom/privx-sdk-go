@@ -64,6 +64,35 @@ func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
+// ResolveAuthorizedKey resolve authorized keys
+func (store *RoleStore) ResolveAuthorizedKey(resolve ResolveAuthorizedKey) ([]AuthorizedKey, error) {
+	result := authorizedkeysResult{}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/authorizedkeys/resolve").
+		Post(&resolve, &result)
+
+	return result.Items, err
+}
+
+// AllAuthorizedKeys returns all authorized keys
+func (store *RoleStore) AllAuthorizedKeys(offset, limit, sortdir, sortkey string) ([]AuthorizedKey, error) {
+	result := authorizedkeysResult{}
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortdir: sortdir,
+		Sortkey: sortkey,
+	}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/authorizedkeys").
+		Query(&filters).
+		Get(&result)
+
+	return result.Items, err
+}
+
 // DeleteLogconfCollector delete a logconf collector
 func (store *RoleStore) DeleteLogconfCollector(id string) error {
 	_, err := store.api.

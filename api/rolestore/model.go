@@ -17,6 +17,12 @@ type Params struct {
 	TTL       int    `json:"ttl,omitempty"`
 }
 
+// ResolveAuthorizedKey struct for resolving authorized key.
+type ResolveAuthorizedKey struct {
+	Username  string `json:"username,omitempty"`
+	PublicKey string `json:"public_key,omitempty"`
+}
+
 // PrivateKey principal privat key definition
 type PrivateKey struct {
 	ID         string `json:"id,omitempty"`
