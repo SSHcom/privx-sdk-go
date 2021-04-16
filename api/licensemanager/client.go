@@ -10,6 +10,7 @@ import (
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
+// LicenseManager is a license manager client instance.
 type LicenseManager struct {
 	api restapi.Connector
 }
