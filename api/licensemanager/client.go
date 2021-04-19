@@ -35,10 +35,10 @@ func (store *LicenseManager) SetLicenseStatistics(optin bool) error {
 }
 
 // SetLicense post a new license to server
-func (store *LicenseManager) SetLicense(license string) error {
+func (store *LicenseManager) SetLicense(licenseCode string) error {
 	_, err := store.api.
 		URL("/license-manager/api/v1/license").
-		Post(license)
+		Post(licenseCode)
 
 	return err
 }
