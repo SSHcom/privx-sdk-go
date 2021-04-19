@@ -21,6 +21,26 @@ func New(api restapi.Connector) *LicenseManager {
 	return &LicenseManager{api: api}
 }
 
+// RefreshLicense refresh the license info
+func (store *LicenseManager) RefreshLicense() (license *License, err error) {
+	license = new(License)
+
+	_, err = store.api.
+		URL("/license-manager/api/v1/license/refresh").
+		PostWithoutBody(license)
+
+	return
+}
+
+// DeactivateLicense deactivate license
+func (store *LicenseManager) DeactivateLicense() error {
+	_, err := store.api.
+		URL("/license-manager/api/v1/license/deactivate").
+		PostWithoutBody()
+
+	return err
+}
+
 // SetLicenseStatistics settings for SSH license statistics
 func (store *LicenseManager) SetLicenseStatistics(optin bool) error {
 	statistics := License{

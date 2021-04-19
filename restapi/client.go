@@ -218,6 +218,18 @@ func (curl *tCURL) Post(eg interface{}, in ...interface{}) (http.Header, error) 
 }
 
 //
+// PostWithoutBody sends content to endpoint without entity body
+func (curl *tCURL) PostWithoutBody(in ...interface{}) (http.Header, error) {
+	curl.method = http.MethodPost
+
+	if len(in) > 0 {
+		return curl.recv(in[0])
+	}
+
+	return curl.status()
+}
+
+//
 // Delete removes content behind url
 func (curl *tCURL) Delete(in ...interface{}) (http.Header, error) {
 	curl.method = http.MethodDelete
