@@ -27,7 +27,7 @@ func (store *LicenseManager) RefreshLicense() (license *License, err error) {
 
 	_, err = store.api.
 		URL("/license-manager/api/v1/license/refresh").
-		PostWithoutBody(license)
+		Post(nil, license)
 
 	return
 }
@@ -36,7 +36,7 @@ func (store *LicenseManager) RefreshLicense() (license *License, err error) {
 func (store *LicenseManager) DeactivateLicense() error {
 	_, err := store.api.
 		URL("/license-manager/api/v1/license/deactivate").
-		PostWithoutBody()
+		Post(nil)
 
 	return err
 }

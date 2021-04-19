@@ -208,19 +208,10 @@ func (curl *tCURL) Put(eg interface{}, in ...interface{}) (http.Header, error) {
 // Post sends content to endpoint
 func (curl *tCURL) Post(eg interface{}, in ...interface{}) (http.Header, error) {
 	curl.method = http.MethodPost
-	curl.send(eg)
 
-	if len(in) > 0 {
-		return curl.recv(in[0])
+	if eg != nil {
+		curl.send(eg)
 	}
-
-	return curl.status()
-}
-
-//
-// PostWithoutBody sends content to endpoint without entity body
-func (curl *tCURL) PostWithoutBody(in ...interface{}) (http.Header, error) {
-	curl.method = http.MethodPost
 
 	if len(in) > 0 {
 		return curl.recv(in[0])
