@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2020 SSH Communications Security Inc.
+// Copyright (c) 2021 SSH Communications Security Inc.
 //
 // All rights reserved.
 //
@@ -34,8 +34,8 @@ func (store *LicenseManager) SetLicenseStatistics(optin bool) error {
 	return err
 }
 
-// CreateLicense post a new license to server
-func (store *LicenseManager) CreateLicense(license string) error {
+// SetLicense post a new license to server
+func (store *LicenseManager) SetLicense(license string) error {
 	_, err := store.api.
 		URL("/license-manager/api/v1/license").
 		Post(license)

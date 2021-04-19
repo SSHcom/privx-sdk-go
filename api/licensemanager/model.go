@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2020 SSH Communications Security Inc.
+// Copyright (c) 2021 SSH Communications Security Inc.
 //
 // All rights reserved.
 //
@@ -24,6 +24,7 @@ type License struct {
 	MaxConcurrentSSHConns   int      `json:"max_concurrent_ssh_conns,omitempty"`
 	MaxConcurrentRDPConns   int      `json:"max_concurrent_rdp_conns,omitempty"`
 	MaxConcurrentHTTPSConns int      `json:"max_concurrent_https_conns,omitempty"`
+	MaxConcurrentVNCConns   int      `json:"max_concurrent_vnc_conns,omitempty"`
 	AnalyticsEnabled        bool     `json:"analytics_enabled,omitempty"`
 	IsOffline               bool     `json:"isoffline,omitempty"`
 	Optin                   bool     `json:"optin,omitempty"`
