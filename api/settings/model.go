@@ -6,7 +6,7 @@
 
 package settings
 
-// Params struct for pagination queries.
+// Params query parameter definition
 type Params struct {
 	Merge string `json:"merge,omitempty"`
 }
