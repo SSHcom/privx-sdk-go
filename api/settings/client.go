@@ -25,7 +25,7 @@ func New(api restapi.Connector) *Settings {
 }
 
 // SectionSchema get schema for the section
-func (store *Settings) SectionSchema(scope, section string) (schema json.RawMessage, err error) {
+func (store *Settings) SectionSchema(scope, section string) (schema *json.RawMessage, err error) {
 	_, err = store.api.
 		URL("/settings/api/v1/schema/%s/%s", url.PathEscape(scope), url.PathEscape(section)).
 		Get(&schema)
@@ -34,7 +34,7 @@ func (store *Settings) SectionSchema(scope, section string) (schema json.RawMess
 }
 
 // ScopeSchema get schema for the scope
-func (store *Settings) ScopeSchema(scope string) (schema json.RawMessage, err error) {
+func (store *Settings) ScopeSchema(scope string) (schema *json.RawMessage, err error) {
 	_, err = store.api.
 		URL("/settings/api/v1/schema/%s", url.PathEscape(scope)).
 		Get(&schema)
@@ -52,23 +52,23 @@ func (store *Settings) UpdateScopeSectionSettings(settings *json.RawMessage, sco
 }
 
 // ScopeSectionSettings get settings for the scope
-func (store *Settings) ScopeSectionSettings(scope, section, merge string) (settings json.RawMessage, err error) {
-	filter := Params{
-		Merge: merge,
-	}
-
+func (store *Settings) ScopeSectionSettings(scope, section string) (settings *json.RawMessage, err error) {
 	_, err = store.api.
 		URL("/settings/api/v1/settings/%s/%s", url.PathEscape(scope), url.PathEscape(section)).
-		Query(&filter).
 		Get(&settings)
 
 	return
 }
 
 // ScopeSettings get settings for the scope
-func (store *Settings) ScopeSettings(scope string) (settings json.RawMessage, err error) {
+func (store *Settings) ScopeSettings(scope, merge string) (settings *json.RawMessage, err error) {
+	filter := Params{
+		Merge: merge,
+	}
+
 	_, err = store.api.
 		URL("/settings/api/v1/settings/%s", url.PathEscape(scope)).
+		Query(&filter).
 		Get(&settings)
 
 	return
