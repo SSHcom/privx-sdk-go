@@ -16,29 +16,21 @@ type Params struct {
 }
 
 // AuditEventCodes audit event codes definitions
-type AuditEventCodes struct {
-	EventCode  int        `json:"key,omitempty"`
-	EventValue EventValue `json:"value,omitempty"`
-}
+type AuditEventCodes map[string]AuditEventInfo
 
-// EventValue audit event codes value definitions
-type EventValue struct {
-	EventID          string `json:"event_id,omitempty"`
-	EventName        string `json:"event_name,omitempty"`
-	EventDescription string `json:"event_desc,omitempty"`
+// AuditEventInfo audit event codes value definitions
+type AuditEventInfo struct {
+	EventID          int    `json:"event_id"`
+	EventName        string `json:"event_name"`
+	EventDescription string `json:"event_desc"`
 }
 
 // AuditEvent audit event definitions
 type AuditEvent struct {
-	ServiceID   string `json:"service_id,omitempty"`
-	ServiceName string `json:"service_name,omitempty"`
-	EventID     string `json:"event_id,omitempty"`
-	EventName   string `json:"event_name,omitempty"`
-	Created     string `json:"created,omitempty"`
-	Message     Message
-}
-
-// Message message definitions
-type Message struct {
-	Message string `json:"message,omitempty"`
+	ServiceID   string            `json:"service_id,omitempty"`
+	ServiceName string            `json:"service_name,omitempty"`
+	EventID     string            `json:"event_id,omitempty"`
+	EventName   string            `json:"event_name,omitempty"`
+	Created     string            `json:"created,omitempty"`
+	Message     map[string]string `json:"message,omitempty"`
 }
