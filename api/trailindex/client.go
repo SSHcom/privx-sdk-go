@@ -18,8 +18,8 @@ type TrailIndex struct {
 }
 
 type trailIndexResult struct {
-	Count int                  `json:"count"`
-	Items []TrailIndexResponse `json:"items"`
+	Count int                `json:"count"`
+	Items []TrailIndexObject `json:"items"`
 }
 
 // New creates a new trail index client instance, using the
@@ -29,7 +29,7 @@ func New(api restapi.Connector) *TrailIndex {
 }
 
 // SearchContent search for the content based on the search parameters defined
-func (store *TrailIndex) SearchContent(offset, limit, sortdir string, searchObject SearchRequestObject) ([]TrailIndexResponse, error) {
+func (store *TrailIndex) SearchContent(offset, limit, sortdir string, searchObject SearchRequestObject) ([]TrailIndexObject, error) {
 	result := trailIndexResult{}
 	filters := Params{
 		Offset:  offset,

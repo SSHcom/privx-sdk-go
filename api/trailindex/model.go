@@ -13,8 +13,8 @@ type Params struct {
 	Sortdir string `json:"sortdir,omitempty"`
 }
 
-// TrailIndexResponse trail index response definition
-type TrailIndexResponse struct {
+// TrailIndexObject trail index response definition
+type TrailIndexObject struct {
 	ConnID      string `json:"connection_id,omitempty"`
 	ChanID      string `json:"channel_id,omitempty"`
 	Protocol    string `json:"protocol,omitempty"`
