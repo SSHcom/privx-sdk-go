@@ -56,8 +56,8 @@ func (store *TrailIndex) StartIndexing(connectionIDs []string) ([]Connection, er
 	return connections, err
 }
 
-// ConnectionStatus gets the statuses of the specified connections
-func (store *TrailIndex) ConnectionStatus(connectionIDs []string) ([]Connection, error) {
+// IndexingStatuses gets the statuses of the specified connections
+func (store *TrailIndex) IndexingStatuses(connectionIDs []string) ([]Connection, error) {
 	var connections []Connection
 
 	_, err := store.api.
