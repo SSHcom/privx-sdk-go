@@ -42,8 +42,8 @@ type User struct {
 	DisplayName string `json:"display_name,omitempty"`
 }
 
-// Workflow workflow response definition
-type Workflow struct {
+// WorkflowResponse workflow response definition
+type WorkflowResponse struct {
 	ID                   string `json:"id,omitempty"`
 	Author               string `json:"author,omitempty"`
 	Created              string `json:"created,omitempty"`
