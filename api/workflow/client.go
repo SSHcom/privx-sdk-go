@@ -12,7 +12,7 @@ import (
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-// Workflow is a workflow client instance.
+// WorkflowEngine is a workflow client instance.
 type WorkflowEngine struct {
 	api restapi.Connector
 }
