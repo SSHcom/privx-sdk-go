@@ -65,7 +65,7 @@ func (store *Engine) CreateWorkflow(workflow Workflow) (string, error) {
 
 	_, err := store.api.
 		URL("/workflow-engine/api/v1/workflows").
-		Post(workflow, &id)
+		Post(&workflow, &id)
 
 	return id.ID, err
 }
