@@ -58,7 +58,7 @@ func (store *Engine) Workflow(workflowID string) (workflow *Workflow, err error)
 }
 
 // CreateWorkflow create a new workflow
-func (store *Engine) CreateWorkflow(workflow Workflow) (string, error) {
+func (store *Engine) CreateWorkflow(workflow *Workflow) (string, error) {
 	var id struct {
 		ID string `json:"id"`
 	}
