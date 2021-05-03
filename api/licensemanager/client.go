@@ -22,14 +22,14 @@ func New(api restapi.Connector) *LicenseManager {
 }
 
 // RefreshLicense refresh the license info
-func (store *LicenseManager) RefreshLicense() (license *License, err error) {
-	license = new(License)
+func (store *LicenseManager) RefreshLicense() (*License, error) {
+	license := &License{}
 
-	_, err = store.api.
+	_, err := store.api.
 		URL("/license-manager/api/v1/license/refresh").
 		Post(nil, license)
 
-	return
+	return license, err
 }
 
 // DeactivateLicense deactivate license
@@ -64,12 +64,12 @@ func (store *LicenseManager) SetLicense(licenseCode string) error {
 }
 
 // License return privx license
-func (store *LicenseManager) License() (license *License, err error) {
-	license = new(License)
+func (store *LicenseManager) License() (*License, error) {
+	license := &License{}
 
-	_, err = store.api.
+	_, err := store.api.
 		URL("/license-manager/api/v1/license").
 		Get(license)
 
-	return
+	return license, err
 }
