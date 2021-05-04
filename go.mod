@@ -5,4 +5,5 @@ go 1.14
 require (
 	9fans.net/go v0.0.2 // indirect
 	github.com/BurntSushi/toml v0.3.1
+	github.com/dustin/go-humanize v1.0.0
 )

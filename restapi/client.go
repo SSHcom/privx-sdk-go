@@ -10,11 +10,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
+	"strconv"
+	"strings"
 	"time"
+
+	"github.com/dustin/go-humanize"
 )
 
 //
@@ -25,6 +32,12 @@ type tClient struct {
 	verbose bool
 	retry   int
 	http    *http.Client
+}
+
+//
+// WriteCounter count bytes for a file download
+type WriteCounter struct {
+	Total uint64
 }
 
 //
@@ -127,13 +140,24 @@ func (curl *tCURL) encodeURL(query interface{}) (url.Values, error) {
 		return nil, err
 	}
 
-	var params map[string]string
+	var params map[string]interface{}
 	if err = json.Unmarshal(bin, &params); err != nil {
 		return nil, err
 	}
 
 	var values url.Values = make(map[string][]string)
-	for key, val := range params {
+	for key, param := range params {
+		var val string
+		switch v := param.(type) {
+		case int:
+			val = strconv.Itoa(v)
+		case float64:
+			val = fmt.Sprintf("%g", v)
+		case string:
+			val = v
+		default:
+			return nil, fmt.Errorf("wrong format: %T", v)
+		}
 		values[key] = []string{val}
 	}
 
@@ -179,6 +203,72 @@ func (curl *tCURL) isSuccess(body []byte, status ...int) error {
 		if curl.output.StatusCode >= http.StatusBadRequest {
 			return ErrorFromResponse(curl.output, body)
 		}
+	}
+
+	return nil
+}
+
+//
+// Write increments the counter by the size of the bytes written into it
+func (wc *WriteCounter) Write(p []byte) (int, error) {
+	n := len(p)
+
+	wc.Total += uint64(n)
+	wc.printProgress()
+
+	return n, nil
+}
+
+func (wc *WriteCounter) printProgress() {
+	fmt.Printf("\r%s", strings.Repeat(" ", 50))
+
+	fmt.Printf("\rDownloading... %s complete", humanize.Bytes(wc.Total))
+}
+
+func writeToFile(filename string, resp *http.Response) error {
+	out, err := os.Create(filename + ".tmp")
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	counter := &WriteCounter{}
+	_, err = io.Copy(out, io.TeeReader(resp.Body, counter))
+	if err != nil {
+		return err
+	}
+
+	err = os.Rename(filename+".tmp", filename)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+//
+// Download dowmload file via http from endpoint
+func (curl *tCURL) Download(filename string) error {
+	curl.method = http.MethodGet
+
+	req, err := http.NewRequest(curl.method, curl.url, curl.payload)
+	if err != nil {
+		return err
+	}
+
+	resp, err := curl.client.do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		log.Fatal(resp.Status)
+	}
+
+	err = writeToFile(filename, resp)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -279,6 +369,7 @@ func (curl *tCURL) recv(data interface{}) (http.Header, error) {
 	}
 
 	curl.fail = curl.isSuccess(body)
+
 	return curl.unWrapWithData(body, data)
 }
 
