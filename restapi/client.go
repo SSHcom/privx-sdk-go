@@ -155,6 +155,8 @@ func (curl *tCURL) encodeURL(query interface{}) (url.Values, error) {
 			val = fmt.Sprintf("%g", v)
 		case string:
 			val = v
+		case bool:
+			val = strconv.FormatBool(v)
 		default:
 			return nil, fmt.Errorf("wrong format: %T", v)
 		}
