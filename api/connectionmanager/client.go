@@ -7,7 +7,6 @@
 package connectionmanager
 
 import (
-	"fmt"
 	"net/url"
 
 	"github.com/SSHcom/privx-sdk-go/restapi"
@@ -38,7 +37,7 @@ func (store *ConnectionManager) Connections(offset, limit int, sortkey, sortdir 
 		Sortkey: sortkey,
 		Sortdir: sortdir,
 	}
-	fmt.Println(filters)
+
 	_, err := store.api.
 		URL("/connection-manager/api/v1/connections").
 		Query(&filters).
