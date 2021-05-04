@@ -17,6 +17,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -139,13 +140,24 @@ func (curl *tCURL) encodeURL(query interface{}) (url.Values, error) {
 		return nil, err
 	}
 
-	var params map[string]string
+	var params map[string]interface{}
 	if err = json.Unmarshal(bin, &params); err != nil {
 		return nil, err
 	}
 
 	var values url.Values = make(map[string][]string)
-	for key, val := range params {
+	for key, param := range params {
+		var val string
+		switch v := param.(type) {
+		case int:
+			val = strconv.Itoa(v)
+		case float64:
+			val = fmt.Sprintf("%g", v)
+		case string:
+			val = v
+		default:
+			return nil, fmt.Errorf("wrong format: %T", v)
+		}
 		values[key] = []string{val}
 	}
 

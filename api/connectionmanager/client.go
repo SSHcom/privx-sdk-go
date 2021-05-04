@@ -7,6 +7,7 @@
 package connectionmanager
 
 import (
+	"fmt"
 	"net/url"
 
 	"github.com/SSHcom/privx-sdk-go/restapi"
@@ -28,43 +29,26 @@ func New(api restapi.Connector) *ConnectionManager {
 	return &ConnectionManager{api: api}
 }
 
-// DownloadStoredFile download trail stored file transferred within audited connection channel
-func (store *ConnectionManager) DownloadStoredFile(connID, chanID, fileID, sessionID, filename string) error {
-	err := store.api.
-		URL("/connection-manager/api/v1/connections/%s/channel/%s/file/%s/%s",
-			url.PathEscape(connID), url.PathEscape(chanID), url.PathEscape(fileID), url.PathEscape(sessionID)).
-		Download(filename)
-
-	return err
-}
-
-// CreateSessionIDFileDownload create session ID for trail stored file download
-func (store *ConnectionManager) CreateSessionIDFileDownload(connID, chanID, fileID string) (string, error) {
-	var id struct {
-		SessionID string `json:"session_id"`
+// Connections get all connections
+func (store *ConnectionManager) Connections(offset, limit int, sortkey, sortdir string) ([]Connection, error) {
+	result := connectionsResult{}
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
 	}
-
+	fmt.Println(filters)
 	_, err := store.api.
-		URL("/connection-manager/api/v1/connections/%s/channel/%s/file/%s",
-			url.PathEscape(connID), url.PathEscape(chanID), url.PathEscape(fileID)).
-		Post(nil, &id)
+		URL("/connection-manager/api/v1/connections").
+		Query(&filters).
+		Get(&result)
 
-	return id.SessionID, err
+	return result.Items, err
 }
 
-// Connection get a single connection
-func (store *ConnectionManager) Connection(connID string) (*Connection, error) {
-	conn := &Connection{}
-
-	_, err := store.api.
-		URL("/connection-manager/api/v1/connections/%s", url.PathEscape(connID)).
-		Get(conn)
-
-	return conn, err
-}
-
-// SearchConnection search for connections
-func (store *ConnectionManager) SearchConnection(offset, limit, sortdir, sortkey string, searchObject ConnectionSearch) ([]Connection, error) {
+// SearchConnections search for connections
+func (store *ConnectionManager) SearchConnections(offset, limit int, sortdir, sortkey string, searchObject ConnectionSearch) ([]Connection, error) {
 	result := connectionsResult{}
 	filters := Params{
 		Offset:  offset,
@@ -80,20 +64,37 @@ func (store *ConnectionManager) SearchConnection(offset, limit, sortdir, sortkey
 	return result.Items, err
 }
 
-// Connections get all connections
-func (store *ConnectionManager) Connections(offset, limit, sortkey, sortdir string) ([]Connection, error) {
-	result := connectionsResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
+// Connection get a single connection
+func (store *ConnectionManager) Connection(connID string) (*Connection, error) {
+	conn := &Connection{}
+
+	_, err := store.api.
+		URL("/connection-manager/api/v1/connections/%s", url.PathEscape(connID)).
+		Get(conn)
+
+	return conn, err
+}
+
+// CreateSessionIDFileDownload create session ID for trail stored file download
+func (store *ConnectionManager) CreateSessionIDFileDownload(connID, chanID, fileID string) (string, error) {
+	var object struct {
+		SessionID string `json:"session_id"`
 	}
 
 	_, err := store.api.
-		URL("/connection-manager/api/v1/connections").
-		Query(&filters).
-		Get(&result)
+		URL("/connection-manager/api/v1/connections/%s/channel/%s/file/%s",
+			url.PathEscape(connID), url.PathEscape(chanID), url.PathEscape(fileID)).
+		Post(nil, &object)
 
-	return result.Items, err
+	return object.SessionID, err
+}
+
+// DownloadStoredFile download trail stored file transferred within audited connection channel
+func (store *ConnectionManager) DownloadStoredFile(connID, chanID, fileID, sessionID, filename string) error {
+	err := store.api.
+		URL("/connection-manager/api/v1/connections/%s/channel/%s/file/%s/%s",
+			url.PathEscape(connID), url.PathEscape(chanID), url.PathEscape(fileID), url.PathEscape(sessionID)).
+		Download(filename)
+
+	return err
 }

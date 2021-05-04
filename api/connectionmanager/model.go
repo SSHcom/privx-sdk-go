@@ -8,8 +8,8 @@ package connectionmanager
 
 // Params query paramas definition
 type Params struct {
-	Offset  string `json:"offset,omitempty"`
-	Limit   string `json:"limit,omitempty"`
+	Offset  int    `json:"offset,omitempty"`
+	Limit   int    `json:"limit,omitempty"`
 	Sortdir string `json:"sortdir,omitempty"`
 	Sortkey string `json:"sortkey,omitempty"`
 	Format  string `json:"format,omitempty"`
