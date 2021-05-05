@@ -8,11 +8,32 @@ package workflow
 
 // Params struct for pagination queries
 type Params struct {
-	Offset  string `json:"offset,omitempty"`
-	Limit   string `json:"limit,omitempty"`
+	Offset  int    `json:"offset,omitempty"`
+	Limit   int    `json:"limit,omitempty"`
 	Sortkey string `json:"sortkey,omitempty"`
 	Sortdir string `json:"sortdir,omitempty"`
 	Filter  string `json:"filter,omitempty"`
+}
+
+// SMTPResponse smtp server test response definition
+type SMTPResponse struct {
+	Status  string      `json:"status,omitempty"`
+	Details interface{} `json:"details,omitempty"`
+}
+
+// SMTP smtp server definition
+type SMTP struct {
+	BackendAddress string `json:"privx_backend_address,omitempty"`
+	Approvers      string `json:"request_role_max_approvers,omitempty"`
+	Attempts       int    `json:"smtp_retry_attempts,omitempty"`
+	Address        string `json:"smtp_sender_address,omitempty"`
+	Server         string `json:"smtp_server,omitempty"`
+	Enabled        bool   `json:"smtp_server_enabled,omitempty"`
+	InsecureVerify bool   `json:"smtp_server_insecure_verify,omitempty"`
+	Password       string `json:"smtp_server_password,omitempty"`
+	Port           int    `json:"smtp_server_port,omitempty"`
+	Protocol       string `json:"smtp_server_protocol,omitempty"`
+	Username       string `json:"smtp_server_username,omitempty"`
 }
 
 // StepApprover workflow step approver defintion
