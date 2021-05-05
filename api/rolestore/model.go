@@ -8,12 +8,12 @@ package rolestore
 
 // Params struct for pagination queries.
 type Params struct {
-	Refresh   string `json:"refresh,omitempty"`
-	Offset    string `json:"offset,omitempty"`
-	Limit     string `json:"limit,omitempty"`
 	Sortdir   string `json:"sortdir,omitempty"`
 	Sortkey   string `json:"sortkey,omitempty"`
 	Tokencode string `json:"tokencode,omitempty"`
+	Refresh   bool   `json:"refresh,omitempty"`
+	Offset    int    `json:"offset,omitempty"`
+	Limit     int    `json:"limit,omitempty"`
 	TTL       int    `json:"ttl,omitempty"`
 }
 
