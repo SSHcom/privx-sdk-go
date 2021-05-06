@@ -53,6 +53,7 @@ func (store *ConnectionManager) SearchConnections(offset, limit int, sortdir, so
 		Offset:  offset,
 		Limit:   limit,
 		Sortdir: sortdir,
+		Sortkey: sortkey,
 	}
 
 	_, err := store.api.
@@ -128,8 +129,8 @@ func (store *ConnectionManager) DownloadTrailLog(connID, chanID, sessionID, form
 	return err
 }
 
-// SavedAccessRoles get saved access roles for a connection
-func (store *ConnectionManager) SavedAccessRoles(connID string) ([]AccessRoles, error) {
+// AccessRoles get saved access roles for a connection
+func (store *ConnectionManager) AccessRoles(connID string) ([]AccessRoles, error) {
 	var result []AccessRoles
 
 	_, err := store.api.
@@ -139,8 +140,8 @@ func (store *ConnectionManager) SavedAccessRoles(connID string) ([]AccessRoles, 
 	return result, err
 }
 
-// GrantRolePermission grant a role permission for a connection
-func (store *ConnectionManager) GrantRolePermission(connID, roleID string) error {
+// GrantAccessRoleToConnection grant a role permission for a connection
+func (store *ConnectionManager) GrantAccessRoleToConnection(connID, roleID string) error {
 	_, err := store.api.
 		URL("/connection-manager/api/v1/connections/%s/access_roles/%s",
 			url.PathEscape(connID), url.PathEscape(roleID)).
@@ -149,8 +150,8 @@ func (store *ConnectionManager) GrantRolePermission(connID, roleID string) error
 	return err
 }
 
-// RevokeRolePermission revoke a permission for a role from a connection
-func (store *ConnectionManager) RevokeRolePermission(connID, roleID string) error {
+// RevokeAccessRoleFromConnection revoke a permission for a role from a connection
+func (store *ConnectionManager) RevokeAccessRoleFromConnection(connID, roleID string) error {
 	_, err := store.api.
 		URL("/connection-manager/api/v1/connections/%s/access_roles/%s",
 			url.PathEscape(connID), url.PathEscape(roleID)).
@@ -159,8 +160,8 @@ func (store *ConnectionManager) RevokeRolePermission(connID, roleID string) erro
 	return err
 }
 
-// RevokeRoleFromConnection revoke permissions for a role from connections
-func (store *ConnectionManager) RevokeRoleFromConnection(roleID string) error {
+// RevokeAccessRoleFromAllConnections revoke permissions for a role from connections
+func (store *ConnectionManager) RevokeAccessRoleFromAllConnections(roleID string) error {
 	_, err := store.api.
 		URL("/connection-manager/api/v1/connections/access_roles/%s",
 			url.PathEscape(roleID)).
@@ -178,8 +179,8 @@ func (store *ConnectionManager) TerminateConnection(connID string) error {
 	return err
 }
 
-// TerminateConnectionFromHost terminate connection(s) from host
-func (store *ConnectionManager) TerminateConnectionFromHost(hostID string) error {
+// TerminateConnectionsByTargetHost terminate connection(s) from host
+func (store *ConnectionManager) TerminateConnectionsByTargetHost(hostID string) error {
 	_, err := store.api.
 		URL("/connection-manager/api/v1/terminate/host/%s", url.PathEscape(hostID)).
 		Post(nil)
@@ -187,8 +188,8 @@ func (store *ConnectionManager) TerminateConnectionFromHost(hostID string) error
 	return err
 }
 
-// TerminateConnectionFromUser terminate connection(s) of a user
-func (store *ConnectionManager) TerminateConnectionFromUser(userID string) error {
+// TerminateConnectionsByUser terminate connection(s) of a user
+func (store *ConnectionManager) TerminateConnectionsByUser(userID string) error {
 	_, err := store.api.
 		URL("/connection-manager/api/v1/terminate/user/%s", url.PathEscape(userID)).
 		Post(nil)
