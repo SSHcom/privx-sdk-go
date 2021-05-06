@@ -41,7 +41,7 @@ func (store *Monitor) ComponentsStatus() (*json.RawMessage, error) {
 	return status, err
 }
 
-// HostComponentStatus get component status object by hostname.
+// ComponentStatus get component status object by hostname.
 func (store *Monitor) ComponentStatus(hostname string) (*json.RawMessage, error) {
 	status := &json.RawMessage{}
 
