@@ -18,7 +18,8 @@ type Monitor struct {
 	api restapi.Connector
 }
 
-type eventsResult struct {
+// EventsResult list of event results
+type EventsResult struct {
 	Count int          `json:"count"`
 	Items []AuditEvent `json:"items"`
 }
@@ -29,38 +30,31 @@ func New(api restapi.Connector) *Monitor {
 	return &Monitor{api: api}
 }
 
-// TerminateInstances terminate PrivX instances
-func (store *Monitor) TerminateInstances() error {
+// ComponentsStatus get the status of all deployed privx components
+func (store *Monitor) ComponentsStatus() (*json.RawMessage, error) {
+	status := &json.RawMessage{}
+
 	_, err := store.api.
-		URL("/monitor-service/api/v1/instance/exit").
-		Post(nil)
-
-	return err
-}
-
-// InstanceStatus status of the whole instance
-func (store *Monitor) InstanceStatus() (status *json.RawMessage, err error) {
-	_, err = store.api.
-		URL("/monitor-service/api/v1/instance/status").
+		URL("/monitor-service/api/v1/components").
 		Get(&status)
 
-	return
+	return status, err
 }
 
-// AuditEventCodes get audit event codes
-func (store *Monitor) AuditEventCodes() (codes *AuditEventCodes, err error) {
-	codes = new(AuditEventCodes)
+// ComponentStatus get component status object by hostname.
+func (store *Monitor) ComponentStatus(hostname string) (*json.RawMessage, error) {
+	status := &json.RawMessage{}
 
-	_, err = store.api.
-		URL("/monitor-service/api/v1/auditevents/codes").
-		Get(codes)
+	_, err := store.api.
+		URL("/monitor-service/api/v1/components/%s", url.PathEscape(hostname)).
+		Get(&status)
 
-	return
+	return status, err
 }
 
 // SearchAuditEvents search for audit events
-func (store *Monitor) SearchAuditEvents(keywords, offset, limit, sortkey, sortdir string, fuzzycount bool) ([]AuditEvent, error) {
-	result := eventsResult{}
+func (store *Monitor) SearchAuditEvents(offset, limit int, keywords, sortkey, sortdir string, fuzzycount bool) (*EventsResult, error) {
+	result := &EventsResult{}
 	filters := Params{
 		Offset:     offset,
 		Limit:      limit,
@@ -76,12 +70,12 @@ func (store *Monitor) SearchAuditEvents(keywords, offset, limit, sortkey, sortdi
 			"keywords": keywords,
 		}, &result)
 
-	return result.Items, err
+	return result, err
 }
 
 // AuditEvents get all audit events
-func (store *Monitor) AuditEvents(offset, limit, sortkey, sortdir string, fuzzycount bool) ([]AuditEvent, error) {
-	result := eventsResult{}
+func (store *Monitor) AuditEvents(offset, limit int, sortkey, sortdir string, fuzzycount bool) (*EventsResult, error) {
+	result := &EventsResult{}
 	filters := Params{
 		Offset:     offset,
 		Limit:      limit,
@@ -95,23 +89,36 @@ func (store *Monitor) AuditEvents(offset, limit, sortkey, sortdir string, fuzzyc
 		Query(&filters).
 		Get(&result)
 
-	return result.Items, err
+	return result, err
 }
 
-// ComponentsStatus get the status of all deployed privx components
-func (store *Monitor) ComponentsStatus() (status *json.RawMessage, err error) {
-	_, err = store.api.
-		URL("/monitor-service/api/v1/components").
-		Get(&status)
+// AuditEventCodes get audit event codes
+func (store *Monitor) AuditEventCodes() (*AuditEventCodes, error) {
+	codes := &AuditEventCodes{}
 
-	return
+	_, err := store.api.
+		URL("/monitor-service/api/v1/auditevents/codes").
+		Get(&codes)
+
+	return codes, err
 }
 
-// HostComponentStatus get component status object by hostname.
-func (store *Monitor) HostComponentStatus(hostname string) (status *json.RawMessage, err error) {
-	_, err = store.api.
-		URL("/monitor-service/api/v1/components/%s", url.PathEscape(hostname)).
+// InstanceStatus status of the whole instance
+func (store *Monitor) InstanceStatus() (*json.RawMessage, error) {
+	status := &json.RawMessage{}
+
+	_, err := store.api.
+		URL("/monitor-service/api/v1/instance/status").
 		Get(&status)
 
-	return
+	return status, err
+}
+
+// TerminateInstances terminate PrivX instances
+func (store *Monitor) TerminateInstances() error {
+	_, err := store.api.
+		URL("/monitor-service/api/v1/instance/exit").
+		Post(nil)
+
+	return err
 }
