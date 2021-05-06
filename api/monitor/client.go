@@ -93,23 +93,25 @@ func (store *Monitor) AuditEvents(offset, limit int, sortkey, sortdir string, fu
 }
 
 // AuditEventCodes get audit event codes
-func (store *Monitor) AuditEventCodes() (codes *AuditEventCodes, err error) {
-	codes = new(AuditEventCodes)
+func (store *Monitor) AuditEventCodes() (*AuditEventCodes, error) {
+	codes := &AuditEventCodes{}
 
-	_, err = store.api.
+	_, err := store.api.
 		URL("/monitor-service/api/v1/auditevents/codes").
-		Get(codes)
+		Get(&codes)
 
-	return
+	return codes, err
 }
 
 // InstanceStatus status of the whole instance
-func (store *Monitor) InstanceStatus() (status *json.RawMessage, err error) {
-	_, err = store.api.
+func (store *Monitor) InstanceStatus() (*json.RawMessage, error) {
+	status := &json.RawMessage{}
+
+	_, err := store.api.
 		URL("/monitor-service/api/v1/instance/status").
 		Get(&status)
 
-	return
+	return status, err
 }
 
 // TerminateInstances terminate PrivX instances
