@@ -179,8 +179,8 @@ func (store *ConnectionManager) TerminateConnection(connID string) error {
 	return err
 }
 
-// TerminateConnectionByTargetHost terminate connection(s) from host
-func (store *ConnectionManager) TerminateConnectionByTargetHost(hostID string) error {
+// TerminateConnectionsByTargetHost terminate connection(s) from host
+func (store *ConnectionManager) TerminateConnectionsByTargetHost(hostID string) error {
 	_, err := store.api.
 		URL("/connection-manager/api/v1/terminate/host/%s", url.PathEscape(hostID)).
 		Post(nil)
@@ -188,8 +188,8 @@ func (store *ConnectionManager) TerminateConnectionByTargetHost(hostID string) e
 	return err
 }
 
-// TerminateConnectionByUser terminate connection(s) of a user
-func (store *ConnectionManager) TerminateConnectionByUser(userID string) error {
+// TerminateConnectionsByUser terminate connection(s) of a user
+func (store *ConnectionManager) TerminateConnectionsByUser(userID string) error {
 	_, err := store.api.
 		URL("/connection-manager/api/v1/terminate/user/%s", url.PathEscape(userID)).
 		Post(nil)
