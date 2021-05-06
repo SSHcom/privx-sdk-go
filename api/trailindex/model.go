@@ -8,8 +8,8 @@ package trailindex
 
 // Params struct for pagination queries.
 type Params struct {
-	Offset  string `json:"offset,omitempty"`
-	Limit   string `json:"limit,omitempty"`
+	Offset  int    `json:"offset,omitempty"`
+	Limit   int    `json:"limit,omitempty"`
 	Sortdir string `json:"sortdir,omitempty"`
 }
 
