@@ -34,8 +34,8 @@ type sourcesResult struct {
 }
 
 type awsrolesResult struct {
-	Count int       `json:"count"`
-	Items []AWSRole `json:"items"`
+	Count int           `json:"count"`
+	Items []AWSRoleLink `json:"items"`
 }
 
 type awsTokenResult struct {
@@ -126,8 +126,8 @@ func (store *RoleStore) RefreshSources(sourceIDs []string) error {
 	return err
 }
 
-// AWSRoles returns all aws roles.
-func (store *RoleStore) AWSRoles(refresh bool) ([]AWSRole, error) {
+// AWSRoleLinks returns all aws roles.
+func (store *RoleStore) AWSRoleLinks(refresh bool) ([]AWSRoleLink, error) {
 	result := awsrolesResult{}
 	filters := Params{
 		Refresh: refresh,
@@ -141,9 +141,9 @@ func (store *RoleStore) AWSRoles(refresh bool) ([]AWSRole, error) {
 	return result.Items, err
 }
 
-// AWSRole returns existing single aws role
-func (store *RoleStore) AWSRole(awsroleID string) (*AWSRole, error) {
-	role := &AWSRole{}
+// AWSRoleLink returns existing single aws role
+func (store *RoleStore) AWSRoleLink(awsroleID string) (*AWSRoleLink, error) {
+	role := &AWSRoleLink{}
 
 	_, err := store.api.
 		URL("/role-store/api/v1/awsroles/%s", url.PathEscape(awsroleID)).
@@ -152,8 +152,8 @@ func (store *RoleStore) AWSRole(awsroleID string) (*AWSRole, error) {
 	return role, err
 }
 
-// DeleteAWSRole delete a aws role
-func (store *RoleStore) DeleteAWSRole(awsroleID string) error {
+// DeleteAWSRoleLInk delete a aws role
+func (store *RoleStore) DeleteAWSRoleLInk(awsroleID string) error {
 	_, err := store.api.
 		URL("/role-store/api/v1/awsroles/%s", awsroleID).
 		Delete()
@@ -161,23 +161,17 @@ func (store *RoleStore) DeleteAWSRole(awsroleID string) error {
 	return err
 }
 
-// UpdateAWSRole update existing aws role
-func (store *RoleStore) UpdateAWSRole(awsRoleID, roleID string) error {
-	res := []RoleRef{
-		{
-			ID: roleID,
-		},
-	}
-
+// UpdateAWSRoleLink update existing aws role
+func (store *RoleStore) UpdateAWSRoleLink(awsRoleID string, roles []RoleRef) error {
 	_, err := store.api.
 		URL("/role-store/api/v1/awsroles/%s/roles", url.PathEscape(awsRoleID)).
-		Put(&res)
+		Put(&roles)
 
 	return err
 }
 
-// AWSGrantedRoles return AWS role granting PrivX roles
-func (store *RoleStore) AWSGrantedRoles(awsroleID string) ([]AWSRole, error) {
+// LinkedRoles return AWS role granting PrivX roles
+func (store *RoleStore) LinkedRoles(awsroleID string) ([]AWSRoleLink, error) {
 	result := awsrolesResult{}
 
 	_, err := store.api.

@@ -67,8 +67,8 @@ type AWSToken struct {
 	Descriptions    []string `json:"descriptions,omitempty"`
 }
 
-// AWSRole aws role definition.
-type AWSRole struct {
+// AWSRoleLink aws role definition.
+type AWSRoleLink struct {
 	ID          string    `json:"id,omitempty"`
 	Name        string    `json:"name,omitempty"`
 	ARN         string    `json:"arn,omitempty"`
