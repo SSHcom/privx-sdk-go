@@ -15,6 +15,7 @@ type Params struct {
 	FuzzyCount bool   `json:"fuzzycount,omitempty"`
 }
 
+// AuditEventSearchObject audit event search definitions
 type AuditEventSearchObject struct {
 	Keywords      string `json:"keywords"`
 	UserID        string `json:"user_id"`
