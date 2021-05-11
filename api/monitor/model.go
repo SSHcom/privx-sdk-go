@@ -15,6 +15,19 @@ type Params struct {
 	FuzzyCount bool   `json:"fuzzycount,omitempty"`
 }
 
+// AuditEventSearchObject audit event search definitions
+type AuditEventSearchObject struct {
+	Keywords      string `json:"keywords"`
+	UserID        string `json:"user_id"`
+	ConnectionID  string `json:"connection_id"`
+	HostID        string `json:"host_id"`
+	SourceID      string `json:"source_id"`
+	SessionID     string `json:"session_id"`
+	AccessGroupID string `json:"access_group_id"`
+	StartTime     string `json:"start_time"`
+	EndTime       string `json:"end_time"`
+}
+
 // AuditEventCodes audit event codes definitions
 type AuditEventCodes map[string]AuditEventInfo
 
