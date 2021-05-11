@@ -7,7 +7,6 @@
 package workflow
 
 import (
-	"encoding/json"
 	"net/url"
 
 	"github.com/SSHcom/privx-sdk-go/restapi"
@@ -142,8 +141,8 @@ func (store *Engine) DeleteRequest(requestID string) error {
 	return err
 }
 
-// UserRequestDecision update a request in queue
-func (store *Engine) UserRequestDecision(requestID string, request Decision) error {
+// MakeDecisionOnRequest update a request in queue
+func (store *Engine) MakeDecisionOnRequest(requestID string, request Decision) error {
 	_, err := store.api.
 		URL("/workflow-engine/api/v1/requests/%s/decision", url.PathEscape(requestID)).
 		Post(&request)
@@ -172,8 +171,8 @@ func (store *Engine) SearchRequests(
 }
 
 // Settings get settings for the microservice
-func (store *Engine) Settings() (*json.RawMessage, error) {
-	settings := &json.RawMessage{}
+func (store *Engine) Settings() (*Settings, error) {
+	settings := &Settings{}
 
 	_, err := store.api.
 		URL("/workflow-engine/api/v1/settings").
@@ -182,8 +181,8 @@ func (store *Engine) Settings() (*json.RawMessage, error) {
 	return settings, err
 }
 
-// SetSettings store microservice settings
-func (store *Engine) SetSettings(settings *json.RawMessage) error {
+// UpdateSettings store microservice settings
+func (store *Engine) UpdateSettings(settings *Settings) error {
 	_, err := store.api.
 		URL("/workflow-engine/api/v1/settings").
 		Put(settings)
@@ -191,13 +190,13 @@ func (store *Engine) SetSettings(settings *json.RawMessage) error {
 	return err
 }
 
-// TestSMTP test the email settings
-func (store *Engine) TestSMTP(smtp *SMTP) (SMTPResponse, error) {
+// TestEmailNotification test the email settings
+func (store *Engine) TestEmailNotification(settings *Settings) (SMTPResponse, error) {
 	var result SMTPResponse
 
 	_, err := store.api.
 		URL("/workflow-engine/api/v1/testsmtp").
-		Post(&smtp, &result)
+		Post(&settings, &result)
 
 	return result, err
 }

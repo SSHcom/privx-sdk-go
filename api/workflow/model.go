@@ -21,19 +21,19 @@ type SMTPResponse struct {
 	Details interface{} `json:"details,omitempty"`
 }
 
-// SMTP smtp server definition
-type SMTP struct {
+// Settings workflow settings definition
+type Settings struct {
 	BackendAddress string `json:"privx_backend_address,omitempty"`
-	Approvers      string `json:"request_role_max_approvers,omitempty"`
-	Attempts       int    `json:"smtp_retry_attempts,omitempty"`
 	Address        string `json:"smtp_sender_address,omitempty"`
 	Server         string `json:"smtp_server,omitempty"`
-	Enabled        bool   `json:"smtp_server_enabled,omitempty"`
-	InsecureVerify bool   `json:"smtp_server_insecure_verify,omitempty"`
 	Password       string `json:"smtp_server_password,omitempty"`
-	Port           int    `json:"smtp_server_port,omitempty"`
 	Protocol       string `json:"smtp_server_protocol,omitempty"`
 	Username       string `json:"smtp_server_username,omitempty"`
+	Approvers      int    `json:"request_role_max_approvers,omitempty"`
+	Attempts       int    `json:"smtp_retry_attempts,omitempty"`
+	Port           int    `json:"smtp_server_port,omitempty"`
+	Enabled        bool   `json:"smtp_server_enabled,omitempty"`
+	InsecureVerify bool   `json:"smtp_server_insecure_verify,omitempty"`
 }
 
 // StepApprover workflow step approver defintion
