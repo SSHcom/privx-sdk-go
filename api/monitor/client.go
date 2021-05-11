@@ -53,7 +53,7 @@ func (store *Monitor) ComponentStatus(hostname string) (*json.RawMessage, error)
 }
 
 // SearchAuditEvents search for audit events
-func (store *Monitor) SearchAuditEvents(offset, limit int, keywords, sortkey, sortdir string, fuzzycount bool) (*EventsResult, error) {
+func (store *Monitor) SearchAuditEvents(offset, limit int, sortkey, sortdir string, fuzzycount bool, searchObject *AuditEventSearchObject) (*EventsResult, error) {
 	result := &EventsResult{}
 	filters := Params{
 		Offset:     offset,
@@ -66,9 +66,7 @@ func (store *Monitor) SearchAuditEvents(offset, limit int, keywords, sortkey, so
 	_, err := store.api.
 		URL("/monitor-service/api/v1/auditevents/search").
 		Query(&filters).
-		Post(map[string]string{
-			"keywords": keywords,
-		}, &result)
+		Post(&searchObject, &result)
 
 	return result, err
 }
