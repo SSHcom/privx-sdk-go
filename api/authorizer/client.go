@@ -22,8 +22,8 @@ func New(api restapi.Connector) *Client {
 	return &Client{api: api}
 }
 
-// RootCertificates gets authorizer's root certificates
-func (auth *Client) RootCertificates(accessGroupID string) ([]CA, error) {
+// CACertificates gets authorizer's root certificates
+func (auth *Client) CACertificates(accessGroupID string) ([]CA, error) {
 	ca := []CA{}
 	filters := Params{
 		AccessGroupID: accessGroupID,
@@ -37,8 +37,8 @@ func (auth *Client) RootCertificates(accessGroupID string) ([]CA, error) {
 	return ca, err
 }
 
-// RootCertificate gets authorizer's root certificate
-func (auth *Client) RootCertificate(caID, filename string) error {
+// CACertificate gets authorizer's root certificate
+func (auth *Client) CACertificate(caID, filename string) error {
 	err := auth.api.
 		URL("/authorizer/api/v1/cas/%s", url.PathEscape(caID)).
 		Download(filename)
