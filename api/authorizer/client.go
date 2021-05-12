@@ -46,7 +46,7 @@ func (auth *Client) RootCertificate(caID, filename string) error {
 	return err
 }
 
-// RootCertificate gets authorizer CA's certificate revocation list.
+// CertificateRevocationList gets authorizer CA's certificate revocation list.
 func (auth *Client) CertificateRevocationList(caID, filename string) error {
 	err := auth.api.
 		URL("/authorizer/api/v1/cas/%s/crl", url.PathEscape(caID)).
@@ -94,12 +94,12 @@ func (auth *Client) Principal(groupID, keyID, filter string) (*Principal, error)
 }
 
 // DeletePrincipalKey delete the principal key by its group ID
-func (store *Client) DeletePrincipalKey(groupID, keyID string) error {
+func (auth *Client) DeletePrincipalKey(groupID, keyID string) error {
 	filters := Params{
 		KeyID: keyID,
 	}
 
-	_, err := store.api.
+	_, err := auth.api.
 		URL("/authorizer/api/v1/principals/%s", url.PathEscape(groupID)).
 		Query(filters).
 		Delete()

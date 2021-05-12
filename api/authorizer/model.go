@@ -11,7 +11,7 @@ type Params struct {
 	ResponseType  string `json:"response_type,omitempty"`
 	ClientID      string `json:"client_id,omitempty"`
 	State         string `json:"state,omitempty"`
-	RedirectUri   string `json:"redirect_uri,omitempty"`
+	RedirectURI   string `json:"redirect_uri,omitempty"`
 	UserAgent     string `json:"user_agent,omitempty"`
 	OidcID        string `json:"oidc_id,omitempty"`
 	AccessGroupID string `json:"access_group_id,omitempty"`
