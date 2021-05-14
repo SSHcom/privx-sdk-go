@@ -24,6 +24,21 @@ type Params struct {
 	Limit         int    `json:"limit,omitempty"`
 }
 
+// ClientTime client time definition
+type ClientTime struct {
+	ClientTime string `json:"client_time,omitempty"`
+}
+
+// ConfigurationError configuration error definition
+type ConfigurationError struct {
+	Errors []string `json:"errors,omitempty"`
+}
+
+// Session session definition
+type Session struct {
+	SessionID string `json:"session_id"`
+}
+
 // Signature signature  definition
 type Signature struct {
 	Signature string `json:"signature"`
