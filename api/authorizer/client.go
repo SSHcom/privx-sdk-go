@@ -143,3 +143,98 @@ func (auth *Client) SignPrincipalKey(groupID, keyID string, credential *Credenti
 
 	return signature, err
 }
+
+// ExtenderCACertificates gets authorizer's extender CA certificates
+func (auth *Client) ExtenderCACertificates(accessGroupID string) ([]CA, error) {
+	certificates := []CA{}
+	filters := Params{
+		AccessGroupID: accessGroupID,
+	}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/extender/cas").
+		Query(&filters).
+		Get(&certificates)
+
+	return certificates, err
+}
+
+// ExtenderCACertificate gets authorizer's extender CA certificate
+func (auth *Client) ExtenderCACertificate(id string) (*CA, error) {
+	certificate := &CA{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/extender/cas/%s", url.PathEscape(id)).
+		Get(&certificate)
+
+	return certificate, err
+}
+
+// DownloadExtenderCertificateCRL gets authorizer CA's certificate revocation list
+func (auth *Client) DownloadExtenderCertificateCRL(filename, id string) error {
+	err := auth.api.
+		URL("/authorizer/api/v1/extender/cas/%s/crl", url.PathEscape(id)).
+		Download(filename)
+
+	return err
+}
+
+// ExtenderConfigDownloadHandle get a session id
+func (auth *Client) ExtenderConfigDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
+	sessionID := &DownloadHandle{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/extender/conf/%s", url.PathEscape(trustedClientID)).
+		Post(nil, &sessionID)
+
+	return sessionID, err
+}
+
+// ExtenderConfig gets a pre-configured extender config
+func (auth *Client) ExtenderConfig(trustedClientID, sessionID, filename string) error {
+	err := auth.api.
+		URL("/authorizer/api/v1/extender/conf/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
+		Download(filename)
+
+	return err
+}
+
+// TrustedClientHealthCheck test the health of the trusted client connection with the server
+func (auth *Client) TrustedClientHealthCheck(time *HealthCheckParams) (*HealthCheckStatus, error) {
+	configErrors := &HealthCheckStatus{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/trusted-clients/health-check").
+		Post(&time, &configErrors)
+
+	return configErrors, err
+}
+
+// DeployScriptSessionID get a session id for a deployment script
+func (auth *Client) DeployScriptSessionID(trustedClientID string) (*DownloadHandle, error) {
+	sessionID := &DownloadHandle{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/deploy/%s", url.PathEscape(trustedClientID)).
+		Post(nil, &sessionID)
+
+	return sessionID, err
+}
+
+// DownloadDeployScript gets a pre-configured deployment script
+func (auth *Client) DownloadDeployScript(trustedClientID, sessionID, filename string) error {
+	err := auth.api.
+		URL("/authorizer/api/v1/deploy/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
+		Download(filename)
+
+	return err
+}
+
+// DownloadPrincipalCommandScript gets the principals_command.sh script
+func (auth *Client) DownloadPrincipalCommandScript(filename string) error {
+	err := auth.api.
+		URL("/authorizer/api/v1/deploy/principals_command.sh").
+		Download(filename)
+
+	return err
+}

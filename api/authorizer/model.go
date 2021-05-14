@@ -24,6 +24,21 @@ type Params struct {
 	Limit         int    `json:"limit,omitempty"`
 }
 
+// HealthCheckParams health check params definition
+type HealthCheckParams struct {
+	ClientTime string `json:"client_time,omitempty"`
+}
+
+// HealthCheckStatus health check status definition
+type HealthCheckStatus struct {
+	Errors []string `json:"errors,omitempty"`
+}
+
+// DownloadHandle download handle definition
+type DownloadHandle struct {
+	SessionID string `json:"session_id"`
+}
+
 // Signature signature  definition
 type Signature struct {
 	Signature string `json:"signature"`
