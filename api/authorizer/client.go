@@ -205,8 +205,8 @@ func (auth *Client) ExtenderConfigDownloadHandle(trustedClientID string) (*Downl
 	return sessionID, err
 }
 
-// ExtenderConfig gets a pre-configured extender config
-func (auth *Client) ExtenderConfig(trustedClientID, sessionID, filename string) error {
+// DownloadExtenderConfig gets a pre-configured extender config
+func (auth *Client) DownloadExtenderConfig(trustedClientID, sessionID, filename string) error {
 	err := auth.api.
 		URL("/authorizer/api/v1/extender/conf/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
 		Download(filename)
@@ -214,8 +214,8 @@ func (auth *Client) ExtenderConfig(trustedClientID, sessionID, filename string) 
 	return err
 }
 
-// DeployScriptSessionID get a session id for a deployment script
-func (auth *Client) DeployScriptSessionID(trustedClientID string) (*DownloadHandle, error) {
+// DeployScriptDownloadHandle get a session id for a deployment script
+func (auth *Client) DeployScriptDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
 	sessionID := &DownloadHandle{}
 
 	_, err := auth.api.
