@@ -170,8 +170,8 @@ func (auth *Client) ExtenderCACertificate(id string) (*CA, error) {
 	return certificate, err
 }
 
-// ExtenderCertificateRevocationList gets authorizer CA's certificate revocation list
-func (auth *Client) ExtenderCertificateRevocationList(filename, id string) error {
+// DownloadExtenderCertificateCRL gets authorizer CA's certificate revocation list
+func (auth *Client) DownloadExtenderCertificateCRL(filename, id string) error {
 	err := auth.api.
 		URL("/authorizer/api/v1/extender/cas/%s/crl", url.PathEscape(id)).
 		Download(filename)
@@ -179,9 +179,9 @@ func (auth *Client) ExtenderCertificateRevocationList(filename, id string) error
 	return err
 }
 
-// ExtenderConfigSessionID get a session id
-func (auth *Client) ExtenderConfigSessionID(trustedClientID string) (*Session, error) {
-	sessionID := &Session{}
+// ExtenderConfigDownloadHandle get a session id
+func (auth *Client) ExtenderConfigDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
+	sessionID := &DownloadHandle{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/extender/conf/%s", url.PathEscape(trustedClientID)).
@@ -200,8 +200,8 @@ func (auth *Client) ExtenderConfig(trustedClientID, sessionID, filename string) 
 }
 
 // TrustedClientHealthCheck test the health of the trusted client connection with the server
-func (auth *Client) TrustedClientHealthCheck(time *ClientTime) (*ConfigurationError, error) {
-	configErrors := &ConfigurationError{}
+func (auth *Client) TrustedClientHealthCheck(time *HealthCheckParams) (*HealthCheckStatus, error) {
+	configErrors := &HealthCheckStatus{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/trusted-clients/health-check").
@@ -210,18 +210,9 @@ func (auth *Client) TrustedClientHealthCheck(time *ClientTime) (*ConfigurationEr
 	return configErrors, err
 }
 
-// OAMVersion gets OAM version javascript snippet
-func (auth *Client) OAMVersion(filename string) error {
-	err := auth.api.
-		URL("/authorizer/api/v1/version.js").
-		Download(filename)
-
-	return err
-}
-
 // DeployScriptSessionID get a session id for a deployment script
-func (auth *Client) DeployScriptSessionID(trustedClientID string) (*Session, error) {
-	sessionID := &Session{}
+func (auth *Client) DeployScriptSessionID(trustedClientID string) (*DownloadHandle, error) {
+	sessionID := &DownloadHandle{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/deploy/%s", url.PathEscape(trustedClientID)).
@@ -230,8 +221,8 @@ func (auth *Client) DeployScriptSessionID(trustedClientID string) (*Session, err
 	return sessionID, err
 }
 
-// DeployScript gets a pre-configured deployment script
-func (auth *Client) DeployScript(trustedClientID, sessionID, filename string) error {
+// DownloadDeployScript gets a pre-configured deployment script
+func (auth *Client) DownloadDeployScript(trustedClientID, sessionID, filename string) error {
 	err := auth.api.
 		URL("/authorizer/api/v1/deploy/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
 		Download(filename)
@@ -239,8 +230,8 @@ func (auth *Client) DeployScript(trustedClientID, sessionID, filename string) er
 	return err
 }
 
-// PrincipalsCommandScript gets the principals_command.sh script
-func (auth *Client) PrincipalsCommandScript(filename string) error {
+// DownloadPrincipalCommandScript gets the principals_command.sh script
+func (auth *Client) DownloadPrincipalCommandScript(filename string) error {
 	err := auth.api.
 		URL("/authorizer/api/v1/deploy/principals_command.sh").
 		Download(filename)

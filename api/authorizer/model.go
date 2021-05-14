@@ -24,18 +24,18 @@ type Params struct {
 	Limit         int    `json:"limit,omitempty"`
 }
 
-// ClientTime client time definition
-type ClientTime struct {
+// HealthCheckParams health check params definition
+type HealthCheckParams struct {
 	ClientTime string `json:"client_time,omitempty"`
 }
 
-// ConfigurationError configuration error definition
-type ConfigurationError struct {
+// HealthCheckStatus health check status definition
+type HealthCheckStatus struct {
 	Errors []string `json:"errors,omitempty"`
 }
 
-// Session session definition
-type Session struct {
+// DownloadHandle download handle definition
+type DownloadHandle struct {
 	SessionID string `json:"session_id"`
 }
 
