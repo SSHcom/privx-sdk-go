@@ -29,7 +29,7 @@ type accessGroupResult struct {
 
 type apiCertificateResult struct {
 	Count int              `json:"count"`
-	Items []ApiCertificate `json:"items"`
+	Items []APICertificate `json:"items"`
 }
 
 // New creates a new authorizer client instance
@@ -284,13 +284,13 @@ func (auth *Client) DownloadWebProxyConfig(trustedClientID, sessionID, filename 
 }
 
 // CertTemplates returns the certificate authentication templates for the service
-func (store *Client) CertTemplates(service string) ([]CertTemplate, error) {
+func (auth *Client) CertTemplates(service string) ([]CertTemplate, error) {
 	result := templatesResult{}
 	filters := Params{
 		Service: service,
 	}
 
-	_, err := store.api.
+	_, err := auth.api.
 		URL("/authorizer/api/v1/cert/templates").
 		Query(&filters).
 		Get(&result)
@@ -299,10 +299,10 @@ func (store *Client) CertTemplates(service string) ([]CertTemplate, error) {
 }
 
 // SSLTrustAnchor returns the SSL trust anchor (PrivX TLS CA certificate)
-func (store *Client) SSLTrustAnchor() (*TrustAnchor, error) {
+func (auth *Client) SSLTrustAnchor() (*TrustAnchor, error) {
 	anchor := &TrustAnchor{}
 
-	_, err := store.api.
+	_, err := auth.api.
 		URL("/authorizer/api/v1/ssl-trust-anchor").
 		Get(&anchor)
 
@@ -310,10 +310,10 @@ func (store *Client) SSLTrustAnchor() (*TrustAnchor, error) {
 }
 
 // ExtenderTrustAnchor returns the extender trust anchor (PrivX TLS CA certificate)
-func (store *Client) ExtenderTrustAnchor() (*TrustAnchor, error) {
+func (auth *Client) ExtenderTrustAnchor() (*TrustAnchor, error) {
 	anchor := &TrustAnchor{}
 
-	_, err := store.api.
+	_, err := auth.api.
 		URL("/authorizer/api/v1/extender-trust-anchor").
 		Get(&anchor)
 
@@ -339,12 +339,12 @@ func (auth *Client) AccessGroups(sortkey, sortdir string, offset, limit int) ([]
 }
 
 // CreateAccessGroup create a access group
-func (store *Client) CreateAccessGroup(accessGroup *AccessGroup) (string, error) {
+func (auth *Client) CreateAccessGroup(accessGroup *AccessGroup) (string, error) {
 	var object struct {
 		ID string `json:"id"`
 	}
 
-	_, err := store.api.
+	_, err := auth.api.
 		URL("/authorizer/api/v1/accessgroups").
 		Post(&accessGroup, &object)
 
@@ -352,7 +352,7 @@ func (store *Client) CreateAccessGroup(accessGroup *AccessGroup) (string, error)
 }
 
 // SearchAccessGroup search for access groups
-func (store *Client) SearchAccessGroup(keywords, sortkey, sortdir string, offset, limit int) ([]AccessGroup, error) {
+func (auth *Client) SearchAccessGroup(keywords, sortkey, sortdir string, offset, limit int) ([]AccessGroup, error) {
 	filters := Params{
 		Sortkey: sortkey,
 		Sortdir: sortdir,
@@ -361,7 +361,7 @@ func (store *Client) SearchAccessGroup(keywords, sortkey, sortdir string, offset
 	}
 	result := accessGroupResult{}
 
-	_, err := store.api.
+	_, err := auth.api.
 		URL("/authorizer/api/v1/accessgroups/search").
 		Query(&filters).
 		Post(map[string]string{
@@ -383,8 +383,8 @@ func (auth *Client) AccessGroup(accessGroupID string) (*AccessGroup, error) {
 }
 
 // UpdateAccessGroup update access group
-func (store *Client) UpdateAccessGroup(accessGroupID string, accessGroup *AccessGroup) error {
-	_, err := store.api.
+func (auth *Client) UpdateAccessGroup(accessGroupID string, accessGroup *AccessGroup) error {
+	_, err := auth.api.
 		URL("/authorizer/api/v1/accessgroups/%s", url.PathEscape(accessGroupID)).
 		Put(accessGroup)
 
@@ -392,7 +392,7 @@ func (store *Client) UpdateAccessGroup(accessGroupID string, accessGroup *Access
 }
 
 // SearchCert search for certificates
-func (store *Client) SearchCert(sortkey, sortdir string, offset, limit int, cert *ApiCertificateSearch) ([]ApiCertificate, error) {
+func (auth *Client) SearchCert(sortkey, sortdir string, offset, limit int, cert *APICertificateSearch) ([]APICertificate, error) {
 	filters := Params{
 		Sortkey: sortkey,
 		Sortdir: sortdir,
@@ -401,7 +401,7 @@ func (store *Client) SearchCert(sortkey, sortdir string, offset, limit int, cert
 	}
 	result := apiCertificateResult{}
 
-	_, err := store.api.
+	_, err := auth.api.
 		URL("/authorizer/api/v1/cert/search").
 		Query(&filters).
 		Post(cert, &result)

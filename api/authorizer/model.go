@@ -24,8 +24,8 @@ type Params struct {
 	Limit         int    `json:"limit,omitempty"`
 }
 
-// ApiCertificate api certificate definition
-type ApiCertificate struct {
+// APICertificate api certificate definition
+type APICertificate struct {
 	ID               string `json:"id,omitempty"`
 	Type             string `json:"type,omitempty"`
 	OwnerID          string `json:"owner_id,omitempty"`
@@ -35,8 +35,8 @@ type ApiCertificate struct {
 	Chain            string `json:"chain,omitempty"`
 }
 
-// ApiCertificateSearch api certificate search definition
-type ApiCertificateSearch struct {
+// APICertificateSearch api certificate search definition
+type APICertificateSearch struct {
 	ID             string `json:"id,omitempty"`
 	Type           string `json:"type,omitempty"`
 	KeyID          string `json:"key_id,omitempty"`
