@@ -210,6 +210,15 @@ func (auth *Client) TrustedClientHealthCheck(time *ClientTime) (*ConfigurationEr
 	return configErrors, err
 }
 
+// OAMVersion gets OAM version javascript snippet
+func (auth *Client) OAMVersion(filename string) error {
+	err := auth.api.
+		URL("/authorizer/api/v1/version.js").
+		Download(filename)
+
+	return err
+}
+
 // DeployScriptSessionID get a session id for a deployment script
 func (auth *Client) DeployScriptSessionID(trustedClientID string) (*Session, error) {
 	sessionID := &Session{}
