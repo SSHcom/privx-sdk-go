@@ -17,6 +17,21 @@ type Client struct {
 	api restapi.Connector
 }
 
+type templatesResult struct {
+	Count int            `json:"count"`
+	Items []CertTemplate `json:"items"`
+}
+
+type accessGroupResult struct {
+	Count int           `json:"count"`
+	Items []AccessGroup `json:"items"`
+}
+
+type apiCertificateResult struct {
+	Count int              `json:"count"`
+	Items []APICertificate `json:"items"`
+}
+
 // New creates a new authorizer client instance
 func New(api restapi.Connector) *Client {
 	return &Client{api: api}
@@ -190,8 +205,8 @@ func (auth *Client) ExtenderConfigDownloadHandle(trustedClientID string) (*Downl
 	return sessionID, err
 }
 
-// ExtenderConfig gets a pre-configured extender config
-func (auth *Client) ExtenderConfig(trustedClientID, sessionID, filename string) error {
+// DownloadExtenderConfig gets a pre-configured extender config
+func (auth *Client) DownloadExtenderConfig(trustedClientID, sessionID, filename string) error {
 	err := auth.api.
 		URL("/authorizer/api/v1/extender/conf/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
 		Download(filename)
@@ -199,19 +214,8 @@ func (auth *Client) ExtenderConfig(trustedClientID, sessionID, filename string) 
 	return err
 }
 
-// TrustedClientHealthCheck test the health of the trusted client connection with the server
-func (auth *Client) TrustedClientHealthCheck(time *HealthCheckParams) (*HealthCheckStatus, error) {
-	configErrors := &HealthCheckStatus{}
-
-	_, err := auth.api.
-		URL("/authorizer/api/v1/trusted-clients/health-check").
-		Post(&time, &configErrors)
-
-	return configErrors, err
-}
-
-// DeployScriptSessionID get a session id for a deployment script
-func (auth *Client) DeployScriptSessionID(trustedClientID string) (*DownloadHandle, error) {
+// DeployScriptDownloadHandle get a session id for a deployment script
+func (auth *Client) DeployScriptDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
 	sessionID := &DownloadHandle{}
 
 	_, err := auth.api.
@@ -237,4 +241,168 @@ func (auth *Client) DownloadPrincipalCommandScript(filename string) error {
 		Download(filename)
 
 	return err
+}
+
+// CarrierConfigDownloadHandle get a session id for a carrier config
+func (auth *Client) CarrierConfigDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
+	sessionID := &DownloadHandle{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/carrier/conf/%s", url.PathEscape(trustedClientID)).
+		Post(nil, &sessionID)
+
+	return sessionID, err
+}
+
+// DownloadCarrierConfig gets a pre-configured carrier config
+func (auth *Client) DownloadCarrierConfig(trustedClientID, sessionID, filename string) error {
+	err := auth.api.
+		URL("/authorizer/api/v1/carrier/conf/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
+		Download(filename)
+
+	return err
+}
+
+// WebProxySessionDownloadHandle get a session id for a web proxy config
+func (auth *Client) WebProxySessionDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
+	sessionID := &DownloadHandle{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/icap/conf/%s", url.PathEscape(trustedClientID)).
+		Post(nil, &sessionID)
+
+	return sessionID, err
+}
+
+// DownloadWebProxyConfig gets a pre-configured web proxy config
+func (auth *Client) DownloadWebProxyConfig(trustedClientID, sessionID, filename string) error {
+	err := auth.api.
+		URL("/authorizer/api/v1/icap/conf/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
+		Download(filename)
+
+	return err
+}
+
+// CertTemplates returns the certificate authentication templates for the service
+func (auth *Client) CertTemplates(service string) ([]CertTemplate, error) {
+	result := templatesResult{}
+	filters := Params{
+		Service: service,
+	}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/cert/templates").
+		Query(&filters).
+		Get(&result)
+
+	return result.Items, err
+}
+
+// SSLTrustAnchor returns the SSL trust anchor (PrivX TLS CA certificate)
+func (auth *Client) SSLTrustAnchor() (*TrustAnchor, error) {
+	anchor := &TrustAnchor{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/ssl-trust-anchor").
+		Get(&anchor)
+
+	return anchor, err
+}
+
+// ExtenderTrustAnchor returns the extender trust anchor (PrivX TLS CA certificate)
+func (auth *Client) ExtenderTrustAnchor() (*TrustAnchor, error) {
+	anchor := &TrustAnchor{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/extender-trust-anchor").
+		Get(&anchor)
+
+	return anchor, err
+}
+
+// AccessGroups lists all access group
+func (auth *Client) AccessGroups(offset, limit int, sortkey, sortdir string) ([]AccessGroup, error) {
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
+	}
+	result := accessGroupResult{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/accessgroups").
+		Query(&filters).
+		Get(&result)
+
+	return result.Items, err
+}
+
+// CreateAccessGroup create a access group
+func (auth *Client) CreateAccessGroup(accessGroup *AccessGroup) (string, error) {
+	var object struct {
+		ID string `json:"id"`
+	}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/accessgroups").
+		Post(&accessGroup, &object)
+
+	return object.ID, err
+}
+
+// SearchAccessGroup search for access groups
+func (auth *Client) SearchAccessGroup(offset, limit int, sortkey, sortdir string, search *SearchParams) ([]AccessGroup, error) {
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
+	}
+	result := accessGroupResult{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/accessgroups/search").
+		Query(&filters).
+		Post(search, &result)
+
+	return result.Items, err
+}
+
+// AccessGroup get access group
+func (auth *Client) AccessGroup(accessGroupID string) (*AccessGroup, error) {
+	accessGroup := &AccessGroup{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/accessgroups/%s", url.PathEscape(accessGroupID)).
+		Get(&accessGroup)
+
+	return accessGroup, err
+}
+
+// UpdateAccessGroup update access group
+func (auth *Client) UpdateAccessGroup(accessGroupID string, accessGroup *AccessGroup) error {
+	_, err := auth.api.
+		URL("/authorizer/api/v1/accessgroups/%s", url.PathEscape(accessGroupID)).
+		Put(accessGroup)
+
+	return err
+}
+
+// SearchCert search for certificates
+func (auth *Client) SearchCert(offset, limit int, sortkey, sortdir string, cert *APICertificateSearch) ([]APICertificate, error) {
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
+	}
+	result := apiCertificateResult{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/cert/search").
+		Query(&filters).
+		Post(cert, &result)
+
+	return result.Items, err
 }

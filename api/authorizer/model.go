@@ -24,14 +24,53 @@ type Params struct {
 	Limit         int    `json:"limit,omitempty"`
 }
 
-// HealthCheckParams health check params definition
-type HealthCheckParams struct {
-	ClientTime string `json:"client_time,omitempty"`
+// SearchParams search params definition
+type SearchParams struct {
+	Keywords string `json:"keywords,omitempty"`
 }
 
-// HealthCheckStatus health check status definition
-type HealthCheckStatus struct {
-	Errors []string `json:"errors,omitempty"`
+// APICertificate api certificate definition
+type APICertificate struct {
+	ID               string `json:"id,omitempty"`
+	Type             string `json:"type,omitempty"`
+	OwnerID          string `json:"owner_id,omitempty"`
+	Revoked          string `json:"revoked,omitempty"`
+	RevocationReason string `json:"revocation_reason,omitempty"`
+	Cert             string `json:"cert,omitempty"`
+	Chain            string `json:"chain,omitempty"`
+}
+
+// APICertificateSearch api certificate search definition
+type APICertificateSearch struct {
+	ID             string `json:"id,omitempty"`
+	Type           string `json:"type,omitempty"`
+	KeyID          string `json:"key_id,omitempty"`
+	OwnerID        string `json:"owner_id,omitempty"`
+	Subject        string `json:"subject,omitempty"`
+	Issuer         string `json:"issuer,omitempty"`
+	NotBefore      string `json:"not_before,omitempty"`
+	NotAfter       string `json:"not_after,omitempty"`
+	IncludeRevoked bool   `json:"include_revoked,omitempty"`
+	IncludeExpired bool   `json:"include_expired,omitempty"`
+}
+
+// TrustAnchor trust anchor definition
+type TrustAnchor struct {
+	TrustAnchor       string `json:"trust_anchor"`
+	TrustAnchorSHA1   string `json:"trust_anchor_sha1,omitempty"`
+	TrustAnchorSHA256 string `json:"trust_anchor_sha256,omitempty"`
+}
+
+// CertTemplate certification template definition
+type CertTemplate struct {
+	Name              string   `json:"name"`
+	Description       string   `json:"description"`
+	Service           string   `json:"service"`
+	Type              string   `json:"type"`
+	KeyID             string   `json:"key_id,omitempty"`
+	RsaSignatureTypes []string `json:"rsa_signature_types,omitempty"`
+	Principals        []string `json:"principals,omitempty"`
+	Extensions        []string `json:"extensions,omitempty"`
 }
 
 // DownloadHandle download handle definition
