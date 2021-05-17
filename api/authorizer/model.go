@@ -24,6 +24,11 @@ type Params struct {
 	Limit         int    `json:"limit,omitempty"`
 }
 
+// SearchParams search params definition
+type SearchParams struct {
+	Keywords string `json:"keywords,omitempty"`
+}
+
 // APICertificate api certificate definition
 type APICertificate struct {
 	ID               string `json:"id,omitempty"`

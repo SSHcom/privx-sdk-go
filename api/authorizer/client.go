@@ -321,12 +321,12 @@ func (auth *Client) ExtenderTrustAnchor() (*TrustAnchor, error) {
 }
 
 // AccessGroups lists all access group
-func (auth *Client) AccessGroups(sortkey, sortdir string, offset, limit int) ([]AccessGroup, error) {
+func (auth *Client) AccessGroups(offset, limit int, sortkey, sortdir string) ([]AccessGroup, error) {
 	filters := Params{
-		Sortkey: sortkey,
-		Sortdir: sortdir,
 		Offset:  offset,
 		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
 	}
 	result := accessGroupResult{}
 
@@ -352,21 +352,19 @@ func (auth *Client) CreateAccessGroup(accessGroup *AccessGroup) (string, error) 
 }
 
 // SearchAccessGroup search for access groups
-func (auth *Client) SearchAccessGroup(keywords, sortkey, sortdir string, offset, limit int) ([]AccessGroup, error) {
+func (auth *Client) SearchAccessGroup(offset, limit int, sortkey, sortdir string, search *SearchParams) ([]AccessGroup, error) {
 	filters := Params{
-		Sortkey: sortkey,
-		Sortdir: sortdir,
 		Offset:  offset,
 		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
 	}
 	result := accessGroupResult{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/accessgroups/search").
 		Query(&filters).
-		Post(map[string]string{
-			"keywords": keywords,
-		}, &result)
+		Post(search, &result)
 
 	return result.Items, err
 }
@@ -392,12 +390,12 @@ func (auth *Client) UpdateAccessGroup(accessGroupID string, accessGroup *AccessG
 }
 
 // SearchCert search for certificates
-func (auth *Client) SearchCert(sortkey, sortdir string, offset, limit int, cert *APICertificateSearch) ([]APICertificate, error) {
+func (auth *Client) SearchCert(offset, limit int, sortkey, sortdir string, cert *APICertificateSearch) ([]APICertificate, error) {
 	filters := Params{
-		Sortkey: sortkey,
-		Sortdir: sortdir,
 		Offset:  offset,
 		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
 	}
 	result := apiCertificateResult{}
 
