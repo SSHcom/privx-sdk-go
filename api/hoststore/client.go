@@ -33,30 +33,112 @@ func New(api restapi.Connector) *HostStore {
 	return &HostStore{api: api}
 }
 
+// SearchHost search for existing hosts
+func (store *HostStore) SearchHost(sortkey, sortdir, filter string, offset, limit int, searchObject *HostSearchObject) ([]Host, error) {
+	result := hostResult{}
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
+		Filter:  filter,
+	}
+
+	_, err := store.api.
+		URL("/host-store/api/v1/hosts/search").
+		Query(&filters).
+		Post(&searchObject, &result)
+
+	return result.Items, err
+}
+
+// Hosts returns existing hosts
+func (store *HostStore) Hosts(offset, limit int, sortkey, sortdir, filter string) ([]Host, error) {
+	result := hostResult{}
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
+		Filter:  filter,
+	}
+
+	_, err := store.api.
+		URL("/host-store/api/v1/hosts").
+		Query(&filters).
+		Get(&result)
+
+	return result.Items, err
+}
+
+// CreateHost create a host to host store
+func (store *HostStore) CreateHost(host Host) (string, error) {
+	var object struct {
+		ID string `json:"id"`
+	}
+
+	_, err := store.api.
+		URL("/host-store/api/v1/hosts").
+		Post(&host, &object)
+
+	return object.ID, err
+}
+
 // ResolveHost resolve service and address to a single host in host store
-func (store *HostStore) ResolveHost(service Service) (host *Host, err error) {
-	host = new(Host)
+func (store *HostStore) ResolveHost(service Service) (*Host, error) {
+	host := &Host{}
 
-	_, err = store.api.
+	_, err := store.api.
 		URL("/host-store/api/v1/hosts/resolve").
-		Post(service, host)
+		Post(&service, &host)
 
-	return
+	return host, err
 }
 
-// ServiceOptions returns default serivce options
-func (store *HostStore) ServiceOptions() (options *DefaultServiceOptions, err error) {
-	options = new(DefaultServiceOptions)
+// Host returns existing single host
+func (store *HostStore) Host(hostID string) (*Host, error) {
+	host := &Host{}
 
-	_, err = store.api.
-		URL("/host-store/api/v1/settings/default_service_options").
-		Get(options)
+	_, err := store.api.
+		URL("/host-store/api/v1/hosts/%s", url.PathEscape(hostID)).
+		Get(&host)
 
-	return
+	return host, err
 }
 
-// HostTags returns hosts tags
-func (store *HostStore) HostTags(offset, limit, sortdir, query string) ([]string, error) {
+// UpdateHost update existing host
+func (store *HostStore) UpdateHost(hostID string, host *Host) error {
+	_, err := store.api.
+		URL("/host-store/api/v1/hosts/%s", url.PathEscape(hostID)).
+		Put(host)
+
+	return err
+}
+
+// DeleteHost delete a host
+func (store *HostStore) DeleteHost(hostID string) error {
+	_, err := store.api.
+		URL("/host-store/api/v1/hosts/%s", hostID).
+		Delete()
+
+	return err
+}
+
+// UpdateDeployStatus update host to be deployable or undeployable
+func (store *HostStore) UpdateDeployStatus(hostID string, status bool) error {
+	deployStatus := Host{
+		Deployable: status,
+	}
+
+	_, err := store.api.
+		URL("/host-store/api/v1/hosts/%s/deployable", url.PathEscape(hostID)).
+		Put(deployStatus)
+
+	return err
+}
+
+// HostTags returns host tags
+func (store *HostStore) HostTags(offset, limit int, sortdir, query string) ([]string, error) {
 	result := tagsResult{}
 	filters := Params{
 		Offset:  offset,
@@ -73,97 +155,26 @@ func (store *HostStore) HostTags(offset, limit, sortdir, query string) ([]string
 	return result.Items, err
 }
 
-// UpdateDeployStatus update host to be deployable or undeployable
-func (store *HostStore) UpdateDeployStatus(id string, status bool) error {
-	deployStatus := Host{
-		Deployable: status,
+// UpdateDisabledHostStatus enable/disable host
+func (store *HostStore) UpdateDisabledHostStatus(hostID string, status bool) error {
+	disabledStatus := HostDisabledRequest{
+		Disabled: status,
 	}
 
 	_, err := store.api.
-		URL("/host-store/api/v1/hosts/%s/deployable", url.PathEscape(id)).
-		Put(deployStatus)
+		URL("/host-store/api/v1/hosts/%s/disabled", url.PathEscape(hostID)).
+		Put(disabledStatus)
 
 	return err
 }
 
-// DeleteHost delete a host
-func (store *HostStore) DeleteHost(id string) error {
-	_, err := store.api.
-		URL("/host-store/api/v1/hosts/%s", id).
-		Delete()
-
-	return err
-}
-
-// UpdateHost update existing host
-func (store *HostStore) UpdateHost(id string, host *Host) error {
-	_, err := store.api.
-		URL("/host-store/api/v1/hosts/%s", url.PathEscape(id)).
-		Put(host)
-
-	return err
-}
-
-// SearchHost search for existing hosts
-func (store *HostStore) SearchHost(keywords, offset, limit, sortkey, sortdir, filter string) ([]Host, error) {
-	result := hostResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
-		Filter:  filter,
-	}
+// ServiceOptions returns default serivce options
+func (store *HostStore) ServiceOptions() (*DefaultServiceOptions, error) {
+	options := &DefaultServiceOptions{}
 
 	_, err := store.api.
-		URL("/host-store/api/v1/hosts/search").
-		Query(&filters).
-		Post(map[string]string{
-			"keywords": keywords,
-		}, &result)
+		URL("/host-store/api/v1/settings/default_service_options").
+		Get(&options)
 
-	return result.Items, err
-}
-
-// Hosts returns existing hosts
-func (store *HostStore) Hosts(offset, limit, sortkey, sortdir, filter string) ([]Host, error) {
-	result := hostResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
-		Filter:  filter,
-	}
-
-	_, err := store.api.
-		URL("/host-store/api/v1/hosts").
-		Query(&filters).
-		Get(&result)
-
-	return result.Items, err
-}
-
-// Host returns existing single host
-func (store *HostStore) Host(id string) (host *Host, err error) {
-	host = new(Host)
-
-	_, err = store.api.
-		URL("/host-store/api/v1/hosts/%s", url.PathEscape(id)).
-		Get(host)
-
-	return
-}
-
-// RegisterHost append a target to PrivX
-func (store *HostStore) RegisterHost(host Host) (string, error) {
-	var id struct {
-		ID string `json:"id"`
-	}
-
-	_, err := store.api.
-		URL("/host-store/api/v1/hosts").
-		Post(&host, &id)
-
-	return id.ID, err
+	return options, err
 }

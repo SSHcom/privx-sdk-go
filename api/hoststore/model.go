@@ -32,14 +32,48 @@ const (
 	HTTPS = Scheme("HTTPS")
 )
 
-// Params struct for pagination queries.
+// Params struct for pagination queries
 type Params struct {
-	Offset  string `json:"offset,omitempty"`
-	Limit   string `json:"limit,omitempty"`
+	Offset  int    `json:"offset,omitempty"`
+	Limit   int    `json:"limit,omitempty"`
 	Sortdir string `json:"sortdir,omitempty"`
 	Sortkey string `json:"sortkey,omitempty"`
 	Filter  string `json:"filter,omitempty"`
 	Query   string `json:"query,omitempty"`
+}
+
+// HostSearchObject host search object definition
+type HostSearchObject struct {
+	ID                    string   `json:"id,omitempty"`
+	Keywords              string   `json:"keywords,omitempty"`
+	ExternalID            string   `json:"external_id,omitempty"`
+	InstanceID            string   `json:"instance_id,omitempty"`
+	SourceID              string   `json:"source_id,omitempty"`
+	Disabled              string   `json:"disabled,omitempty"`
+	Deployable            bool     `json:"deployable,omitempty"`
+	IgnoreDisabledSources bool     `json:"ignore_disabled_sources,omitempty"`
+	Port                  []int    `json:"port,omitempty"`
+	CommonName            []string `json:"common_name,omitempty"`
+	Organization          []string `json:"organization,omitempty"`
+	OrganizationalUnit    []string `json:"organizational_unit,omitempty"`
+	Address               []string `json:"address,omitempty"`
+	Service               []string `json:"service,omitempty"`
+	Zone                  []string `json:"zone,omitempty"`
+	HostType              []string `json:"host_type,omitempty"`
+	HostClassification    []string `json:"host_classification,omitempty"`
+	Role                  []string `json:"role,omitempty"`
+	Scope                 []string `json:"scope,omitempty"`
+	Tags                  []string `json:"tags,omitempty"`
+	AccessGroupIDs        []string `json:"access_group_ids,omitempty"`
+	CloudProviders        []string `json:"cloud_providers,omitempty"`
+	CloudProviderRegions  []string `json:"cloud_provider_regions,omitempty"`
+	Statuses              []string `json:"statuses,omitempty"`
+	DistinguishedName     []string `json:"distinguished_name,omitempty"`
+}
+
+// HostDisabledRequest host disabled request definition
+type HostDisabledRequest struct {
+	Disabled bool `json:"disabled"`
 }
 
 // Service specify the service available on target host
@@ -93,6 +127,7 @@ type Host struct {
 	HostType            string         `json:"host_type,omitempty"`
 	HostClassification  string         `json:"host_classification,omitempty"`
 	Comment             string         `json:"comment,omitempty"`
+	Disabled            string         `json:"disabled,omitempty"`
 	Deployable          bool           `json:"deployable,omitempty"`
 	Tofu                bool           `json:"tofu,omitempty"`
 	StandAlone          bool           `json:"stand_alone_host,omitempty"`
