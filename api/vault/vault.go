@@ -24,14 +24,22 @@ type secretResult struct {
 	Items []Secret `json:"items"`
 }
 
+// tVaultReq t vault request definition
+type tVaultReq struct {
+	Name       string              `json:"name,omitempty"`
+	Data       interface{}         `json:"data"`
+	AllowRead  []rolestore.RoleRef `json:"read_roles,omitempty"`
+	AllowWrite []rolestore.RoleRef `json:"write_roles,omitempty"`
+}
+
 // New creates a new Vault client instance, using the argument
 // SDK API client.
 func New(api restapi.Connector) *Vault {
 	return &Vault{api: api}
 }
 
-// Create new secret to PrivX Vault
-func (vault *Vault) Create(
+// CreateSecret create new secret to PrivX Vault
+func (vault *Vault) CreateSecret(
 	name string,
 	allowReadBy []string,
 	allowWriteBy []string,
@@ -73,8 +81,8 @@ func (vault *Vault) Secret(name string) (*Secret, error) {
 	return bag, err
 }
 
-// Update existing secret at PrivX Vault
-func (vault *Vault) Update(
+// UpdateSecret existing secret at PrivX Vault
+func (vault *Vault) UpdateSecret(
 	name string,
 	allowReadTo []string,
 	allowWriteTo []string,
@@ -89,8 +97,8 @@ func (vault *Vault) Update(
 	return err
 }
 
-// Remove existing secret from PrivX vault
-func (vault *Vault) Remove(name string) error {
+// DeleteSecret delete existing secret from PrivX vault
+func (vault *Vault) DeleteSecret(name string) error {
 	_, err := vault.api.
 		URL("/vault/api/v1/secrets/%s", name).
 		Delete()
@@ -144,7 +152,7 @@ func (vault *Vault) mkVaultReq(
 	allowReadBy []string,
 	allowWriteBy []string,
 	secret interface{},
-) TVaultReq {
+) tVaultReq {
 	allow := func(ids []string) []rolestore.RoleRef {
 		seq := []rolestore.RoleRef{}
 		for _, id := range ids {
@@ -153,7 +161,7 @@ func (vault *Vault) mkVaultReq(
 		return seq
 	}
 
-	return TVaultReq{
+	return tVaultReq{
 		Data:       secret,
 		AllowRead:  allow(allowReadBy),
 		AllowWrite: allow(allowWriteBy),

@@ -31,11 +31,3 @@ type Secret struct {
 	AllowWrite []rolestore.RoleRef `json:"write_roles,omitempty"`
 	Data       json.RawMessage     `json:"data,omitempty"`
 }
-
-// TVaultReq t vault request definition
-type TVaultReq struct {
-	Name       string              `json:"name,omitempty"`
-	Data       interface{}         `json:"data"`
-	AllowRead  []rolestore.RoleRef `json:"read_roles,omitempty"`
-	AllowWrite []rolestore.RoleRef `json:"write_roles,omitempty"`
-}
