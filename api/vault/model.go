@@ -14,8 +14,8 @@ import (
 
 // Params struct for pagination queries.
 type Params struct {
-	Offset  string `json:"offset,omitempty"`
-	Limit   string `json:"limit,omitempty"`
+	Offset  int    `json:"offset,omitempty"`
+	Limit   int    `json:"limit,omitempty"`
 	Sortkey string `json:"sortkey,omitempty"`
 	Sortdir string `json:"sortdir,omitempty"`
 }
@@ -30,4 +30,12 @@ type Secret struct {
 	AllowRead  []rolestore.RoleRef `json:"read_roles,omitempty"`
 	AllowWrite []rolestore.RoleRef `json:"write_roles,omitempty"`
 	Data       json.RawMessage     `json:"data,omitempty"`
+}
+
+// TVaultReq t vault request definition
+type TVaultReq struct {
+	Name       string              `json:"name,omitempty"`
+	Data       interface{}         `json:"data"`
+	AllowRead  []rolestore.RoleRef `json:"read_roles,omitempty"`
+	AllowWrite []rolestore.RoleRef `json:"write_roles,omitempty"`
 }
