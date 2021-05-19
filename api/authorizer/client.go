@@ -425,7 +425,7 @@ func (auth *Client) UpdateAccessGroup(accessGroupID string, accessGroup *AccessG
 }
 
 // DeleteAccessGroup delete a access group
-func (store *Client) DeleteAccessGroup(accessGroupID string) error {
+func (auth *Client) DeleteAccessGroup(accessGroupID string) error {
 	_, err := store.api.
 		URL("/authorizer/api/v1/accessgroups/%s", accessGroupID).
 		Delete()
