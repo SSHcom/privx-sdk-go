@@ -263,6 +263,41 @@ func (auth *Client) DownloadCarrierConfig(trustedClientID, sessionID, filename s
 	return err
 }
 
+// WebProxyCACertificates gets authorizer's web proxy CA certificates
+func (auth *Client) WebProxyCACertificates(accessGroupID string) ([]CA, error) {
+	certificates := []CA{}
+	filters := Params{
+		AccessGroupID: accessGroupID,
+	}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/icap/cas").
+		Query(&filters).
+		Get(&certificates)
+
+	return certificates, err
+}
+
+// WebProxyCACertificate gets authorizer's web proxy CA certificate
+func (auth *Client) WebProxyCACertificate(trustedClientID string) (*CA, error) {
+	certificate := &CA{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/icap/cas/%s", url.PathEscape(trustedClientID)).
+		Get(&certificate)
+
+	return certificate, err
+}
+
+// DownloadWebProxyCertificateCRL gets authorizer CA's certificate revocation list
+func (auth *Client) DownloadWebProxyCertificateCRL(filename, trustedClientID string) error {
+	err := auth.api.
+		URL("/authorizer/api/v1/icap/cas/%s/crl", url.PathEscape(trustedClientID)).
+		Download(filename)
+
+	return err
+}
+
 // WebProxySessionDownloadHandle get a session id for a web proxy config
 func (auth *Client) WebProxySessionDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
 	sessionID := &DownloadHandle{}
@@ -385,6 +420,15 @@ func (auth *Client) UpdateAccessGroup(accessGroupID string, accessGroup *AccessG
 	_, err := auth.api.
 		URL("/authorizer/api/v1/accessgroups/%s", url.PathEscape(accessGroupID)).
 		Put(accessGroup)
+
+	return err
+}
+
+// DeleteAccessGroup delete a access group
+func (auth *Client) DeleteAccessGroup(accessGroupID string) error {
+	_, err := auth.api.
+		URL("/authorizer/api/v1/accessgroups/%s", accessGroupID).
+		Delete()
 
 	return err
 }
