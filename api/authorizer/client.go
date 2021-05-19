@@ -279,20 +279,20 @@ func (auth *Client) WebProxyCACertificates(accessGroupID string) ([]CA, error) {
 }
 
 // WebProxyCACertificate gets authorizer's web proxy CA certificate
-func (auth *Client) WebProxyCACertificate(id string) (*CA, error) {
+func (auth *Client) WebProxyCACertificate(trustedClientID string) (*CA, error) {
 	certificate := &CA{}
 
 	_, err := auth.api.
-		URL("/authorizer/api/v1/icap/cas/%s", url.PathEscape(id)).
+		URL("/authorizer/api/v1/icap/cas/%s", url.PathEscape(trustedClientID)).
 		Get(&certificate)
 
 	return certificate, err
 }
 
 // DownloadWebProxyCertificateCRL gets authorizer CA's certificate revocation list
-func (auth *Client) DownloadWebProxyCertificateCRL(filename, id string) error {
+func (auth *Client) DownloadWebProxyCertificateCRL(filename, trustedClientID string) error {
 	err := auth.api.
-		URL("/authorizer/api/v1/icap/cas/%s/crl", url.PathEscape(id)).
+		URL("/authorizer/api/v1/icap/cas/%s/crl", url.PathEscape(trustedClientID)).
 		Download(filename)
 
 	return err
