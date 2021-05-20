@@ -18,7 +18,7 @@ type KeyValue struct {
 type ServiceStatus struct {
 	Variant       string     `json:"variant,omitempty"`
 	Version       string     `json:"version,omitempty"`
-	ApiVersion    string     `json:"api_version,omitempty"`
+	APIVersion    string     `json:"api_version,omitempty"`
 	Status        string     `json:"status,omitempty"`
 	StatusMessage string     `json:"status_message,omitempty"`
 	ApplicationID string     `json:"app_id,omitempty"`
