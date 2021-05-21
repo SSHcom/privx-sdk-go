@@ -37,7 +37,7 @@ type TrustedClient struct {
 	ID              string     `json:"id,omitempty"`
 	Secret          string     `json:"secret,omitempty"`
 	Name            string     `json:"name,omitempty"`
-	WebProxy        string     `json:"web_proxy_address,omitempty"`
+	WebProxyAddress string     `json:"web_proxy_address,omitempty"`
 	Registered      bool       `json:"registered,omitempty"`
 	Enabled         bool       `json:"enabled,omitempty"`
 	Type            ClientType `json:"type,omitempty"`
