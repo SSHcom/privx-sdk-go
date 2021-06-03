@@ -34,13 +34,15 @@ type FilterUser struct {
 
 // TrustedClient definition
 type TrustedClient struct {
-	ID          string     `json:"id,omitempty"`
-	Type        ClientType `json:"type,omitempty"`
-	Secret      string     `json:"secret,omitempty"`
-	Name        string     `json:"name,omitempty"`
-	Permissions []string   `json:"permissions,omitempty"`
-	Registered  bool       `json:"registered,omitempty"`
-	Enabled     bool       `json:"enabled,omitempty"`
+	ID              string     `json:"id,omitempty"`
+	Secret          string     `json:"secret,omitempty"`
+	Name            string     `json:"name,omitempty"`
+	WebProxyAddress string     `json:"web_proxy_address,omitempty"`
+	Registered      bool       `json:"registered,omitempty"`
+	Enabled         bool       `json:"enabled,omitempty"`
+	Type            ClientType `json:"type,omitempty"`
+	Permissions     []string   `json:"permissions,omitempty"`
+	ExtenderAddress []string   `json:"extender_address,omitempty"`
 }
 
 // Extender creates new trusted client
