@@ -17,7 +17,7 @@ jobs:
       - name: golang
         uses: actions/setup-go@v2
         with:
-          go-version: 1.14
+          go-version: 1.16
 
       - name: fix GOPATH
         run: |
