@@ -42,7 +42,7 @@ jobs:
 
       - name: go vet
         run: |
-          go vet github.com/${{ github.repository }}/restapi
+          go vet github.com/${{ github.repository }}/...
     
       - name: golint
         run: |
