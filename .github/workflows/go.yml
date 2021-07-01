@@ -38,7 +38,7 @@ jobs:
 
       - name: go get deps
         run: |
-          go install github.com/${{ github.repository }}/...
+          go get -v -t -d github.com/${{ github.repository }}
 
       - name: go build
         run: |
