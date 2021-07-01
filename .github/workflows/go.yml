@@ -38,15 +38,15 @@ jobs:
 
       - name: go get deps
         run: |
-          go get -v -t -d github.com/${{ github.repository }}
+          go get -v -t -d github.com/${{ github.repository }}/...
 
       - name: go build
         run: |
-          go build -v github.com/${{ github.repository }}/
+          go build -v github.com/${{ github.repository }}/...
 
       - name: go vet
         run: |
-          go vet github.com/${{ github.repository }}/...
+          go vet github.com/${{ github.repository }}
     
       - name: golint
         run: |
