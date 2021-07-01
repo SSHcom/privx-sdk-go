@@ -19,6 +19,12 @@ jobs:
         with:
           go-version: 1.16
 
+      - name: fix GOPATH
+        run: |
+          echo "GOPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+          echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
+        shell: bash
+
       - name: checkout
         uses: actions/checkout@v2
         with:
@@ -32,7 +38,7 @@ jobs:
 
       - name: go get deps
         run: |
-          go get -v -t -d github.com/${{ github.repository }}/...
+          go get -v -t github.com/${{ github.repository }}/...
 
       - name: go build
         run: |
