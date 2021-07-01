@@ -19,12 +19,6 @@ jobs:
         with:
           go-version: 1.16
 
-      - name: fix GOPATH
-        run: |
-          echo "GOPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
-          echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
-        shell: bash
-
       - name: checkout
         uses: actions/checkout@v2
         with:
@@ -46,7 +40,7 @@ jobs:
 
       - name: go vet
         run: |
-          go vet github.com/${{ github.repository }}
+          go vet github.com/${{ github.repository }}/...
     
       - name: golint
         run: |
