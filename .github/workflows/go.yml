@@ -42,7 +42,7 @@ jobs:
 
       - name: go build
         run: |
-          go build -v github.com/${{ github.repository }}
+          go build -v github.com/${{ github.repository }}/
 
       - name: go vet
         run: |
