@@ -59,4 +59,5 @@ jobs:
         env:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          goveralls -coverprofile=covprofile -service=github
+          GOPATH=${GITHUB_WORKSPACE} roveralls
+          GOPATH=${GITHUB_WORKSPACE} goveralls -coverprofile=roveralls.coverprofile -service=github
