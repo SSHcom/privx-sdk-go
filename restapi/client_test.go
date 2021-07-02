@@ -17,15 +17,6 @@ import (
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-//
-type mockIdP struct{ string }
-
-func (idp mockIdP) AccessToken() (string, error) {
-	return idp.string, nil
-}
-
-var access = restapi.Auth(mockIdP{"Bearer trusted"})
-
 func TestGet(t *testing.T) {
 	ts := mockStatus()
 	defer ts.Close()

@@ -9,6 +9,10 @@ on:
       - master
       - /refs/heads/master
 
+defaults:
+  run:
+    working-directory: ./src/github.com/SSHcom/privx-sdk-go
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,38 +23,37 @@ jobs:
         with:
           go-version: 1.16
 
-      - name: fix GOPATH
-        run: |
-          echo "GOPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
-          echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
-        shell: bash
-
       - name: checkout
         uses: actions/checkout@v2
         with:
-          path: src/github.com/${{ github.repository }}
+          path: src/github.com/SSHcom/privx-sdk-go
 
-      - name: go get tools
+      - name: Get source dependencies
         run: |
-          go get golang.org/x/lint/golint
+          go mod download -json
+
+      - name: go get CI tools
+        run: |
           go get github.com/mattn/goveralls
           go get github.com/lawrencewoodman/roveralls
+        env:
+          GO111MODULE: off
 
-      - name: go get deps
+      - name: go nstall staticcheck
         run: |
-          go get -v -t github.com/${{ github.repository }}/...
+          go install honnef.co/go/tools/cmd/staticcheck@latest
 
       - name: go vet
         run: |
-          go vet github.com/${{ github.repository }}/...
+          go vet ./...
     
-      - name: golint
+      - name: staticcheck
         run: |
-          golint -set_exit_status github.com/${{ github.repository }}/...
+          staticcheck ./...
   
       - name: go test
         run: |
-          go test github.com/${{ github.repository }}/...
+          go test ./...
       
       - name: coverage
         env:
