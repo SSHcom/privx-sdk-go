@@ -77,7 +77,7 @@ type APIClient struct {
 
 // LocalUser definition
 type LocalUser struct {
-	ID         string   `json:"id,omnitempty"`
+	ID         string   `json:"id,omitempty"`
 	Created    string   `json:"created,omitempty"`
 	Updated    string   `json:"updated,omitempty"`
 	UpdatedBy  string   `json:"updated_by,omitempty"`
