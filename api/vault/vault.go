@@ -24,7 +24,7 @@ type secretResult struct {
 	Items []Secret `json:"items"`
 }
 
-type secretID struct {
+type SecretID struct {
 	ownerID string
 	name    string
 }
@@ -63,7 +63,7 @@ func (vault *Vault) CreateSecret(
 
 //CreateUserSecret creates a user secret
 func (vault *Vault) CreateUserSecret(
-	secretID secretID,
+	secretID SecretID,
 	allowReadBy []string,
 	allowWriteBy []string,
 	secret interface{},
@@ -96,7 +96,7 @@ func (vault *Vault) Secrets(offset, limit int) ([]Secret, error) {
 }
 
 // UserSecrets returns user secrets client has access to
-func (vault *Vault) UserSecrets(secretID secretID, offset, limit int) ([]Secret, error) {
+func (vault *Vault) UserSecrets(secretID SecretID, offset, limit int) ([]Secret, error) {
 	result := secretResult{}
 	filters := Params{
 		Offset: offset,
@@ -122,7 +122,7 @@ func (vault *Vault) Secret(name string) (*Secret, error) {
 }
 
 // UserSecret gets the content of the argument user secret.
-func (vault *Vault) UserSecret(secretID secretID) (*Secret, error) {
+func (vault *Vault) UserSecret(secretID SecretID) (*Secret, error) {
 	bag := &Secret{}
 	_, err := vault.api.
 		URL("/vault/api/v1/user/%s/secrets/%s", url.PathEscape(secretID.ownerID), url.PathEscape(secretID.name)).
@@ -149,7 +149,7 @@ func (vault *Vault) UpdateSecret(
 
 // UpdateUserSecret existing secret at PrivX Vault
 func (vault *Vault) UpdateUserSecret(
-	secretID secretID,
+	secretID SecretID,
 	allowReadTo []string,
 	allowWriteTo []string,
 	secret interface{},
@@ -174,7 +174,7 @@ func (vault *Vault) DeleteSecret(name string) error {
 }
 
 // DeleteSecret delete existing secret from PrivX vault
-func (vault *Vault) DeleteUserSecret(secretID secretID) error {
+func (vault *Vault) DeleteUserSecret(secretID SecretID) error {
 	ownerID := url.PathEscape(secretID.ownerID)
 	name := url.PathEscape(secretID.name)
 
@@ -197,7 +197,7 @@ func (vault *Vault) SecretMetadata(name string) (*Secret, error) {
 }
 
 // SecretMetadata returns secret metadata
-func (vault *Vault) UserSecretMetadata(secretID secretID) (*Secret, error) {
+func (vault *Vault) UserSecretMetadata(secretID SecretID) (*Secret, error) {
 	metadata := &Secret{}
 	ownerID := url.PathEscape(secretID.ownerID)
 	name := url.PathEscape(secretID.name)
