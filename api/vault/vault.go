@@ -25,8 +25,8 @@ type secretResult struct {
 }
 
 type SecretID struct {
-	ownerID string
-	name    string
+	OwnerID string
+	Name    string
 }
 
 // tVaultReq t vault request definition
@@ -69,8 +69,8 @@ func (vault *Vault) CreateUserSecret(
 	secret interface{},
 ) error {
 	req := vault.mkVaultReq(allowReadBy, allowWriteBy, secret)
-	req.Name = secretID.name
-	req.OwnerID = url.PathEscape(secretID.ownerID)
+	req.Name = secretID.Name
+	req.OwnerID = url.PathEscape(secretID.OwnerID)
 
 	_, err := vault.api.
 		URL("/vault/api/v1/user/%s/secrets", req.OwnerID).
@@ -104,7 +104,7 @@ func (vault *Vault) UserSecrets(secretID SecretID, offset, limit int) ([]Secret,
 	}
 
 	_, err := vault.api.
-		URL("/vault/api/v1/user/%s/secrets", url.PathEscape(secretID.ownerID)).
+		URL("/vault/api/v1/user/%s/secrets", url.PathEscape(secretID.OwnerID)).
 		Query(&filters).
 		Get(&result)
 
@@ -125,7 +125,7 @@ func (vault *Vault) Secret(name string) (*Secret, error) {
 func (vault *Vault) UserSecret(secretID SecretID) (*Secret, error) {
 	bag := &Secret{}
 	_, err := vault.api.
-		URL("/vault/api/v1/user/%s/secrets/%s", url.PathEscape(secretID.ownerID), url.PathEscape(secretID.name)).
+		URL("/vault/api/v1/user/%s/secrets/%s", url.PathEscape(secretID.OwnerID), url.PathEscape(secretID.Name)).
 		Get(&bag)
 
 	return bag, err
@@ -155,8 +155,8 @@ func (vault *Vault) UpdateUserSecret(
 	secret interface{},
 ) error {
 	req := vault.mkVaultReq(allowReadTo, allowWriteTo, secret)
-	req.Name = url.PathEscape(secretID.name)
-	req.OwnerID = url.PathEscape(secretID.ownerID)
+	req.Name = url.PathEscape(secretID.Name)
+	req.OwnerID = url.PathEscape(secretID.OwnerID)
 	_, err := vault.api.
 		URL("/vault/api/v1/user/%s/secrets/%s", req.OwnerID, req.Name).
 		Put(req)
@@ -175,8 +175,8 @@ func (vault *Vault) DeleteSecret(name string) error {
 
 // DeleteSecret delete existing secret from PrivX vault
 func (vault *Vault) DeleteUserSecret(secretID SecretID) error {
-	ownerID := url.PathEscape(secretID.ownerID)
-	name := url.PathEscape(secretID.name)
+	ownerID := url.PathEscape(secretID.OwnerID)
+	name := url.PathEscape(secretID.Name)
 
 	_, err := vault.api.
 		URL("/vault/api/v1/user/%s/secrets/%s", ownerID, name).
@@ -199,8 +199,8 @@ func (vault *Vault) SecretMetadata(name string) (*Secret, error) {
 // SecretMetadata returns secret metadata
 func (vault *Vault) UserSecretMetadata(secretID SecretID) (*Secret, error) {
 	metadata := &Secret{}
-	ownerID := url.PathEscape(secretID.ownerID)
-	name := url.PathEscape(secretID.name)
+	ownerID := url.PathEscape(secretID.OwnerID)
+	name := url.PathEscape(secretID.Name)
 
 	_, err := vault.api.
 		URL("/vault/api/v1/user/%s/metadata/secrets/%s", ownerID, name).
