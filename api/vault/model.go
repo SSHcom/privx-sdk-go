@@ -18,6 +18,7 @@ type Params struct {
 	Limit   int    `json:"limit,omitempty"`
 	Sortkey string `json:"sortkey,omitempty"`
 	Sortdir string `json:"sortdir,omitempty"`
+	Filter  string `json:"filter"`
 }
 
 // Secret contains PrivX metadata about secret and its vault

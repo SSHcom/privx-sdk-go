@@ -8,6 +8,7 @@ package vault
 
 import (
 	"encoding/json"
+	"errors"
 	"net/url"
 
 	"github.com/SSHcom/privx-sdk-go/api/rolestore"
@@ -209,17 +210,37 @@ func (vault *Vault) UserSecretMetadata(secretID SecretID) (*Secret, error) {
 	return metadata, err
 }
 
+func validateFilter(filter string) error {
+	filterAllowedValues := []string{"personal", "shared", "accessible", "readable", "writable", ""}
+	isFilterAllowed := false
+	for _, a := range filterAllowedValues {
+		if a == filter {
+			isFilterAllowed = true
+		}
+	}
+	if !isFilterAllowed {
+		return errors.New("filter field must be one of these values {'personal', 'shared', 'accessible', 'readable', 'writable', ''}")
+	}
+	return nil
+}
+
 // SearchSecrets search for existing secrets
-func (vault *Vault) SearchSecrets(offset, limit int, keywords, sortkey, sortdir string) ([]Secret, error) {
+func (vault *Vault) SearchSecrets(offset, limit int, keywords, sortkey, sortdir string, filter string) ([]Secret, error) {
+
+	err := validateFilter(filter)
+	if err != nil {
+		return nil, err
+	}
 	result := secretResult{}
 	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
 		Sortkey: sortkey,
 		Sortdir: sortdir,
+		Filter:  filter,
 	}
 
-	_, err := vault.api.
+	_, err = vault.api.
 		URL("/vault/api/v1/search/secrets").
 		Query(&filters).
 		Post(map[string]string{
