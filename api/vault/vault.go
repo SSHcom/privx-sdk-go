@@ -216,6 +216,7 @@ func validateFilter(filter string) error {
 	for _, a := range filterAllowedValues {
 		if a == filter {
 			isFilterAllowed = true
+			break
 		}
 	}
 	if !isFilterAllowed {
