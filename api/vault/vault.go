@@ -220,8 +220,7 @@ func validateFilter(filter string) error {
 		}
 	}
 	if !isValidFilter {
-		err := fmt.Errorf("filter field must be one of these values %q", filterAllowedValues)
-		return err
+		return fmt.Errorf("filter field must be one of these values %q", filterAllowedValues)
 	}
 	return nil
 }
