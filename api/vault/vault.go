@@ -8,7 +8,7 @@ package vault
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"net/url"
 
 	"github.com/SSHcom/privx-sdk-go/api/rolestore"
@@ -212,15 +212,16 @@ func (vault *Vault) UserSecretMetadata(secretID SecretID) (*Secret, error) {
 
 func validateFilter(filter string) error {
 	filterAllowedValues := []string{"personal", "shared", "accessible", "readable", "writable", ""}
-	isFilterAllowed := false
+	isValidFilter := false
 	for _, a := range filterAllowedValues {
 		if a == filter {
-			isFilterAllowed = true
+			isValidFilter = true
 			break
 		}
 	}
-	if !isFilterAllowed {
-		return errors.New("filter field must be one of these values {'personal', 'shared', 'accessible', 'readable', 'writable', ''}")
+	if !isValidFilter {
+		err := fmt.Errorf("filter field must be one of these values %q", filterAllowedValues)
+		return err
 	}
 	return nil
 }
