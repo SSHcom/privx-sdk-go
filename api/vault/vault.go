@@ -238,7 +238,6 @@ func (vault *Vault) SearchSecrets(offset, limit int, keywords, sortkey, sortdir 
 		Limit:   limit,
 		Sortkey: sortkey,
 		Sortdir: sortdir,
-		Filter:  filter,
 	}
 
 	_, err = vault.api.
@@ -246,6 +245,7 @@ func (vault *Vault) SearchSecrets(offset, limit int, keywords, sortkey, sortdir 
 		Query(&filters).
 		Post(map[string]string{
 			"keywords": keywords,
+			"filter":   filter,
 		}, &result)
 
 	return result.Items, err
