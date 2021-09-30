@@ -8,6 +8,7 @@ package vault
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
 
 	"github.com/SSHcom/privx-sdk-go/api/rolestore"
@@ -24,9 +25,9 @@ type secretResult struct {
 	Items []Secret `json:"items"`
 }
 
-type secretID struct {
-	ownerID string
-	name    string
+type SecretID struct {
+	OwnerID string
+	Name    string
 }
 
 // tVaultReq t vault request definition
@@ -63,14 +64,14 @@ func (vault *Vault) CreateSecret(
 
 //CreateUserSecret creates a user secret
 func (vault *Vault) CreateUserSecret(
-	secretID secretID,
+	secretID SecretID,
 	allowReadBy []string,
 	allowWriteBy []string,
 	secret interface{},
 ) error {
 	req := vault.mkVaultReq(allowReadBy, allowWriteBy, secret)
-	req.Name = secretID.name
-	req.OwnerID = url.PathEscape(secretID.ownerID)
+	req.Name = secretID.Name
+	req.OwnerID = url.PathEscape(secretID.OwnerID)
 
 	_, err := vault.api.
 		URL("/vault/api/v1/user/%s/secrets", req.OwnerID).
@@ -96,7 +97,7 @@ func (vault *Vault) Secrets(offset, limit int) ([]Secret, error) {
 }
 
 // UserSecrets returns user secrets client has access to
-func (vault *Vault) UserSecrets(secretID secretID, offset, limit int) ([]Secret, error) {
+func (vault *Vault) UserSecrets(secretID SecretID, offset, limit int) ([]Secret, error) {
 	result := secretResult{}
 	filters := Params{
 		Offset: offset,
@@ -104,7 +105,7 @@ func (vault *Vault) UserSecrets(secretID secretID, offset, limit int) ([]Secret,
 	}
 
 	_, err := vault.api.
-		URL("/vault/api/v1/user/%s/secrets", url.PathEscape(secretID.ownerID)).
+		URL("/vault/api/v1/user/%s/secrets", url.PathEscape(secretID.OwnerID)).
 		Query(&filters).
 		Get(&result)
 
@@ -122,10 +123,10 @@ func (vault *Vault) Secret(name string) (*Secret, error) {
 }
 
 // UserSecret gets the content of the argument user secret.
-func (vault *Vault) UserSecret(secretID secretID) (*Secret, error) {
+func (vault *Vault) UserSecret(secretID SecretID) (*Secret, error) {
 	bag := &Secret{}
 	_, err := vault.api.
-		URL("/vault/api/v1/user/%s/secrets/%s", url.PathEscape(secretID.ownerID), url.PathEscape(secretID.name)).
+		URL("/vault/api/v1/user/%s/secrets/%s", url.PathEscape(secretID.OwnerID), url.PathEscape(secretID.Name)).
 		Get(&bag)
 
 	return bag, err
@@ -149,14 +150,14 @@ func (vault *Vault) UpdateSecret(
 
 // UpdateUserSecret existing secret at PrivX Vault
 func (vault *Vault) UpdateUserSecret(
-	secretID secretID,
+	secretID SecretID,
 	allowReadTo []string,
 	allowWriteTo []string,
 	secret interface{},
 ) error {
 	req := vault.mkVaultReq(allowReadTo, allowWriteTo, secret)
-	req.Name = url.PathEscape(secretID.name)
-	req.OwnerID = url.PathEscape(secretID.ownerID)
+	req.Name = url.PathEscape(secretID.Name)
+	req.OwnerID = url.PathEscape(secretID.OwnerID)
 	_, err := vault.api.
 		URL("/vault/api/v1/user/%s/secrets/%s", req.OwnerID, req.Name).
 		Put(req)
@@ -174,9 +175,9 @@ func (vault *Vault) DeleteSecret(name string) error {
 }
 
 // DeleteSecret delete existing secret from PrivX vault
-func (vault *Vault) DeleteUserSecret(secretID secretID) error {
-	ownerID := url.PathEscape(secretID.ownerID)
-	name := url.PathEscape(secretID.name)
+func (vault *Vault) DeleteUserSecret(secretID SecretID) error {
+	ownerID := url.PathEscape(secretID.OwnerID)
+	name := url.PathEscape(secretID.Name)
 
 	_, err := vault.api.
 		URL("/vault/api/v1/user/%s/secrets/%s", ownerID, name).
@@ -197,10 +198,10 @@ func (vault *Vault) SecretMetadata(name string) (*Secret, error) {
 }
 
 // SecretMetadata returns secret metadata
-func (vault *Vault) UserSecretMetadata(secretID secretID) (*Secret, error) {
+func (vault *Vault) UserSecretMetadata(secretID SecretID) (*Secret, error) {
 	metadata := &Secret{}
-	ownerID := url.PathEscape(secretID.ownerID)
-	name := url.PathEscape(secretID.name)
+	ownerID := url.PathEscape(secretID.OwnerID)
+	name := url.PathEscape(secretID.Name)
 
 	_, err := vault.api.
 		URL("/vault/api/v1/user/%s/metadata/secrets/%s", ownerID, name).
@@ -209,8 +210,25 @@ func (vault *Vault) UserSecretMetadata(secretID secretID) (*Secret, error) {
 	return metadata, err
 }
 
+func validateFilter(filter string) error {
+	filterAllowedValues := []string{"personal", "shared", "accessible", "readable", "writable", ""}
+
+	for _, a := range filterAllowedValues {
+		if a == filter {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("filter field must be one of these values %q", filterAllowedValues)
+}
+
 // SearchSecrets search for existing secrets
-func (vault *Vault) SearchSecrets(offset, limit int, keywords, sortkey, sortdir string) ([]Secret, error) {
+func (vault *Vault) SearchSecrets(offset, limit int, keywords, sortkey, sortdir, filter string) ([]Secret, error) {
+
+	err := validateFilter(filter)
+	if err != nil {
+		return nil, err
+	}
 	result := secretResult{}
 	filters := Params{
 		Offset:  offset,
@@ -219,11 +237,12 @@ func (vault *Vault) SearchSecrets(offset, limit int, keywords, sortkey, sortdir 
 		Sortdir: sortdir,
 	}
 
-	_, err := vault.api.
+	_, err = vault.api.
 		URL("/vault/api/v1/search/secrets").
 		Query(&filters).
 		Post(map[string]string{
 			"keywords": keywords,
+			"filter":   filter,
 		}, &result)
 
 	return result.Items, err
