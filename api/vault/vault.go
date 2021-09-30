@@ -212,17 +212,14 @@ func (vault *Vault) UserSecretMetadata(secretID SecretID) (*Secret, error) {
 
 func validateFilter(filter string) error {
 	filterAllowedValues := []string{"personal", "shared", "accessible", "readable", "writable", ""}
-	isValidFilter := false
+
 	for _, a := range filterAllowedValues {
 		if a == filter {
-			isValidFilter = true
-			break
+			return nil
 		}
 	}
-	if !isValidFilter {
-		return fmt.Errorf("filter field must be one of these values %q", filterAllowedValues)
-	}
-	return nil
+
+	return fmt.Errorf("filter field must be one of these values %q", filterAllowedValues)
 }
 
 // SearchSecrets search for existing secrets
