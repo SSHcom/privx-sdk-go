@@ -223,9 +223,9 @@ func validateFilter(filter string) error {
 }
 
 // SearchSecrets search for existing secrets
-func (vault *Vault) SearchSecrets(offset, limit int, keywords, sortkey, sortdir, filter string) ([]Secret, error) {
+func (vault *Vault) SearchSecrets(offset, limit int, keywords, sortkey, sortdir string, searchBody SecretSearchRequest) ([]Secret, error) {
 
-	err := validateFilter(filter)
+	err := validateFilter(searchBody.Filter)
 	if err != nil {
 		return nil, err
 	}
@@ -240,10 +240,7 @@ func (vault *Vault) SearchSecrets(offset, limit int, keywords, sortkey, sortdir,
 	_, err = vault.api.
 		URL("/vault/api/v1/search/secrets").
 		Query(&filters).
-		Post(map[string]string{
-			"keywords": keywords,
-			"filter":   filter,
-		}, &result)
+		Post(searchBody, &result)
 
 	return result.Items, err
 }
