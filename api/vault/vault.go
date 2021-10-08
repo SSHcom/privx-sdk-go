@@ -223,7 +223,7 @@ func validateFilter(filter string) error {
 }
 
 // SearchSecrets search for existing secrets
-func (vault *Vault) SearchSecrets(offset, limit int, keywords, sortkey, sortdir string, searchBody SecretSearchRequest) ([]Secret, error) {
+func (vault *Vault) SearchSecrets(offset, limit int, sortkey, sortdir string, searchBody SecretSearchRequest) ([]Secret, error) {
 
 	err := validateFilter(searchBody.Filter)
 	if err != nil {
