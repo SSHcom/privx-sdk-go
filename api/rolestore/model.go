@@ -264,3 +264,10 @@ func SourceRuleNone() SourceRule {
 		Match: "ANY",
 	}
 }
+
+// UserSearchObject user search parameters
+type UserSearchObject struct {
+	Keywords string   `json:"keywords,omitempty"`
+	Source   string   `json:"source,omitempty"`
+	UserIDs  []string `json:"user_id,omitempty"`
+}
