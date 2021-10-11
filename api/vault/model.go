@@ -31,3 +31,10 @@ type Secret struct {
 	AllowWrite []rolestore.RoleRef `json:"write_roles,omitempty"`
 	Data       json.RawMessage     `json:"data,omitempty"`
 }
+
+// Search criteria for secrets
+type SecretSearchRequest struct {
+	Keywords string   `json:"keywords"`
+	Filter   string   `json:"filter"`
+	OwnerIDs []string `json:"owner_id"`
+}
