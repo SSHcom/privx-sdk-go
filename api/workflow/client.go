@@ -132,6 +132,15 @@ func (store *Engine) Request(requestID string) (*Request, error) {
 	return request, err
 }
 
+//RevokeTargetRole Revokes the target role in a request from target user
+func (store *Engine) RevokeTargetRole(requestID string) error {
+	_, err := store.api.
+		URL("/workflow-engine/api/v1/requests/%s/role/revoke", url.PathEscape(requestID)).
+		Post(nil)
+
+	return err
+}
+
 // DeleteRequest delete request item by ID.
 func (store *Engine) DeleteRequest(requestID string) error {
 	_, err := store.api.
