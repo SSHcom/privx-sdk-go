@@ -1,11 +1,11 @@
 module github.com/SSHcom/privx-sdk-go
 
-go 1.17
+go 1.18
 
 require (
-	github.com/BurntSushi/toml v0.4.1
+	github.com/BurntSushi/toml v1.1.0
 	github.com/dustin/go-humanize v1.0.0
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1
 )
 
 require (
