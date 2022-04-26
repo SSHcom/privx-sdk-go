@@ -25,7 +25,7 @@ func TestGet(t *testing.T) {
 		URL("/users/%v", 1).Status()
 
 	if err != nil {
-		t.Errorf("client get fails: %w", err)
+		t.Errorf("client get fails: %v", err)
 	}
 }
 
@@ -59,7 +59,7 @@ func TestPut(t *testing.T) {
 		URL("/echo").Put(eg, &in)
 
 	if err != nil {
-		t.Errorf("client fails: %w", err)
+		t.Errorf("client fails: %v", err)
 	}
 
 	if eg.ID != in.ID {
@@ -78,7 +78,7 @@ func TestPost(t *testing.T) {
 		URL("/echo").Post(eg, &in)
 
 	if err != nil {
-		t.Errorf("client fails: %w", err)
+		t.Errorf("client fails: %v", err)
 	}
 
 	if eg.ID != in.ID {
@@ -98,7 +98,7 @@ func TestRecvNoIdP(t *testing.T) {
 		URL("/").Get(&data)
 
 	if err != nil {
-		t.Errorf("client fails: %w", err)
+		t.Errorf("client fails: %v", err)
 	}
 
 	if data.ID != "untrusted" {
