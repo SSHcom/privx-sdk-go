@@ -71,8 +71,8 @@ func (auth *Client) CertificateRevocationList(caID, filename string) error {
 }
 
 // TargetHostCredentials get target host credentials for the user
-func (auth *Client) TargetHostCredentials(authorizer *AuthorizationRequest) (*Principal, error) {
-	principal := &Principal{}
+func (auth *Client) TargetHostCredentials(authorizer *AuthorizationRequest) (*ApiIdentitiesResponse, error) {
+	principal := &ApiIdentitiesResponse{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/ca/authorize").

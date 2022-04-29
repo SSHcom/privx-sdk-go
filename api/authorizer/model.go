@@ -116,6 +116,20 @@ type Principal struct {
 	Size            int    `json:"size,omitempty"`
 }
 
+type ApiSshCertificate struct {
+	Type       string   `json:"type"`
+	Data       string   `json:"data"`
+	DataString string   `json:"data_string"`
+	Chain      []string `json:"chain"`
+}
+type ApiIdentitiesResponse struct {
+	Certificates  []ApiSshCertificate `json:"certificates"`
+	PrincipalKeys []Principal         `json:"principal_keys"`
+	Passphrase    string              `json:"passphrase,omitempty"`
+	ResponseCode  int                 `json:"response_code"`
+	Message       string              `json:"message"`
+}
+
 // CA is root certificate representation
 type CA struct {
 	ID        string `json:"id"`
