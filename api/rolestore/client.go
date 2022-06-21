@@ -490,10 +490,17 @@ func (store *RoleStore) ResolveUser(userID string) (*User, error) {
 
 // SearchUsers searches for users, matching the keywords and source
 // criteria.
-func (store *RoleStore) SearchUsers(searchBody UserSearchObject) ([]User, error) {
+func (store *RoleStore) SearchUsers(offset, limit int, sortkey, sortdir string, searchBody UserSearchObject) ([]User, error) {
 	result := usersResult{}
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
+	}
 	_, err := store.api.
 		URL("/role-store/api/v1/users/search").
+		Query(&filters).
 		Post(searchBody, &result)
 
 	return result.Items, err
