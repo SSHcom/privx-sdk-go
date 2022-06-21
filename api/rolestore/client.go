@@ -492,7 +492,7 @@ func (store *RoleStore) ResolveUser(userID string) (*User, error) {
 // criteria.
 func (store *RoleStore) SearchUsers(offset, limit int, sortkey, sortdir string, searchBody UserSearchObject) ([]User, error) {
 	result := usersResult{}
-	queryParam := Params{
+	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
 		Sortkey: sortkey,
@@ -500,7 +500,7 @@ func (store *RoleStore) SearchUsers(offset, limit int, sortkey, sortdir string, 
 	}
 	_, err := store.api.
 		URL("/role-store/api/v1/users/search").
-		Query(&queryParam).
+		Query(&filters).
 		Post(searchBody, &result)
 
 	return result.Items, err
