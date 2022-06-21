@@ -2,7 +2,7 @@
 
 PrivX is a lean and modern privileged access management solution to automate your AWS, Azure and GCP infrastructure access management in one multi-cloud solution. This Software Development Kit (SDK) offers a high-level abstraction to programmatically configure your PrivX instances.
 
-[![PrivX API](https://img.shields.io/badge/PrivX%20API-v23-blue)]([https://apispecs.ssh.com](https://privx.docs.ssh.com/reference/get_auth-api-v1-status-1))
+[![PrivX API](https://img.shields.io/badge/PrivX%20API-v23-blue)](https://privx.docs.ssh.com/reference/get_auth-api-v1-status-1)
 [![Documentation](https://godoc.org/github.com/SSHcom/privx-sdk-go?status.svg)](http://godoc.org/github.com/SSHcom/privx-sdk-go)
 [![Build Status](https://img.shields.io/github/workflow/status/SSHcom/privx-sdk-go/Go)](https://github.com/SSHcom/privx-sdk-go/actions)
 [![Git Hub](https://img.shields.io/github/last-commit/SSHcom/privx-sdk-go.svg)](https://github.com/SSHcom/privx-sdk-go/actions)
