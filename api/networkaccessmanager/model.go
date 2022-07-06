@@ -25,7 +25,7 @@ type Selector struct {
 }
 type Dst struct {
 	Selector Selector `json:"selector,omitempty"`
-	Nat      Nat      `json:"nat,omitempty"`
+	Nat      *Nat     `json:"nat,omitempty"`
 }
 type Role struct {
 	ID   string `json:"id,omitempty"`
@@ -44,11 +44,11 @@ type Item struct {
 	Roles            []Role `json:"roles,omitempty"`
 	Dst              []Dst  `json:"dst,omitempty"`
 	ExclusiveAccess  bool   `json:"exclusive_access,omitempty"`
-	Disabled         bool   `json:"disabled,omitempty"`
+	Disabled         string `json:"disabled,omitempty"`
 }
 type ApiNwtargetsResponse struct {
-	Count int    `json:"count,omitempty"`
-	Items []Item `json:"items,omitempty"`
+	Count int    `json:"count"`
+	Items []Item `json:"items"`
 }
 type ApiNwtargetsResponsePost struct {
 	ID string `json:"id,omitempty"`
@@ -61,4 +61,22 @@ type Params struct {
 	Name    string `json:"name,omitempty"`
 	ID      string `json:"id,omitempty"`
 	Filter  string `json:"filter,omitempty"`
+}
+
+type StatusDetails struct {
+	Key   string `json:"k,omitempty"`
+	Value string `json:"v,omitempty"`
+}
+type ApiNAMstatus struct {
+	Version       string          `json:"version"`
+	ApiVersion    string          `json:"api_version,omitempty"`
+	Status        string          `json:"status,omitempty"`
+	StatusMessage string          `json:"status_message,omitempty"`
+	StatusDetails []StatusDetails `json:"status_details,omitempty"`
+}
+type KeywordsStruct struct {
+	Keywords string `json:"keywords,omitempty"`
+}
+type DisabledStruct struct {
+	Disabled bool `json:"disabled,omitempty"`
 }

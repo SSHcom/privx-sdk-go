@@ -7,6 +7,8 @@
 package networkaccessmanager
 
 import (
+	"net/url"
+
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -62,11 +64,67 @@ func (nam *NetworkAccessManager) SearchNetworkTargets(offset, limit int, sortkey
 		Sortdir: sortdir,
 		Filter:  filter,
 	}
-
+	body := KeywordsStruct{
+		Keywords: keywords,
+	}
 	_, err := nam.api.
 		URL("/network-access-manager/api/v1/nwtargets/search").
 		Query(&filters).
-		Post(&keywords, &result)
+		Post(body, &result)
 
 	return result, err
+}
+
+// Get microservice status
+func (nam *NetworkAccessManager) NetworkAccessManagerStatus() (ApiNAMstatus, error) {
+	result := ApiNAMstatus{}
+
+	_, err := nam.api.
+		URL("/network-access-manager/api/v1/status").
+		Get(&result)
+
+	return result, err
+}
+
+// nwtarget Get network targets by ID
+func (nam *NetworkAccessManager) GetNetworkTargetByID(NetworkTargetID string) (Item, error) {
+	result := Item{}
+
+	_, err := nam.api.
+		URL("/network-access-manager/api/v1/nwtargets/%s", url.PathEscape(NetworkTargetID)).
+		Get(&result)
+
+	return result, err
+}
+
+//nwtarget Update a network target
+func (nam *NetworkAccessManager) UpdateNetworkTarget(networkTarget *Item, NetworkTargetID string) error {
+
+	_, err := nam.api.
+		URL("/network-access-manager/api/v1/nwtargets/%s", url.PathEscape(NetworkTargetID)).
+		Put(networkTarget)
+
+	return err
+}
+
+// nwtarget Delete network target by ID
+func (nam *NetworkAccessManager) DeleteNetworkTargetByID(NetworkTargetID string) error {
+
+	_, err := nam.api.
+		URL("/network-access-manager/api/v1/nwtargets/%s", url.PathEscape(NetworkTargetID)).
+		Delete()
+
+	return err
+}
+
+//nwtarget disable a network target
+func (nam *NetworkAccessManager) DisableNetworkTargetByID(DisabledVal bool, NetworkTargetID string) error {
+	dis := DisabledStruct{}
+	dis.Disabled = DisabledVal
+
+	_, err := nam.api.
+		URL("/network-access-manager/api/v1/nwtargets/%s/disabled", url.PathEscape(NetworkTargetID)).
+		Put(dis)
+
+	return err
 }
