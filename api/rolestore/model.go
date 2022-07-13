@@ -271,3 +271,62 @@ type UserSearchObject struct {
 	Source   string   `json:"source,omitempty"`
 	UserIDs  []string `json:"user_id,omitempty"`
 }
+type IdentityProvider struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	TokenType string `json:"token_type"`
+
+	JWTIssuer                     string `json:"jwt_issuer"`
+	JWTAudience                   string `json:"jwt_audience"`
+	JWTSubjectType                string `json:"jwt_subject_type"`
+	JWTSubjectDNUsernameAttribute string `json:"jwt_subject_dn_username_attribute,omitempty"`
+
+	CustomAttributes []CustomAttributeValidation `json:"custom_attributes,omitempty"`
+
+	PublicKey       []PublicKey `json:"public_key,omitempty"`
+	PublicKeyMethod string      `json:"public_key_method"`
+
+	// Used for validating certs fetched from x5u urls
+	X5uTrustAnchor string `json:"x5u_trust_anchor,omitempty"`
+	// Optional TLS trust anchor cert used when doing x5u https requests
+	X5uTLSTrustAnchor string `json:"x5u_tls_trust_anchor,omitempty"`
+
+	X5uPrefix      string `json:"x5u_prefix,omitempty"`
+	UsersDirectory string `json:"users_directory"`
+
+	Enabled   bool   `json:"enabled"`
+	Author    string `json:"author"`
+	Created   string `json:"created"`
+	Updated   string `json:"updated,omitempty"`
+	UpdatedBy string `json:"updated_by,omitempty"`
+}
+
+type CustomAttributeValidation struct {
+	FieldName     string `json:"field_name" validate:"required"`
+	Type          string `json:"type"`
+	ExpectedValue string `json:"expected_value"`
+	Start         string `json:"start"`
+	End           string `json:"end"`
+}
+
+type PublicKey struct {
+	KeyID     string `json:"key_id"`
+	Comment   string `json:"comment,omitempty"`
+	PublicKey string `json:"public_key,omitempty"`
+}
+
+type IdentityProviderResponse struct {
+	Count int                `json:"count"`
+	Items []IdentityProvider `json:"items"`
+}
+
+type IdentityProviderSearch struct {
+	Keywords string `json:"keywords,omitempty"`
+}
+
+type IdentityProviderResolveUserRequest struct {
+	Principal string `json:"principal"`
+}
+type IdentityProviderCreateResponse struct {
+	ID string `json:"id"`
+}

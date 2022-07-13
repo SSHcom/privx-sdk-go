@@ -9,6 +9,7 @@ package rolestore
 import (
 	"encoding/json"
 	"net/url"
+	"strings"
 
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
@@ -645,4 +646,87 @@ func (store *RoleStore) ResolveAuthorizedKey(resolve ResolveAuthorizedKey) ([]Au
 		Post(&resolve, &result)
 
 	return result.Items, err
+}
+
+/////////////////////////////
+//// Idendity providers ////
+///////////////////////////
+
+// List all identity providers.
+func (store *RoleStore) GetAllIdendityProviders(offset, limit int) (IdentityProviderResponse, error) {
+	result := IdentityProviderResponse{}
+
+	filters := Params{
+		Offset: offset,
+		Limit:  limit,
+	}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/identity-providers").
+		Query(&filters).
+		Get(&result)
+	return result, err
+}
+
+// Create a new Identity Provider.
+func (store *RoleStore) CreateIdendityProvider(newIP IdentityProvider) (IdentityProviderCreateResponse, error) {
+	result := IdentityProviderCreateResponse{}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/identity-providers").
+		Post(newIP, &result)
+
+	return result, err
+}
+
+// Get Identity Provider by ID.
+func (store *RoleStore) GetIdendityProviderByID(ID string) (IdentityProvider, error) {
+	result := IdentityProvider{}
+
+	_, err := store.api.
+		URL("/role-store/api/v1/identity-providers/%s", url.PathEscape(ID)).
+		Get(&result)
+
+	return result, err
+}
+
+// Delete Identity Provider by ID.
+func (store *RoleStore) DeleteIdendityProviderByID(ID string) error {
+
+	_, err := store.api.
+		URL("/role-store/api/v1/identity-providers/%s", url.PathEscape(ID)).
+		Delete()
+
+	return err
+}
+
+// Update a Identity Provider.
+func (store *RoleStore) UpdateIdendityProvider(UpdatedIP IdentityProvider, ID string) error {
+
+	_, err := store.api.
+		URL("/role-store/api/v1/identity-providers/%s", url.PathEscape(ID)).
+		Put(UpdatedIP)
+
+	return err
+}
+
+// Search Identity Providers.
+func (store *RoleStore) SearchIdendityProviders(offset, limit int, sortkey, sortdir, keywords string) (IdentityProviderResponse, error) {
+	result := IdentityProviderResponse{}
+
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: strings.ToUpper(sortdir),
+	}
+	body := IdentityProviderSearch{
+		Keywords: keywords,
+	}
+	_, err := store.api.
+		URL("/role-store/api/v1/identity-providers/search").
+		Query(filters).
+		Post(body, &result)
+
+	return result, err
 }
