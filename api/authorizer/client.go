@@ -450,3 +450,25 @@ func (auth *Client) SearchCert(offset, limit int, sortkey, sortdir string, cert 
 
 	return result.Items, err
 }
+
+// Get all Certificates
+func (auth *Client) GetAllCertificates() (apiCertificateResult, error) {
+	certificates := apiCertificateResult{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/cert").
+		Get(&certificates)
+
+	return certificates, err
+}
+
+// Get Certificate by ID
+func (auth *Client) GetCertByID(ID string) (ApiCertificateObject, error) {
+	cert := ApiCertificateObject{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/cert/%s", url.PathEscape(ID)).
+		Get(&cert)
+
+	return cert, err
+}
