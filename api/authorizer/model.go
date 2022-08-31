@@ -152,3 +152,32 @@ type AccessGroup struct {
 	UpdatedBy string `json:"updated_by,omitempty"`
 	Default   bool   `json:"default,omitempty"`
 }
+type ApiCertificateSearchResponse struct {
+	Count int                    `json:"count"`
+	Items []ApiCertificateObject `json:"items"`
+}
+
+type ApiCertificateObject struct {
+	Type              string       `json:"type"`
+	ID                string       `json:"id"`
+	Serial            string       `json:"serial"`
+	OwnerID           string       `json:"owner_id,omitempty"`
+	Revoked           string       `json:"revoked,omitempty"`
+	RevocationReason  string       `json:"revocation_reason,omitempty"`
+	Cert              string       `json:"cert"`
+	Chain             string       `json:"chain"`
+	Issuer            string       `json:"issuer,omitempty"`
+	Subject           string       `json:"subject,omitempty"`
+	NotBefore         string       `json:"not_before,omitempty"`
+	NotAfter          string       `json:"not_after,omitempty"`
+	KeyUsage          string       `json:"key_usage,omitempty"`
+	BasicConstraints  string       `json:"basic_constraints,omitempty"`
+	Extensions        string       `json:"extensions,omitempty"`
+	FingerPrintSHA1   string       `json:"fingerprint_sha1,omitempty"`
+	FingerPrintSHA256 string       `json:"fingerprint_sha256,omitempty"`
+	SubjectKeyID      string       `json:"subject_key_id,omitempty"`
+	AuthorityKeyID    string       `json:"authority_key_id,omitempty"`
+	ExpiryStatus      ExpiryStatus `json:"expiry_status,omitempty"`
+}
+// ExpiryStatus specifies the certificate expiry status
+type ExpiryStatus string
