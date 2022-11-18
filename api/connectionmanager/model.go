@@ -6,7 +6,9 @@
 
 package connectionmanager
 
-// Params query paramas definition
+import "time"
+
+// Params query params definition
 type Params struct {
 	Offset  int    `json:"offset,omitempty"`
 	Limit   int    `json:"limit,omitempty"`
@@ -106,4 +108,109 @@ type ConnectionSearch struct {
 	Connected            TimestampSearch `json:"connected,omitempty"`
 	Disconnected         TimestampSearch `json:"disconnected,omitempty"`
 	LastActivity         TimestampSearch `json:"last_activity,omitempty"`
+}
+
+//UEBA
+
+// UebaConfigurations uebaconfigurations struct definition
+type UebaConfigurations struct {
+	Address      string `json:"address"`
+	TrustAnchors string `json:"trust_anchors"`
+}
+
+// UebaAnomalySettings ueba anomaly settings struct definition
+type UebaAnomalySettings struct {
+	Action    string  `json:"action"`
+	Threshold float32 `json:"threshold"`
+}
+
+// UebaDatasetQueryParams query params definition for Ueba DataSet
+type UebaDatasetQueryParams struct {
+	Logs     bool `json:"logs,omitempty"`
+	BinCount int  `json:"bin_count,omitempty"`
+}
+
+// TimeRange time range struct definition
+type TimeRange struct {
+	Start   *time.Time         `json:"start,omitempty"`
+	End     *time.Time         `json:"end,omitempty"`
+	Exclude []ExcludeTimeRange `json:"exclude,omitempty"`
+}
+
+type ExcludeTimeRange struct {
+	Start time.Time `json:"start" validate:"required"`
+	End   time.Time `json:"end" validate:"required"`
+}
+
+// Dataset dataset struct definition for Ueba
+type Dataset struct {
+	ID                         string               `db:"id" json:"id" validate:"omitempty,uuid"`
+	LastTraining               *time.Time           `db:"last_training" json:"last_training"`
+	FeatureConfigName          string               `db:"feature_config_name" json:"-"`
+	IsActive                   bool                 `db:"is_active" json:"is_active"`
+	UseForInferenceOnceTrained bool                 `db:"use_for_inference_once_trained" json:"use_for_inference_once_trained"`
+	Quantile99                 float32              `db:"quantile_99" json:"-"`
+	Quantile999                float32              `db:"quantile_999" json:"-"`
+	Std                        float32              `db:"std" json:"-"`
+	TimeRangeSettings          *TimeRange           `json:"time_range_settings" validate:"required"`
+	DBTimeRangeSettings        string               `db:"time_range_settings" json:"-"`
+	TrainingResults            []UebaTrainingResult `json:"training_results"`
+	Created                    *time.Time           `db:"created" json:"created,omitempty"`
+	CreatedBy                  string               `db:"created_by" json:"created_by,omitempty"`
+	Updated                    *time.Time           `db:"updated" json:"updated,omitempty"`
+	UpdatedBy                  string               `db:"updated_by" json:"updated_by,omitempty"`
+	Comment                    string               `db:"comment" json:"comment,omitempty"`
+}
+
+// DatasetBodyParam struct definition for body params in ueba dataset api calls
+type DatasetBodyParam struct {
+	ID                string     `db:"id" json:"id" validate:"omitempty"`
+	TimeRangeSettings *TimeRange `json:"time_range_settings" validate:"required"`
+	Created           *time.Time `db:"created" json:"created,omitempty"`
+	CreatedBy         string     `db:"created_by" json:"created_by,omitempty"`
+	Updated           *time.Time `db:"updated" json:"updated,omitempty"`
+	UpdatedBy         string     `db:"updated_by" json:"updated_by,omitempty"`
+	Comment           string     `db:"comment" json:"comment,omitempty"`
+}
+
+type uebaDatasetsResult struct {
+	Items []Dataset `json:"items"`
+	Count int       `json:"count"`
+}
+
+// UebaTrainingResult ueba training result struct definition
+type UebaTrainingResult struct {
+	DatasetID                  string    `json:"dataset_id"`
+	Created                    time.Time `json:"created"`
+	FeatureConfigName          string    `json:"feature_config_name"`
+	Status                     string    `json:"status"`
+	ErrorCode                  string    `json:"error_code"`
+	ErrorDetails               string    `json:"error_details"`
+	NumConnections             int       `json:"num_connections"`
+	Mean                       float32   `json:"mean"`
+	Std                        float32   `json:"std"`
+	Quantile99                 float32   `json:"quantile_99"`
+	Quantile999                float32   `json:"quantile_999"`
+	TrainingLog                string    `json:"training_log"`
+	TrainingDatasetLoss        []float32 `json:"training_dataset_loss"`
+	ValidationDatasetLoss      []float32 `json:"validation_dataset_loss"`
+	ValidationDatasetHistogram Histogram `json:"validation_dataset_histogram"`
+}
+
+type Histogram struct {
+	Hist     []float32 `json:"hist"`
+	BinEdges []float32 `json:"bin_edges"`
+}
+
+// trainingQueryParams struct definition for ueba training query params
+type trainingQueryParams struct {
+	SetActiveAfterTraining bool `json:"set_active_after_training"`
+}
+
+type ConnectionCount struct {
+	Count int `json:"count"`
+}
+
+type DatasetID struct {
+	ID string `json:"id"`
 }
