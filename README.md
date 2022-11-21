@@ -28,27 +28,39 @@ PrivX SDK composes API client from three independent layers:
 * `oauth` implements OAuth2 access token grant flows
 * `api/...` type-safe implementation of PrivX API 
 
-Here is a typical workflow required to setup the client:
+Here is a typical workflow explained with an example to setup the client:
 
 ```go
 // 1. Create Authorizer and Access Token Provider
-auth := oauth2.WithClientID(
-	restapi.New(/* use restapi options to config http */),
+func authorize() restapi.Authorizer {
+	auth := restapi.New(
+		/* use restapi options to config http */
+		/* the options can be referred from SDK Configuration providers section below*/
+		restapi.UseConfigFile("config.toml"),
+		restapi.UseEnvironment(),
+	)
 
-	// Use oauth2 options to config authorizer
-	oauth2.Access(/* ... */),
-	oauth2.Secret(/* ... */),
-)
+	return oauth.With(
+		auth,
+		// 1. Use config file option to configure authorizer
+		oauth.UseConfigFile("config.toml"),
+		// 2. Use environment variables option to configure authorizer
+		oauth.UseEnvironment(),
+		// 3. Use oauth options to configure authorizer
+		oauth.Access(/* ... */),
+		oauth.Secret(/* ... */),
+	)
+}
 
 // 2. Create HTTP transport for PrivX API
-curl := restapi.New(
-	restapi.Auth(provider),
+func curl() restapi.Connector {
+	return restapi.New(
+		restapi.Auth(authorize())
+	)
+}
 
-  // Use other transport options
-)
-
-// 3. Create API client of rolestore feature
-client := rolestore.New(curl)
+// 3. Create rolestore instance with API client/connector
+roleStore := rolestore.New(curl())
 ```
 
 ### SDK Configuration providers
