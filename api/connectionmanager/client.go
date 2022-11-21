@@ -7,6 +7,7 @@
 package connectionmanager
 
 import (
+	"fmt"
 	"net/url"
 
 	"github.com/SSHcom/privx-sdk-go/restapi"
@@ -195,4 +196,171 @@ func (store *ConnectionManager) TerminateConnectionsByUser(userID string) error 
 		Post(nil)
 
 	return err
+}
+
+// UEBA
+
+// UebaConfigurations get ueba configurations
+func (store *ConnectionManager) UebaConfigurations() (UebaConfigurations, error) {
+	configurations := UebaConfigurations{}
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/configure").
+		Get(&configurations)
+
+	return configurations, err
+}
+
+// SetUebaConfigurations set ueba configurations
+func (store *ConnectionManager) SetUebaConfigurations(configurations *UebaConfigurations) error {
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/configure").
+		Post(&configurations)
+
+	return err
+}
+
+// UebaAnomalySettings get ueba anomaly settings
+func (store *ConnectionManager) UebaAnomalySettings() (UebaAnomalySettings, error) {
+	settings := UebaAnomalySettings{}
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/anomaly-settings").
+		Get(&settings)
+
+	return settings, err
+}
+
+// CreateAnomalySettings create a host to host store
+func (store *ConnectionManager) CreateAnomalySettings(settings UebaAnomalySettings) error {
+
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/anomaly-settings").
+		Post(&settings)
+
+	return err
+}
+
+// StartAnalyzing start ueba analysis
+func (store *ConnectionManager) StartAnalyzing(datasetID string) error {
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/start-analyzing/%s", url.PathEscape(datasetID)).
+		Post(nil)
+
+	return err
+}
+
+// StopAnalyzing stop ueba analysis
+func (store *ConnectionManager) StopAnalyzing() error {
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/stop-analyzing").
+		Post(nil)
+
+	return err
+}
+
+// CreateIdForUebaScript create session ID for Ueba setup script
+func (store *ConnectionManager) CreateIdForUebaScript() (IDstruct, error) {
+	sessionId := IDstruct{}
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/setup-script").
+		Post(nil, &sessionId)
+
+	return sessionId, err
+}
+
+// DownloadUebaScript download ueba setup script.
+func (store *ConnectionManager) DownloadUebaScript(sessionID string) error {
+	filename := fmt.Sprintf("ueba-%s-startup.sh", sessionID)
+	err := store.api.
+		URL("/connection-manager/api/v1/ueba/setup-script/%s", url.PathEscape(sessionID)).
+		Download(filename)
+	return err
+}
+
+// UebaDatasets get dataset object list for ueba.
+func (store *ConnectionManager) UebaDatasets(logs bool, bin_count int) (uebaDatasetsResult, error) {
+	result := uebaDatasetsResult{}
+	filters := UebaDatasetQueryParams{
+		Logs:     logs,
+		BinCount: bin_count,
+	}
+
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/datasets").
+		Query(&filters).
+		Get(&result)
+
+	return result, err
+}
+
+// CreateUebaDataset Save new dataset definition.
+func (store *ConnectionManager) CreateUebaDataset(uebaDatasetParam DatasetBodyParam) (IDstruct, error) {
+	datasetID := IDstruct{}
+
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/datasets").
+		Post(&uebaDatasetParam, &datasetID)
+
+	return datasetID, err
+}
+
+// UebaDataset Get dataset by id, possibility to filter training history.
+func (store *ConnectionManager) UebaDataset(logs bool, bin_count int, datasetID string) (Dataset, error) {
+	result := Dataset{}
+	filters := UebaDatasetQueryParams{
+		Logs:     logs,
+		BinCount: bin_count,
+	}
+
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/datasets/%s", datasetID).
+		Query(&filters).
+		Get(&result)
+
+	return result, err
+}
+
+// UpdateUebaDataset Update dataset.
+func (store *ConnectionManager) UpdateUebaDataset(uebaDatasetParam DatasetBodyParam, datasetID string) error {
+
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/datasets/%s", datasetID).
+		Put(&uebaDatasetParam)
+
+	return err
+}
+
+// DeleteUebaDataset Delete dataset.
+func (store *ConnectionManager) DeleteUebaDataset(datasetID string) error {
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/datasets/%s", datasetID).
+		Delete()
+
+	return err
+}
+
+// TrainUebaDataset Train or retrain saved dataset.
+func (store *ConnectionManager) TrainUebaDataset(datasetID string, set_active_after_training bool) (ConnectionCount, error) {
+	count := ConnectionCount{}
+	filters := trainingQueryParams{
+		SetActiveAfterTraining: set_active_after_training,
+	}
+
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/train/%s", url.PathEscape(datasetID)).
+		Query(&filters).
+		Post(nil, &count)
+
+	return count, err
+}
+
+// ConnectionCounts Get number of connections for dataset with given parameters.
+// All connections, if json empty in body.
+func (store *ConnectionManager) ConnectionCounts(timerange TimeRange) (ConnectionCount, error) {
+	count := ConnectionCount{}
+
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/query-connection-count").
+		Post(&timerange, &count)
+
+	return count, err
 }
