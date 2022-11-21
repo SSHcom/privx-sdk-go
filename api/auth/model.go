@@ -67,3 +67,7 @@ type IdpClientConfig struct {
 	ClientId     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 }
+
+type IDstruct struct {
+	ID string `json:"id"`
+}

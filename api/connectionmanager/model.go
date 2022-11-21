@@ -211,6 +211,6 @@ type ConnectionCount struct {
 	Count int `json:"count"`
 }
 
-type DatasetID struct {
+type IDstruct struct {
 	ID string `json:"id"`
 }

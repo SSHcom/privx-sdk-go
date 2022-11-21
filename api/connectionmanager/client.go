@@ -258,8 +258,8 @@ func (store *ConnectionManager) StopAnalyzing() error {
 }
 
 // CreateIdForUebaScript create session ID for Ueba setup script
-func (store *ConnectionManager) CreateIdForUebaScript() (map[string]string, error) {
-	sessionId := make(map[string]string)
+func (store *ConnectionManager) CreateIdForUebaScript() (IDstruct, error) {
+	sessionId := IDstruct{}
 	_, err := store.api.
 		URL("/connection-manager/api/v1/ueba/setup-script").
 		Post(nil, &sessionId)
@@ -292,15 +292,15 @@ func (store *ConnectionManager) UebaDatasets(logs bool, bin_count int) (uebaData
 	return result, err
 }
 
-// SaveUebaDatasets Save new dataset definition.
-func (store *ConnectionManager) SaveUebaDatasets(uebaDatasetParam DatasetBodyParam) (map[string]string, error) {
-	datasetIDMap := make(map[string]string)
+// CreateUebaDataset Save new dataset definition.
+func (store *ConnectionManager) CreateUebaDataset(uebaDatasetParam DatasetBodyParam) (IDstruct, error) {
+	datasetID := IDstruct{}
 
 	_, err := store.api.
 		URL("/connection-manager/api/v1/ueba/datasets").
-		Post(&uebaDatasetParam, &datasetIDMap)
+		Post(&uebaDatasetParam, &datasetID)
 
-	return datasetIDMap, err
+	return datasetID, err
 }
 
 // UebaDataset Get dataset by id, possibility to filter training history.
@@ -338,9 +338,9 @@ func (store *ConnectionManager) DeleteUebaDataset(datasetID string) error {
 	return err
 }
 
-// TrainUebaDatasets Train or retrain saved dataset.
-func (store *ConnectionManager) TrainUebaDatasets(datasetID string, set_active_after_training bool) (map[string]int, error) {
-	count := make(map[string]int)
+// TrainUebaDataset Train or retrain saved dataset.
+func (store *ConnectionManager) TrainUebaDataset(datasetID string, set_active_after_training bool) (ConnectionCount, error) {
+	count := ConnectionCount{}
 	filters := trainingQueryParams{
 		SetActiveAfterTraining: set_active_after_training,
 	}
@@ -355,8 +355,8 @@ func (store *ConnectionManager) TrainUebaDatasets(datasetID string, set_active_a
 
 // ConnectionCounts Get number of connections for dataset with given parameters.
 // All connections, if json empty in body.
-func (store *ConnectionManager) ConnectionCounts(timerange TimeRange) (map[string]int, error) {
-	count := make(map[string]int)
+func (store *ConnectionManager) ConnectionCounts(timerange TimeRange) (ConnectionCount, error) {
+	count := ConnectionCount{}
 
 	_, err := store.api.
 		URL("/connection-manager/api/v1/ueba/query-connection-count").

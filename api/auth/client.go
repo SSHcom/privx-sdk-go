@@ -35,14 +35,14 @@ func (store *Auth) AuthStatus() (*ServiceStatus, error) {
 }
 
 // CreateIdpClient creates a new identity provider client configuration.
-func (store *Auth) CreateIdpClient(idpClient *IDPClient) (map[string]string, error) {
-	idpClientIdMap := make(map[string]string)
+func (store *Auth) CreateIdpClient(idpClient *IDPClient) (IDstruct, error) {
+	idpClientId := IDstruct{}
 
 	_, err := store.api.
 		URL("/auth/api/v1/idp/clients").
-		Post(&idpClient, &idpClientIdMap)
+		Post(&idpClient, &idpClientId)
 
-	return idpClientIdMap, err
+	return idpClientId, err
 }
 
 // UpdateIdpClient updates existing identity provider client configuration definition.
