@@ -214,3 +214,36 @@ type ConnectionCount struct {
 type IDstruct struct {
 	ID string `json:"id"`
 }
+
+type UebaInternalModelInstance struct {
+	ID                string `json:"id" validate:"uuid"`
+	FeatureConfigName string `json:"feature_config_name"`
+	Status            string `json:"status"`
+	Created           string `json:"created"`
+}
+
+type UebaInternalStatus struct {
+	TrainingStatus      string                      `json:"training_status"`
+	InferenceStatus     string                      `json:"inference_status"`
+	DatasetID           string                      `json:"dataset_id" validate:"uuid,omitempty"`
+	ModelInstanceStatus []UebaInternalModelInstance `json:"model_instance_status"`
+}
+
+// KeyValue key value definition
+type KeyValue struct {
+	Key   string `json:"k"`
+	Value string `json:"v"`
+}
+
+// ServiceStatus ueba service status definition
+type ServiceStatus struct {
+	Variant       string     `json:"variant,omitempty"`
+	Version       string     `json:"version"`
+	APIVersion    string     `json:"api_version"`
+	Status        string     `json:"status"`
+	StatusMessage string     `json:"status_message,omitempty"`
+	ApplicationID string     `json:"app_id,omitempty"`
+	ServerMode    string     `json:"server-mode,omitempty"`
+	StatusDetails []KeyValue `json:"status_details,omitempty"`
+	StartTime     time.Time  `json:"start_time"`
+}

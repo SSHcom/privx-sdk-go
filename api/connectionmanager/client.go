@@ -364,3 +364,25 @@ func (store *ConnectionManager) ConnectionCounts(timerange TimeRange) (Connectio
 
 	return count, err
 }
+
+// UebaStatus Get Ueba service status
+func (store *ConnectionManager) UebaStatus() (ServiceStatus, error) {
+	uebaStatus := ServiceStatus{}
+
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/status").
+		Get(&uebaStatus)
+
+	return uebaStatus, err
+}
+
+// UebaInternalStatus Get Ueba microservice internal status
+func (store *ConnectionManager) UebaInternalStatus() (UebaInternalStatus, error) {
+	uebaInternalStatus := UebaInternalStatus{}
+
+	_, err := store.api.
+		URL("/connection-manager/api/v1/ueba/status/internal").
+		Get(&uebaInternalStatus)
+
+	return uebaInternalStatus, err
+}
