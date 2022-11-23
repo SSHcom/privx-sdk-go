@@ -216,7 +216,7 @@ type IDstruct struct {
 }
 
 type UebaInternalModelInstance struct {
-	ID                string `json:"id" validate:"uuid,omitempty"`
+	ID                string `json:"id" validate:"uuid"`
 	FeatureConfigName string `json:"feature_config_name"`
 	Status            string `json:"status"`
 	Created           string `json:"created"`
