@@ -229,7 +229,7 @@ func (store *ConnectionManager) UebaAnomalySettings() (UebaAnomalySettings, erro
 	return settings, err
 }
 
-// CreateAnomalySettings create a host to host store
+// CreateAnomalySettings create Ueba anomaly settings
 func (store *ConnectionManager) CreateAnomalySettings(settings UebaAnomalySettings) error {
 
 	_, err := store.api.
