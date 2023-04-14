@@ -14,6 +14,14 @@ type KeyValue struct {
 	Value string `json:"v"`
 }
 
+// Params query params definition
+type Params struct {
+	Sortkey string `json:"sortkey,omitempty"`
+	Sortdir string `json:"sortdir,omitempty"`
+	Offset  int    `json:"offset,omitempty"`
+	Limit   int    `json:"limit,omitempty"`
+}
+
 // ServiceStatus auth service status definition
 type ServiceStatus struct {
 	Variant       string     `json:"variant,omitempty"`
@@ -70,4 +78,33 @@ type IdpClientConfig struct {
 
 type IDstruct struct {
 	ID string `json:"id"`
+}
+
+type Session struct {
+	ID           string    `json:"id"`
+	UserID       string    `json:"user_id"`
+	SourceID     string    `json:"source_id"`
+	Domain       string    `json:"domain"`
+	Username     string    `json:"username"`
+	RemoteAddr   string    `json:"remote_addr"`
+	UserAgent    string    `json:"user_agent"`
+	Type         string    `json:"type" jsonschema:"enum=login,enum=sso"`
+	Created      time.Time `json:"created"`
+	Updated      time.Time `json:"updated"`
+	Expires      time.Time `json:"expires"`
+	TokenExpires time.Time `json:"token_expires"`
+	LoggedOut    bool      `json:"logged_out"`
+	Current      bool      `json:"current,omitempty"`
+}
+
+type sessionsResult struct {
+	Items []Session `json:"items"`
+	Count int       `json:"count"`
+}
+
+// SearchParams search params definition
+type SearchParams struct {
+	Keywords string `json:"keywords,omitempty"`
+	UserID   string `json:"user_id,omitempty"`
+	Type     string `json:"type.omitempty" jsonschema:"enum=login,enum=sso"`
 }
