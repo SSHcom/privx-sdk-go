@@ -88,7 +88,7 @@ type Session struct {
 	Username     string    `json:"username"`
 	RemoteAddr   string    `json:"remote_addr"`
 	UserAgent    string    `json:"user_agent"`
-	Type         string    `json:"type" jsonschema:"enum=login,enum=sso"`
+	Type         string    `json:"type"`
 	Created      time.Time `json:"created"`
 	Updated      time.Time `json:"updated"`
 	Expires      time.Time `json:"expires"`
@@ -106,5 +106,5 @@ type sessionsResult struct {
 type SearchParams struct {
 	Keywords string `json:"keywords,omitempty"`
 	UserID   string `json:"user_id,omitempty"`
-	Type     string `json:"type.omitempty"`
+	Type     string `json:"type,omitempty"`
 }
