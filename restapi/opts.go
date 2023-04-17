@@ -9,7 +9,7 @@ package restapi
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 
@@ -88,7 +88,7 @@ func UseConfigFile(path string) Option {
 		}
 		defer f.Close()
 
-		data, err := ioutil.ReadAll(f)
+		data, err := io.ReadAll(f)
 		if err != nil {
 			panic(err)
 		}

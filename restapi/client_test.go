@@ -8,7 +8,7 @@ package restapi_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -139,7 +139,7 @@ func mockStatus() *httptest.Server {
 				w.Write(body)
 
 			case r.URL.Path == "/echo":
-				b, _ := ioutil.ReadAll(r.Body)
+				b, _ := io.ReadAll(r.Body)
 				w.Write(b)
 			}
 		}),

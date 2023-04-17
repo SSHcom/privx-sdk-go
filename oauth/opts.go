@@ -8,7 +8,7 @@ package oauth
 
 import (
 	"encoding/base64"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/BurntSushi/toml"
@@ -70,7 +70,7 @@ func UseConfigFile(path string) Option {
 		}
 		defer f.Close()
 
-		data, err := ioutil.ReadAll(f)
+		data, err := io.ReadAll(f)
 		if err != nil {
 			panic(err)
 		}
