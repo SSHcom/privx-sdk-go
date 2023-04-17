@@ -106,5 +106,5 @@ type sessionsResult struct {
 type SearchParams struct {
 	Keywords string `json:"keywords,omitempty"`
 	UserID   string `json:"user_id,omitempty"`
-	Type     string `json:"type.omitempty" jsonschema:"enum=login,enum=sso"`
+	Type     string `json:"type.omitempty"`
 }
