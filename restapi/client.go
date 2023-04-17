@@ -11,7 +11,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -187,7 +186,7 @@ func (curl *tCURL) status(status ...int) (http.Header, error) {
 	}
 
 	defer curl.output.Body.Close()
-	body, err := ioutil.ReadAll(curl.output.Body)
+	body, err := io.ReadAll(curl.output.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -365,7 +364,7 @@ func (curl *tCURL) recv(data interface{}) (http.Header, error) {
 	}
 
 	defer curl.output.Body.Close()
-	body, err := ioutil.ReadAll(curl.output.Body)
+	body, err := io.ReadAll(curl.output.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -385,7 +384,7 @@ func (curl *tCURL) Fetch() ([]byte, error) {
 	}
 
 	defer curl.output.Body.Close()
-	body, err := ioutil.ReadAll(curl.output.Body)
+	body, err := io.ReadAll(curl.output.Body)
 	if err != nil {
 		return nil, err
 	}

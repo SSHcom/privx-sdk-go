@@ -87,3 +87,84 @@ func (store *Auth) RegenerateIdpClientConfig(idpID string) (*IdpClientConfig, er
 
 	return clientConfig, err
 }
+
+// UserSessions fetches valid sessions by userID.
+func (store *Auth) UserSessions(offset, limit int, sortkey, sortdir, userID string) (*sessionsResult, error) {
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
+	}
+	userSessions := &sessionsResult{}
+
+	_, err := store.api.
+		URL("/auth/api/v1/sessionstorage/users/%s/sessions", userID).
+		Query(&filters).
+		Get(&userSessions)
+
+	return userSessions, err
+}
+
+// SourceSessions fetches valid sessions by sourceID.
+func (store *Auth) SourceSessions(offset, limit int, sortkey, sortdir, sourceID string) (*sessionsResult, error) {
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
+	}
+	sourceSessions := &sessionsResult{}
+
+	_, err := store.api.
+		URL("/auth/api/v1/sessionstorage/sources/%s/sessions", sourceID).
+		Query(&filters).
+		Get(&sourceSessions)
+
+	return sourceSessions, err
+}
+
+// SearchSessions searches for sessions
+func (store *Auth) SearchSessions(offset, limit int, sortkey, sortdir string, search *SearchParams) (*sessionsResult, error) {
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
+	}
+	sessions := &sessionsResult{}
+
+	_, err := store.api.
+		URL("/auth/api/v1/sessionstorage/sessions/search").
+		Query(&filters).
+		Post(search, &sessions)
+
+	return sessions, err
+}
+
+// TerminateSession terminates single session by ID.
+func (store *Auth) TerminateSession(sessionID string) error {
+
+	_, err := store.api.
+		URL("/auth/api/v1/sessionstorage/sessions/%s/terminate", sessionID).
+		Post(nil)
+	return err
+}
+
+// TerminateUserSessions terminates all sessions for a user.
+func (store *Auth) TerminateUserSessions(userID string) error {
+
+	_, err := store.api.
+		URL("/auth/api/v1/sessionstorage/users/%s/sessions/terminate", userID).
+		Post(nil)
+	return err
+}
+
+// Logout logs out user.
+func (store *Auth) Logout() error {
+
+	_, err := store.api.
+		URL("/auth/api/v1/logout").
+		Post(nil)
+	return err
+}
