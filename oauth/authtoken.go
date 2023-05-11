@@ -11,8 +11,8 @@ import "github.com/SSHcom/privx-sdk-go/restapi"
 type tAuthExplicit struct{ string }
 
 /*
-
-WithToken uses explicitly defined JWT to authenticate client
+WithToken uses explicitly defined JWT to authenticate client.
+Add a 'Bearer ' prefix to the token when passing it to WithToken.
 */
 func WithToken(token string) restapi.Authorizer {
 	return &tAuthExplicit{token}
