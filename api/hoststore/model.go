@@ -25,11 +25,31 @@ type Scheme string
 
 // Scheme constants, all supported protocols
 const (
-	SSH   = Scheme("SSH")
-	RDP   = Scheme("RDP")
-	VNC   = Scheme("VNC")
-	HTTP  = Scheme("HTTP")
-	HTTPS = Scheme("HTTPS")
+	SSH = Scheme("SSH")
+	RDP = Scheme("RDP")
+	VNC = Scheme("VNC")
+	WEB = Scheme("WEB")
+	DB  = Scheme("DB")
+)
+
+// DB protocols allowed by the host
+type HostServiceDBProtocol string
+
+// DB protocols constants, all supported protocols
+const (
+	DBProtocolPostgres    = HostServiceDBProtocol("postgres")
+	DBProtocolMySQL       = HostServiceDBProtocol("mysql")
+	DBProtocolPassthrough = HostServiceDBProtocol("passthrough")
+	DBProtocolTLS         = HostServiceDBProtocol("tls")
+)
+
+// DBCertificateValidation of HostServiceDBParameters objects
+type HostServiceDBCertificateValidation string
+
+// DBCertificateValidation Constants
+const (
+	DBCertificateValidationEnabled  = HostServiceDBCertificateValidation("ENABLED")
+	DBCertificateValidationDisabled = HostServiceDBCertificateValidation("DISABLED")
 )
 
 // Params struct for pagination queries
@@ -78,10 +98,11 @@ type HostDisabledRequest struct {
 
 // Service specify the service available on target host
 type Service struct {
-	Scheme  Scheme  `json:"service"`
-	Address Address `json:"address"`
-	Port    int     `json:"port"`
-	Source  Source  `json:"source"`
+	Scheme  Scheme                  `json:"service"`
+	Address Address                 `json:"address"`
+	Port    int                     `json:"port"`
+	DB      HostServiceDBParameters `json:"db"`
+	Source  Source                  `json:"source"`
 }
 
 // Principal of the target host
@@ -141,6 +162,13 @@ type Host struct {
 	Status              []Status       `json:"status,omitempty"`
 }
 
+type HostServiceDBParameters struct {
+	Protocol                   HostServiceDBProtocol              `json:"protocol"`
+	TLSCertificateValidation   HostServiceDBCertificateValidation `json:"tls_certificate_validation"`
+	TLSCertificateTrustAnchors string                             `json:"tls_certificate_trust_anchors"`
+	AuditSkipBytes             int64                              `json:"audit_skip_bytes"`
+}
+
 // SSHService default options
 type SSHService struct {
 	Shell        bool `json:"shell"`
@@ -165,15 +193,28 @@ type WebService struct {
 	Clipboard    bool `json:"clipboard"`
 }
 
+type VNCService struct {
+	FileTransfer bool `json:"file_transfer"`
+	Clipboard    bool `json:"clipboard"`
+}
+
+type DBService struct {
+	MaxBytesUpload   int64 `json:"max_bytes_upload"`
+	MaxBytesDownload int64 `json:"max_bytes_download"`
+}
+
 // DefaultServiceOptions default service options
 type DefaultServiceOptions struct {
 	SSH SSHService `json:"ssh"`
 	RDP RDPService `json:"rdp"`
 	Web WebService `json:"web"`
+	VNC VNCService `json:"vnc"`
+	DB  DBService  `json:"db"`
 }
 
 // Service creates a corresponding service definition
-//   hosts.SSH.Service(...)
+//
+//	hosts.SSH.Service(...)
 func (scheme Scheme) Service(addr Address, port int) Service {
 	return Service{
 		Scheme:  scheme,
