@@ -25,6 +25,7 @@ type License struct {
 	MaxConcurrentRDPConns   int      `json:"max_concurrent_rdp_conns,omitempty"`
 	MaxConcurrentHTTPSConns int      `json:"max_concurrent_https_conns,omitempty"`
 	MaxConcurrentVNCConns   int      `json:"max_concurrent_vnc_conns,omitempty"`
+	MaxUsers                int      `json:"max_users,omitempty"`
 	AnalyticsEnabled        bool     `json:"analytics_enabled,omitempty"`
 	IsOffline               bool     `json:"isoffline,omitempty"`
 	Optin                   bool     `json:"optin,omitempty"`
