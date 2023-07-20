@@ -17,6 +17,7 @@ type License struct {
 	SerialNumber            string   `json:"serial_number,omitempty"`
 	Product                 string   `json:"product,omitempty"`
 	LicenseCode             string   `json:"license_code,omitempty"`
+	LicenseMessage          string   `json:"license_message,omitempty"`
 	Status                  int      `json:"status,omitempty"`
 	Message                 int      `json:"message,omitempty"`
 	MaxHosts                int      `json:"max_hosts,omitempty"`
@@ -30,4 +31,7 @@ type License struct {
 	IsOffline               bool     `json:"isoffline,omitempty"`
 	Optin                   bool     `json:"optin,omitempty"`
 	Features                []string `json:"features,omitempty"`
+	HostInUse               int      `json:"hosts_in_use,omitempty"`
+	AuditHostInUse          int      `json:"audit_hosts_in_use,omitempty"`
+	UsersInUse              int      `json:"users_in_use,omitempty"`
 }
