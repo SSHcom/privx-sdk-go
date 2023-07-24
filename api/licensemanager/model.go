@@ -31,7 +31,7 @@ type License struct {
 	IsOffline               bool     `json:"isoffline,omitempty"`
 	Optin                   bool     `json:"optin,omitempty"`
 	Features                []string `json:"features,omitempty"`
-	HostInUse               int      `json:"hosts_in_use,omitempty"`
-	AuditHostInUse          int      `json:"audit_hosts_in_use,omitempty"`
+	HostsInUse              int      `json:"hosts_in_use,omitempty"`
+	AuditHostsInUse         int      `json:"audit_hosts_in_use,omitempty"`
 	UsersInUse              int      `json:"users_in_use,omitempty"`
 }
