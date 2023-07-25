@@ -9,6 +9,7 @@ package auth
 import (
 	"net/url"
 
+	"github.com/SSHcom/privx-sdk-go/common"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -24,8 +25,8 @@ func New(api restapi.Connector) *Auth {
 }
 
 // AuthStatus get microservice status
-func (store *Auth) AuthStatus() (*ServiceStatus, error) {
-	status := &ServiceStatus{}
+func (store *Auth) AuthStatus() (*common.ServiceStatus, error) {
+	status := &common.ServiceStatus{}
 
 	_, err := store.api.
 		URL("/auth/api/v1/status").
