@@ -6,25 +6,6 @@
 
 package dbproxy
 
-import "time"
-
-// KeyValue key value definition
-type KeyValue struct {
-	Key   string `json:"k"`
-	Value string `json:"v"`
-}
-
-// ServiceStatus db proxy service status definition
-type ServiceStatus struct {
-	Version       string     `json:"version"`
-	APIVersion    string     `json:"api_version"`
-	Status        string     `json:"status"`
-	StatusMessage string     `json:"status_message,omitempty"`
-	ApplicationID string     `json:"app_id,omitempty"`
-	StatusDetails []KeyValue `json:"status_details,omitempty"`
-	StartTime     time.Time  `json:"start_time"`
-}
-
 // DBProxyCACertificateInfo DB proxy x509 CA certificate information
 type DBProxyCACertificateInfo struct {
 	Subject           string `json:"subject,omitempty"`

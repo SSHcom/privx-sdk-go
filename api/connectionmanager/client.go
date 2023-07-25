@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/SSHcom/privx-sdk-go/common"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -366,12 +367,12 @@ func (store *ConnectionManager) ConnectionCounts(timerange TimeRange) (Connectio
 }
 
 // UebaStatus Get Ueba service status
-func (store *ConnectionManager) UebaStatus() (ServiceStatus, error) {
-	uebaStatus := ServiceStatus{}
+func (store *ConnectionManager) UebaStatus() (*common.ServiceStatus, error) {
+	uebaStatus := &common.ServiceStatus{}
 
 	_, err := store.api.
 		URL("/connection-manager/api/v1/ueba/status").
-		Get(&uebaStatus)
+		Get(uebaStatus)
 
 	return uebaStatus, err
 }

@@ -7,6 +7,7 @@
 package dbproxy
 
 import (
+	"github.com/SSHcom/privx-sdk-go/common"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -22,8 +23,8 @@ func New(api restapi.Connector) *DbProxy {
 }
 
 // DbProxyStatus get microservice status
-func (store *DbProxy) DbProxyStatus() (*ServiceStatus, error) {
-	status := &ServiceStatus{}
+func (store *DbProxy) DbProxyStatus() (*common.ServiceStatus, error) {
+	status := &common.ServiceStatus{}
 
 	_, err := store.api.
 		URL("/db-proxy/api/v1/status").
