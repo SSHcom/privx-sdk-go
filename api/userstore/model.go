@@ -43,6 +43,9 @@ type TrustedClient struct {
 	Type            ClientType `json:"type,omitempty"`
 	Permissions     []string   `json:"permissions,omitempty"`
 	ExtenderAddress []string   `json:"extender_address,omitempty"`
+	Subnets         []string   `json:"subnets,omitempty"`
+	RoutingPrefix   string     `json:"routing_prefix,omitempty"`
+	AccessGroupId   string     `json:"access_group_id,omitempty"`
 }
 
 // Extender creates new trusted client
