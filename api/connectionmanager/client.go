@@ -31,13 +31,14 @@ func New(api restapi.Connector) *ConnectionManager {
 }
 
 // Connections get all connections
-func (store *ConnectionManager) Connections(offset, limit int, sortkey, sortdir string) ([]Connection, error) {
+func (store *ConnectionManager) Connections(offset, limit int, sortkey, sortdir string, fuzzycount bool) ([]Connection, error) {
 	result := connectionsResult{}
 	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
+		Offset:     offset,
+		Limit:      limit,
+		Sortkey:    sortkey,
+		Sortdir:    sortdir,
+		FuzzyCount: fuzzycount,
 	}
 
 	_, err := store.api.
@@ -48,14 +49,42 @@ func (store *ConnectionManager) Connections(offset, limit int, sortkey, sortdir 
 	return result.Items, err
 }
 
-// SearchConnections search for connections
-func (store *ConnectionManager) SearchConnections(offset, limit int, sortdir, sortkey string, searchObject ConnectionSearch) ([]Connection, error) {
-	result := connectionsResult{}
+func (store *ConnectionManager) ConnectionTags(offset, limit int, sortdir string, query string) (connectionsTagResult, error) {
+	result := connectionsTagResult{}
 	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
 		Sortdir: sortdir,
-		Sortkey: sortkey,
+		Query:   query,
+	}
+
+	_, err := store.api.
+		URL("/connection-manager/api/v1/connections/tags").
+		Query(&filters).
+		Get(&result)
+
+	return result, err
+}
+
+// UpdateUebaDataset Update dataset.
+func (store *ConnectionManager) UpdateConnectionTags(connectionTags []string, connectionID string) error {
+
+	_, err := store.api.
+		URL("/connection-manager/api/v1/connections/%s/tags", connectionID).
+		Put(&connectionTags)
+
+	return err
+}
+
+// SearchConnections search for connections
+func (store *ConnectionManager) SearchConnections(offset, limit int, sortdir, sortkey string, fuzzycount bool, searchObject ConnectionSearch) ([]Connection, error) {
+	result := connectionsResult{}
+	filters := Params{
+		Offset:     offset,
+		Limit:      limit,
+		Sortdir:    sortdir,
+		Sortkey:    sortkey,
+		FuzzyCount: fuzzycount,
 	}
 
 	_, err := store.api.
