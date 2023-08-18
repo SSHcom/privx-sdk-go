@@ -433,6 +433,26 @@ func (auth *Client) DeleteAccessGroup(accessGroupID string) error {
 	return err
 }
 
+// CreateAccessGroupsIdCas create CA Key to an access group
+func (auth *Client) CreateAccessGroupsIdCas(accessGroupID string) (string, error) {
+	var result string
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/accessgroups/%s/cas", accessGroupID).
+		Post(nil, &result)
+
+	return result, err
+}
+
+// DeleteAccessGroup delete a CA Key to an access group
+func (auth *Client) DeleteAccessGroupsIdCas(accessGroupID string, caID string) error {
+	_, err := auth.api.
+		URL("/authorizer/api/v1/accessgroups/%s/cas/%s", accessGroupID, caID).
+		Delete()
+
+	return err
+}
+
 // SearchCert search for certificates
 func (auth *Client) SearchCert(offset, limit int, sortkey, sortdir string, cert *APICertificateSearch) ([]APICertificate, error) {
 	filters := Params{
