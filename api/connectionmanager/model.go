@@ -10,12 +10,14 @@ import "time"
 
 // Params query params definition
 type Params struct {
-	Offset  int    `json:"offset,omitempty"`
-	Limit   int    `json:"limit,omitempty"`
-	Sortdir string `json:"sortdir,omitempty"`
-	Sortkey string `json:"sortkey,omitempty"`
-	Format  string `json:"format,omitempty"`
-	Filter  string `json:"filter,omitempty"`
+	Offset     int    `json:"offset,omitempty"`
+	Limit      int    `json:"limit,omitempty"`
+	Sortdir    string `json:"sortdir,omitempty"`
+	Sortkey    string `json:"sortkey,omitempty"`
+	Format     string `json:"format,omitempty"`
+	Filter     string `json:"filter,omitempty"`
+	FuzzyCount bool   `json:"fuzzycount,omitempty"`
+	Query      string `json:"query,omitempty"`
 }
 
 // ConnectionHost connection host struct definition
@@ -75,6 +77,12 @@ type Connection struct {
 	UserRoles         []ConnectionRole `json:"user_roles,omitempty"`
 	TargetHostRoles   []ConnectionRole `json:"target_host_roles,omitempty"`
 	AccessRoles       []AccessRoles    `json:"access_roles,omitempty"`
+	Tags              []string         `json:"tags,omitempty"`
+}
+
+type connectionsTagResult struct {
+	Count int      `json:"count"`
+	Items []string `json:"items"`
 }
 
 // TimestampSearch timestamp search struct definition
@@ -108,6 +116,7 @@ type ConnectionSearch struct {
 	Connected            TimestampSearch `json:"connected,omitempty"`
 	Disconnected         TimestampSearch `json:"disconnected,omitempty"`
 	LastActivity         TimestampSearch `json:"last_activity,omitempty"`
+	Tags                 []string        `json:"tags,omitempty"`
 }
 
 //UEBA
