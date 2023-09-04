@@ -24,6 +24,11 @@ type connectionsResult struct {
 	Items []Connection `json:"items"`
 }
 
+type connectionsTagResult struct {
+	Count int      `json:"count"`
+	Items []string `json:"items"`
+}
+
 // New creates a new connection manager client instance, using the
 // argument SDK API client.
 func New(api restapi.Connector) *ConnectionManager {
@@ -49,6 +54,7 @@ func (store *ConnectionManager) Connections(offset, limit int, sortkey, sortdir 
 	return result.Items, err
 }
 
+// ConnectionTags get connection tags
 func (store *ConnectionManager) ConnectionTags(offset, limit int, sortdir string, query string) (connectionsTagResult, error) {
 	result := connectionsTagResult{}
 	filters := Params{
@@ -66,9 +72,8 @@ func (store *ConnectionManager) ConnectionTags(offset, limit int, sortdir string
 	return result, err
 }
 
-// UpdateUebaDataset Update dataset.
+// UpdateConnectionTags update connection tags
 func (store *ConnectionManager) UpdateConnectionTags(connectionTags []string, connectionID string) error {
-
 	_, err := store.api.
 		URL("/connection-manager/api/v1/connections/%s/tags", connectionID).
 		Put(&connectionTags)
