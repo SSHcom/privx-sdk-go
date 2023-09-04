@@ -80,11 +80,6 @@ type Connection struct {
 	Tags              []string         `json:"tags,omitempty"`
 }
 
-type connectionsTagResult struct {
-	Count int      `json:"count"`
-	Items []string `json:"items"`
-}
-
 // TimestampSearch timestamp search struct definition
 type TimestampSearch struct {
 	Start string
