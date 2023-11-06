@@ -96,6 +96,12 @@ type HostDisabledRequest struct {
 	Disabled bool `json:"disabled"`
 }
 
+// SessionRecordingOptions optional host options to disable session recording per feature
+type SessionRecordingOptions struct {
+	DisableClipboardRecording    bool `json:"disable_clipboard_recording"`
+	DisableFileTransferRecording bool `json:"disable_file_transfer_recording"`
+}
+
 // Service specify the service available on target host
 type Service struct {
 	Scheme  Scheme                  `json:"service"`
@@ -129,37 +135,38 @@ type Status struct {
 
 // Host defines PrivX target
 type Host struct {
-	ID                  string         `json:"id,omitempty"`
-	AccessGroupID       string         `json:"access_group_id,omitempty"`
-	ExternalID          string         `json:"external_id,omitempty"`
-	InstanceID          string         `json:"instance_id,omitempty"`
-	SourceID            string         `json:"source_id,omitempty"`
-	Name                string         `json:"common_name,omitempty"`
-	ContactAdress       string         `json:"contact_address,omitempty"`
-	CloudProvider       string         `json:"cloud_provider,omitempty"`
-	CloudProviderRegion string         `json:"cloud_provider_region,omitempty"`
-	Created             string         `json:"created,omitempty"`
-	Updated             string         `json:"updated,omitempty"`
-	UpdatedBy           string         `json:"updated_by,omitempty"`
-	DistinguishedName   string         `json:"distinguished_name,omitempty"`
-	Organization        string         `json:"organization,omitempty"`
-	OrganizationUnit    string         `json:"organizational_unit,omitempty"`
-	Zone                string         `json:"zone,omitempty"`
-	HostType            string         `json:"host_type,omitempty"`
-	HostClassification  string         `json:"host_classification,omitempty"`
-	Comment             string         `json:"comment,omitempty"`
-	Disabled            string         `json:"disabled,omitempty"`
-	Deployable          bool           `json:"deployable,omitempty"`
-	Tofu                bool           `json:"tofu,omitempty"`
-	StandAlone          bool           `json:"stand_alone_host,omitempty"`
-	Audit               bool           `json:"audit_enabled,omitempty"`
-	Scope               []string       `json:"scope,omitempty"`
-	Tags                []string       `json:"tags,omitempty"`
-	Addresses           []Address      `json:"addresses,omitempty"`
-	Services            []Service      `json:"services,omitempty"`
-	Principals          []Principal    `json:"principals,omitempty"`
-	PublicKeys          []SSHPublicKey `json:"ssh_host_public_keys,omitempty"`
-	Status              []Status       `json:"status,omitempty"`
+	ID                      string                   `json:"id,omitempty"`
+	AccessGroupID           string                   `json:"access_group_id,omitempty"`
+	ExternalID              string                   `json:"external_id,omitempty"`
+	InstanceID              string                   `json:"instance_id,omitempty"`
+	SourceID                string                   `json:"source_id,omitempty"`
+	Name                    string                   `json:"common_name,omitempty"`
+	ContactAdress           string                   `json:"contact_address,omitempty"`
+	CloudProvider           string                   `json:"cloud_provider,omitempty"`
+	CloudProviderRegion     string                   `json:"cloud_provider_region,omitempty"`
+	Created                 string                   `json:"created,omitempty"`
+	Updated                 string                   `json:"updated,omitempty"`
+	UpdatedBy               string                   `json:"updated_by,omitempty"`
+	DistinguishedName       string                   `json:"distinguished_name,omitempty"`
+	Organization            string                   `json:"organization,omitempty"`
+	OrganizationUnit        string                   `json:"organizational_unit,omitempty"`
+	Zone                    string                   `json:"zone,omitempty"`
+	HostType                string                   `json:"host_type,omitempty"`
+	HostClassification      string                   `json:"host_classification,omitempty"`
+	Comment                 string                   `json:"comment,omitempty"`
+	Disabled                string                   `json:"disabled,omitempty"`
+	Deployable              bool                     `json:"deployable,omitempty"`
+	Tofu                    bool                     `json:"tofu,omitempty"`
+	StandAlone              bool                     `json:"stand_alone_host,omitempty"`
+	Audit                   bool                     `json:"audit_enabled,omitempty"`
+	Scope                   []string                 `json:"scope,omitempty"`
+	Tags                    []string                 `json:"tags,omitempty"`
+	Addresses               []Address                `json:"addresses,omitempty"`
+	Services                []Service                `json:"services,omitempty"`
+	Principals              []Principal              `json:"principals,omitempty"`
+	PublicKeys              []SSHPublicKey           `json:"ssh_host_public_keys,omitempty"`
+	Status                  []Status                 `json:"status,omitempty"`
+	SessionRecordingOptions *SessionRecordingOptions `json:"session_recording_options,omitempty"`
 }
 
 type HostServiceDBParameters struct {
