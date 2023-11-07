@@ -6,6 +6,10 @@
 
 package rolestore
 
+import (
+	authmodel "github.com/SSHcom/privx-sdk-go/api/auth"
+)
+
 // Params struct for pagination queries.
 type Params struct {
 	Sortdir   string `json:"sortdir,omitempty"`
@@ -142,21 +146,24 @@ type EUM struct {
 
 // Source definitions - user and host directories
 type Source struct {
-	ID                  string     `json:"id,omitempty"`
-	Created             string     `json:"created,omitempty"`
-	Updated             string     `json:"updated,omitempty"`
-	UpdatedBy           string     `json:"updated_by,omitempty"`
-	Author              string     `json:"author,omitempty"`
-	Name                string     `json:"name,omitempty"`
-	StatusCode          string     `json:"status_code,omitempty"`
-	StatusText          string     `json:"status_text,omitempty"`
-	Comment             string     `json:"comment,omitempty"`
-	TTL                 int        `json:"ttl,omitempty"`
-	Enabled             bool       `json:"enabled,omitempty"`
-	Tags                []string   `json:"tags,omitempty"`
-	UsernamePattern     []string   `json:"username_pattern,omitempty"`
-	ExternalUserMapping []EUM      `json:"external_user_mapping,omitempty"`
-	Connection          Connection `json:"connection,omitempty"`
+	ID                          string                           `json:"id,omitempty"`
+	Created                     string                           `json:"created,omitempty"`
+	Updated                     string                           `json:"updated,omitempty"`
+	UpdatedBy                   string                           `json:"updated_by,omitempty"`
+	Author                      string                           `json:"author,omitempty"`
+	Name                        string                           `json:"name,omitempty"`
+	StatusCode                  string                           `json:"status_code,omitempty"`
+	StatusText                  string                           `json:"status_text,omitempty"`
+	Comment                     string                           `json:"comment,omitempty"`
+	TTL                         int                              `json:"ttl,omitempty"`
+	Enabled                     bool                             `json:"enabled,omitempty"`
+	Tags                        []string                         `json:"tags,omitempty"`
+	UsernamePattern             []string                         `json:"username_pattern,omitempty"`
+	ExternalUserMapping         []EUM                            `json:"external_user_mapping,omitempty"`
+	Connection                  Connection                       `json:"connection,omitempty"`
+	SessionPasswordEnabled      bool                             `json:"session_password_enabled,omitempty"`
+	SessionPasswordPolicy       *authmodel.SessionPasswordPolicy `json:"session_password_policy,omitempty"`
+	ChildSessionAutoLogoutDelay int                              `json:"child_session_auto_logout_delay,omitempty"`
 }
 
 // User contains PrivX user information.

@@ -83,6 +83,17 @@ type sessionsResult struct {
 	Count int       `json:"count"`
 }
 
+type SessionPasswordPolicy struct {
+	PasswordMinLength    int    `json:"password_min_length"`
+	PasswordMaxLength    int    `json:"password_max_length"`
+	UseSpecialCharacters bool   `json:"use_special_characters"`
+	UseLowercase         bool   `json:"use_lower_case"`
+	UseUppercase         bool   `json:"use_upper_case"`
+	UseNumbers           bool   `json:"use_numbers"`
+	PasswordEntropy      int    `json:"password_entropy,omitempty"`
+	PasswordStrength     string `json:"password_strength,omitempty"`
+}
+
 // SearchParams search params definition
 type SearchParams struct {
 	Keywords string `json:"keywords,omitempty"`
