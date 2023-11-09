@@ -6,6 +6,8 @@
 
 package licensemanager
 
+import "github.com/SSHcom/privx-sdk-go/api/rolestore"
+
 // License license definition
 type License struct {
 	LicenseStatus           string   `json:"license_status,omitempty"`
@@ -34,4 +36,10 @@ type License struct {
 	HostsInUse              int      `json:"hosts_in_use,omitempty"`
 	AuditHostsInUse         int      `json:"audit_hosts_in_use,omitempty"`
 	UsersInUse              int      `json:"users_in_use,omitempty"`
+}
+
+type RegistrationStatus struct {
+	Status      string             `json:"status"`
+	UsedSources []rolestore.Source `json:"used_sources"`
+	ProductId   string             `json:"product_id"`
 }

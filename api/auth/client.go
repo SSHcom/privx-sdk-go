@@ -169,3 +169,21 @@ func (store *Auth) Logout() error {
 		Post(nil)
 	return err
 }
+
+func (store *Auth) GetUserPairedDevices(userID string) (*PairedDevices, error) {
+	devices := &PairedDevices{}
+
+	_, err := store.api.
+		URL("/auth/api/v1/users/%s/devices", userID).
+		Get(devices)
+
+	return devices, err
+}
+
+func (store *Auth) UnpairUserDevice(userID, deviceID string) error {
+	_, err := store.api.
+		URL("/auth/api/v1/users/%s/devices/%s", userID, deviceID).
+		Delete()
+
+	return err
+}
