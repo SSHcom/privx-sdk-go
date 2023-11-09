@@ -100,3 +100,17 @@ type SearchParams struct {
 	UserID   string `json:"user_id,omitempty"`
 	Type     string `json:"type,omitempty"`
 }
+
+type Device struct {
+	ID        string `json:"id"`
+	OS        string `json:"os"`
+	Name      string `json:"name"`
+	Activated string `json:"activated"`
+	Updated   string `json:"updated"`
+	LastUsed  string `json:"lastUsed"`
+}
+
+type PairedDevices struct {
+	Count int      `json:"count"`
+	Items []Device `json:"items"`
+}

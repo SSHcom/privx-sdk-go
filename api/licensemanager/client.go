@@ -73,3 +73,32 @@ func (store *LicenseManager) License() (*License, error) {
 
 	return license, err
 }
+
+// Register PrivX instance to mobilegw
+func (store *LicenseManager) RegisterToMobileGW() error {
+	_, err := store.api.
+		URL("/license-manager/api/v1/mobilegw/register").
+		Post(nil)
+
+	return err
+}
+
+// Unregister PrivX instance from mobilegw
+func (store *LicenseManager) UnregisterToMobileGW() error {
+	_, err := store.api.
+		URL("/license-manager/api/v1/mobilegw/unregister").
+		Delete(nil)
+
+	return err
+}
+
+// Get PrivX registration status to mobilegw
+func (store *LicenseManager) GetMobileGwRegistration() (*RegistrationStatus, error) {
+	status := &RegistrationStatus{}
+
+	_, err := store.api.
+		URL("/license-manager/api/v1/mobilegw/status").
+		Get(status)
+
+	return status, err
+}
