@@ -23,7 +23,6 @@ import (
 	"github.com/dustin/go-humanize"
 )
 
-//
 // tClient is an HTTP client instance.
 type tClient struct {
 	auth    Authorizer
@@ -33,13 +32,11 @@ type tClient struct {
 	http    *http.Client
 }
 
-//
 // WriteCounter count bytes for a file download
 type WriteCounter struct {
 	Total uint64
 }
 
-//
 // New creates an instance of HTTP client
 func New(opts ...Option) Connector {
 	client := &tClient{
@@ -64,7 +61,6 @@ func New(opts ...Option) Connector {
 	return client
 }
 
-//
 func (client *tClient) doWithRetry(req *http.Request) (*http.Response, error) {
 	for i := 0; i < client.retry; i++ {
 		in, err := client.do(req)
@@ -122,7 +118,6 @@ type tCURL struct {
 	fail    error
 }
 
-//
 // Query defines URI parameters of the request
 func (curl *tCURL) Query(data interface{}) CURL {
 	params, err := curl.encodeURL(data)
@@ -165,14 +160,12 @@ func (curl *tCURL) encodeURL(query interface{}) (url.Values, error) {
 	return values, nil
 }
 
-//
 // Header defines request header
 func (curl *tCURL) Header(head, value string) CURL {
 	curl.header.Add(head, value)
 	return curl
 }
 
-//
 // Status payload from target URL and discards it.
 func (curl *tCURL) Status(status ...int) (http.Header, error) {
 	curl.method = http.MethodGet
@@ -209,7 +202,6 @@ func (curl *tCURL) isSuccess(body []byte, status ...int) error {
 	return nil
 }
 
-//
 // Write increments the counter by the size of the bytes written into it
 func (wc *WriteCounter) Write(p []byte) (int, error) {
 	n := len(p)
@@ -247,7 +239,6 @@ func writeToFile(filename string, resp *http.Response) error {
 	return nil
 }
 
-//
 // Download dowmload file via http from endpoint
 func (curl *tCURL) Download(filename string) error {
 	curl.method = http.MethodGet
@@ -275,14 +266,12 @@ func (curl *tCURL) Download(filename string) error {
 	return nil
 }
 
-//
 // Get fetches content from endpoint
 func (curl *tCURL) Get(in interface{}) (http.Header, error) {
 	curl.method = http.MethodGet
 	return curl.recv(in)
 }
 
-//
 // Put sends content to endpoint
 func (curl *tCURL) Put(eg interface{}, in ...interface{}) (http.Header, error) {
 	curl.method = http.MethodPut
@@ -295,7 +284,6 @@ func (curl *tCURL) Put(eg interface{}, in ...interface{}) (http.Header, error) {
 	return curl.status()
 }
 
-//
 // Post sends content to endpoint
 func (curl *tCURL) Post(eg interface{}, in ...interface{}) (http.Header, error) {
 	curl.method = http.MethodPost
@@ -311,7 +299,6 @@ func (curl *tCURL) Post(eg interface{}, in ...interface{}) (http.Header, error) 
 	return curl.status()
 }
 
-//
 // Delete removes content behind url
 func (curl *tCURL) Delete(in ...interface{}) (http.Header, error) {
 	curl.method = http.MethodDelete
@@ -338,6 +325,8 @@ func (curl *tCURL) send(data interface{}) CURL {
 }
 
 func (curl *tCURL) encodeJSON(data interface{}) CURL {
+	curl.header.Set("Content-Type", "application/json")
+
 	encoded, err := json.Marshal(data)
 	if curl.fail = err; err == nil {
 		curl.payload = bytes.NewBuffer(encoded)
@@ -392,7 +381,6 @@ func (curl *tCURL) Fetch() ([]byte, error) {
 	return body, nil
 }
 
-//
 func (curl *tCURL) unsafeIO() *tCURL {
 	if curl.fail != nil {
 		return curl
