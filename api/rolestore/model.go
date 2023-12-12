@@ -226,6 +226,8 @@ type Role struct {
 	GrantType            string           `json:"grant_type"`
 	Comment              string           `json:"comment"`
 	AccessGroupID        string           `json:"access_group_id"`
+	GrantStart           string           `json:"grant_start"`
+	GrantEnd             string           `json:"grant_end"`
 	GrantValidityPeriods []ValidityPeriod `json:"grant_validity_periods,omitempty"`
 	Permissions          []string         `json:"permissions"`
 	PublicKey            []string         `json:"principal_public_key_strings"`
