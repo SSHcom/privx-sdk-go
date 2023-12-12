@@ -221,23 +221,27 @@ type Seed struct {
 
 // Role contains PrivX role information.
 type Role struct {
-	ID             string     `json:"id"`
-	Name           string     `json:"name"`
-	GrantType      string     `json:"grant_type"`
-	Comment        string     `json:"comment"`
-	AccessGroupID  string     `json:"access_group_id"`
-	GrantStart     string     `json:"grant_start"`
-	GrantEnd       string     `json:"grant_end"`
-	Permissions    []string   `json:"permissions"`
-	PublicKey      []string   `json:"principal_public_key_strings"`
-	MemberCount    int        `json:"member_count"`
-	FloatingLength int        `json:"floating_length"`
-	Explicit       bool       `json:"explicit" tabulate:"@userCtx"`
-	Implicit       bool       `json:"implicit" tabulate:"@userCtx"`
-	System         bool       `json:"system"`
-	PermitAgent    bool       `json:"permit_agent"`
-	Context        *Context   `json:"context"`
-	SourceRule     SourceRule `json:"source_rules"`
+	ID                   string           `json:"id"`
+	Name                 string           `json:"name"`
+	GrantType            string           `json:"grant_type"`
+	Comment              string           `json:"comment"`
+	AccessGroupID        string           `json:"access_group_id"`
+	GrantValidityPeriods []ValidityPeriod `json:"grant_validity_periods,omitempty"`
+	Permissions          []string         `json:"permissions"`
+	PublicKey            []string         `json:"principal_public_key_strings"`
+	MemberCount          int              `json:"member_count"`
+	FloatingLength       int              `json:"floating_length"`
+	Explicit             bool             `json:"explicit" tabulate:"@userCtx"`
+	Implicit             bool             `json:"implicit" tabulate:"@userCtx"`
+	System               bool             `json:"system"`
+	PermitAgent          bool             `json:"permit_agent"`
+	Context              *Context         `json:"context"`
+	SourceRule           SourceRule       `json:"source_rules"`
+}
+
+type ValidityPeriod struct {
+	GrantStart string `json:"grant_start,omitempty"`
+	GrantEnd   string `json:"grant_end,omitempty"`
 }
 
 // RoleRef is a reference to role object
