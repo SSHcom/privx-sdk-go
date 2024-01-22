@@ -86,3 +86,14 @@ func (store *Settings) SectionSchema(scope, section string) (*json.RawMessage, e
 
 	return schema, err
 }
+
+// RestartRequired get restart required information for given settings and scope
+func (store *Settings) RestartRequired(settings *json.RawMessage, scope string) (*json.RawMessage, error) {
+	isRestartRequiredResponse := &json.RawMessage{}
+
+	_, err := store.api.
+		URL("/settings/api/v1/restart_required/%s", url.PathEscape(scope)).
+		Post(settings, isRestartRequiredResponse)
+
+	return isRestartRequiredResponse, err
+}
