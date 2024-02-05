@@ -195,6 +195,8 @@ func (auth *Client) DownloadExtenderCertificateCRL(filename, id string) error {
 }
 
 // ExtenderConfigDownloadHandle get a session id
+//
+// Deprecated: Use GetExtenderConfig instead
 func (auth *Client) ExtenderConfigDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
 	sessionID := &DownloadHandle{}
 
@@ -206,6 +208,8 @@ func (auth *Client) ExtenderConfigDownloadHandle(trustedClientID string) (*Downl
 }
 
 // DownloadExtenderConfig gets a pre-configured extender config
+//
+// Deprecated: Use GetExtenderConfig instead
 func (auth *Client) DownloadExtenderConfig(trustedClientID, sessionID, filename string) error {
 	err := auth.api.
 		URL("/authorizer/api/v1/extender/conf/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
@@ -214,7 +218,18 @@ func (auth *Client) DownloadExtenderConfig(trustedClientID, sessionID, filename 
 	return err
 }
 
+// GetExtenderConfig gets a pre-configured extender config
+func (auth *Client) GetExtenderConfig(trustedClientID, filename string) error {
+	err := auth.api.
+		URL("/authorizer/api/v1/extender/conf/%s", url.PathEscape(trustedClientID)).
+		Download(filename)
+
+	return err
+}
+
 // DeployScriptDownloadHandle get a session id for a deployment script
+//
+// Deprecated: Use GetDeployScript instead.
 func (auth *Client) DeployScriptDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
 	sessionID := &DownloadHandle{}
 
@@ -226,9 +241,20 @@ func (auth *Client) DeployScriptDownloadHandle(trustedClientID string) (*Downloa
 }
 
 // DownloadDeployScript gets a pre-configured deployment script
+//
+// Deprecated: Use GetDeployScript instead.
 func (auth *Client) DownloadDeployScript(trustedClientID, sessionID, filename string) error {
 	err := auth.api.
 		URL("/authorizer/api/v1/deploy/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
+		Download(filename)
+
+	return err
+}
+
+// GetDeployScript gets a pre-configured deployment script
+func (auth *Client) GetDeployScript(trustedClientID, filename string) error {
+	err := auth.api.
+		URL("/authorizer/api/v1/deploy/%s", url.PathEscape(trustedClientID)).
 		Download(filename)
 
 	return err
@@ -244,6 +270,8 @@ func (auth *Client) DownloadPrincipalCommandScript(filename string) error {
 }
 
 // CarrierConfigDownloadHandle get a session id for a carrier config
+//
+// Deprecated: Use GetCarrierConfig instead
 func (auth *Client) CarrierConfigDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
 	sessionID := &DownloadHandle{}
 
@@ -255,9 +283,20 @@ func (auth *Client) CarrierConfigDownloadHandle(trustedClientID string) (*Downlo
 }
 
 // DownloadCarrierConfig gets a pre-configured carrier config
+//
+// Deprecated: Use GetCarrierConfig instead
 func (auth *Client) DownloadCarrierConfig(trustedClientID, sessionID, filename string) error {
 	err := auth.api.
 		URL("/authorizer/api/v1/carrier/conf/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
+		Download(filename)
+
+	return err
+}
+
+// GetCarrierConfig gets a pre-configured carrier config
+func (auth *Client) GetCarrierConfig(trustedClientID, filename string) error {
+	err := auth.api.
+		URL("/authorizer/api/v1/carrier/conf/%s", url.PathEscape(trustedClientID)).
 		Download(filename)
 
 	return err
@@ -299,6 +338,8 @@ func (auth *Client) DownloadWebProxyCertificateCRL(filename, trustedClientID str
 }
 
 // WebProxySessionDownloadHandle get a session id for a web proxy config
+//
+// Deprecated: Use GetWebProxyConfig instead
 func (auth *Client) WebProxySessionDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
 	sessionID := &DownloadHandle{}
 
@@ -310,9 +351,20 @@ func (auth *Client) WebProxySessionDownloadHandle(trustedClientID string) (*Down
 }
 
 // DownloadWebProxyConfig gets a pre-configured web proxy config
+//
+// Deprecated: Use GetWebProxyConfig instead
 func (auth *Client) DownloadWebProxyConfig(trustedClientID, sessionID, filename string) error {
 	err := auth.api.
 		URL("/authorizer/api/v1/icap/conf/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
+		Download(filename)
+
+	return err
+}
+
+// GetWebProxyConfig gets a pre-configured web proxy config
+func (auth *Client) GetWebProxyConfig(trustedClientID, filename string) error {
+	err := auth.api.
+		URL("/authorizer/api/v1/icap/conf/%s", url.PathEscape(trustedClientID)).
 		Download(filename)
 
 	return err
