@@ -21,3 +21,8 @@ func WithToken(token string) restapi.Authorizer {
 func (auth *tAuthExplicit) AccessToken() (string, error) {
 	return auth.string, nil
 }
+
+func (auth *tAuthExplicit) Cookie() string {
+	// Session cookies not suppoted for explicit auth
+	return ""
+}

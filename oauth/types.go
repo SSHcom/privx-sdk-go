@@ -30,15 +30,16 @@ func (token *AccessToken) isInvalid() bool {
 // tAuth authorizer client
 type tAuth struct {
 	*sync.Cond
-	access  string
-	secret  string
-	digest  string
-	client  restapi.Connector
-	token   *AccessToken
-	pending bool
+	access     string
+	secret     string
+	digest     string
+	client     restapi.Connector
+	token      *AccessToken
+	useCookies bool
+	cookie     string
+	pending    bool
 }
 
-//
 func newAuth(client restapi.Connector, opts ...Option) *tAuth {
 	auth := &tAuth{
 		Cond:   sync.NewCond(new(sync.Mutex)),
@@ -70,6 +71,10 @@ func (auth *tAuth) synchronized(f func() error) (err error) {
 	}
 
 	return
+}
+
+func (auth *tAuth) Cookie() string {
+	return auth.cookie
 }
 
 // tClientID is a pair of unique client id and redirect uri

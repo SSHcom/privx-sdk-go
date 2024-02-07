@@ -112,3 +112,10 @@ func UseEnvironment() Option {
 		return auth
 	}
 }
+
+func UseCookies() Option {
+	return func(auth *tAuth) *tAuth {
+		auth.useCookies = true
+		return auth
+	}
+}
