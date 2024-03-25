@@ -16,22 +16,21 @@ import (
 type tAuthPassword struct{ *tAuth }
 
 /*
-
 WithClientID executes OAuth2 Resource Owner Password Grant
 It uses access/secret key pair to authenticate client
 
-  auth := oauth2.WithClientID(
-		restapi.New(...),
-		oauth2.Access(...),
-		oauth2.Secret(...),
-	)
+	  auth := oauth2.WithClientID(
+			restapi.New(...),
+			oauth2.Access(...),
+			oauth2.Secret(...),
+		)
 
-	client := restapi.New(
-		restapi.Auth(auth),
-		restapi.Endpoint("https://privx.example.com"),
-	)
+		client := restapi.New(
+			restapi.Auth(auth),
+			restapi.Endpoint("https://privx.example.com"),
+		)
 
-	rolestore.New(client)
+		rolestore.New(client)
 */
 func WithClientID(client restapi.Connector, opts ...Option) restapi.Authorizer {
 	return &tAuthPassword{tAuth: newAuth(client, opts...)}
@@ -54,11 +53,15 @@ func (auth *tAuthPassword) grantPasswordCredentials() error {
 	}
 	var token AccessToken
 
-	_, err := auth.client.
+	header, err := auth.client.
 		URL("/auth/api/v1/oauth/token").
 		Header("Content-Type", "application/x-www-form-urlencoded").
 		Header("Authorization", "Basic "+auth.digest).
 		Post(request, &token)
+
+	if auth.useCookies && auth.cookie == "" {
+		auth.cookie = header.Get("Set-Cookie")
+	}
 
 	if err != nil {
 		token.notAfter = time.Now().Add(

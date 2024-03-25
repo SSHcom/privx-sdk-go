@@ -38,6 +38,7 @@ type CURL interface {
 // Authorizer provides access token for REST API client
 type Authorizer interface {
 	AccessToken() (string, error)
+	Cookie() string
 }
 
 const (

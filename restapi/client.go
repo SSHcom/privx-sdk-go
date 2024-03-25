@@ -85,6 +85,10 @@ func (client *tClient) do(req *http.Request) (*http.Response, error) {
 			return nil, err
 		}
 		req.Header.Set("Authorization", token)
+
+		if cookie := client.auth.Cookie(); cookie != "" {
+			req.Header.Set("Cookie", cookie)
+		}
 	}
 	req.Header.Set("User-Agent", UserAgent)
 
