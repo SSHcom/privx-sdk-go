@@ -183,12 +183,18 @@ func (store *RoleStore) LinkedRoles(awsroleID string) ([]AWSRoleLink, error) {
 }
 
 // Roles gets all configured roles.
-func (store *RoleStore) Roles() ([]Role, error) {
+func (store *RoleStore) Roles(offset, limit int, sortkey, sortdir string) ([]Role, error) {
 	result := rolesResult{}
 
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
+	}
+
 	_, err := store.api.
-		URL("/role-store/api/v1/roles").
-		Get(&result)
+		URL("/role-store/api/v1/roles").Query(filters).Get(&result)
 
 	return result.Items, err
 }
