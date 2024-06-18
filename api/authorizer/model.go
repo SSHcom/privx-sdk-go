@@ -6,6 +6,8 @@
 
 package authorizer
 
+import "time"
+
 // Params query params definition
 type Params struct {
 	ResponseType  string `json:"response_type,omitempty"`
@@ -158,26 +160,89 @@ type ApiCertificateSearchResponse struct {
 }
 
 type ApiCertificateObject struct {
-	Type              string       `json:"type"`
-	ID                string       `json:"id"`
-	Serial            string       `json:"serial"`
-	OwnerID           string       `json:"owner_id,omitempty"`
-	Revoked           string       `json:"revoked,omitempty"`
-	RevocationReason  string       `json:"revocation_reason,omitempty"`
-	Cert              string       `json:"cert"`
-	Chain             string       `json:"chain"`
-	Issuer            string       `json:"issuer,omitempty"`
-	Subject           string       `json:"subject,omitempty"`
-	NotBefore         string       `json:"not_before,omitempty"`
-	NotAfter          string       `json:"not_after,omitempty"`
-	KeyUsage          string       `json:"key_usage,omitempty"`
-	BasicConstraints  string       `json:"basic_constraints,omitempty"`
-	Extensions        string       `json:"extensions,omitempty"`
-	FingerPrintSHA1   string       `json:"fingerprint_sha1,omitempty"`
-	FingerPrintSHA256 string       `json:"fingerprint_sha256,omitempty"`
-	SubjectKeyID      string       `json:"subject_key_id,omitempty"`
-	AuthorityKeyID    string       `json:"authority_key_id,omitempty"`
-	ExpiryStatus      ExpiryStatus `json:"expiry_status,omitempty"`
+	Type              string `json:"type"`
+	ID                string `json:"id"`
+	Serial            string `json:"serial"`
+	OwnerID           string `json:"owner_id,omitempty"`
+	Revoked           string `json:"revoked,omitempty"`
+	RevocationReason  string `json:"revocation_reason,omitempty"`
+	Cert              string `json:"cert"`
+	Chain             string `json:"chain"`
+	Issuer            string `json:"issuer,omitempty"`
+	Subject           string `json:"subject,omitempty"`
+	NotBefore         string `json:"not_before,omitempty"`
+	NotAfter          string `json:"not_after,omitempty"`
+	KeyUsage          string `json:"key_usage,omitempty"`
+	BasicConstraints  string `json:"basic_constraints,omitempty"`
+	Extensions        string `json:"extensions,omitempty"`
+	FingerPrintSHA1   string `json:"fingerprint_sha1,omitempty"`
+	FingerPrintSHA256 string `json:"fingerprint_sha256,omitempty"`
+	SubjectKeyID      string `json:"subject_key_id,omitempty"`
+	AuthorityKeyID    string `json:"authority_key_id,omitempty"`
+	ExpiryStatus      string `json:"expiry_status,omitempty"`
 }
-// ExpiryStatus specifies the certificate expiry status
-type ExpiryStatus string
+
+type AccountSecrets struct {
+	Path         string             `json:"path"`
+	Type         string             `json:"type"`
+	Username     string             `json:"username"`
+	Email        string             `json:"email,omitempty"`
+	FullName     string             `json:"full_name,omitempty"`
+	TargetDomain TargetDomainHandle `json:"target_domain,omitempty"`
+	Host         HostPrincipals     `json:"host,omitempty"`
+	Created      string             `json:"created,omitempty"`
+	Updated      string             `json:"updated,omitempty"`
+}
+
+type TargetDomainHandle struct {
+	ID      string `json:"id"`
+	Name    string `json:"name,omitempty"`
+	Deleted bool   `json:"deleted,omitempty"`
+}
+
+type HostPrincipals struct {
+	ID         string   `json:"id"`
+	Addresses  []string `json:"addresses"`
+	CommonName string   `json:"common_name,omitempty"`
+	ExternalID string   `json:"external_id,omitempty"`
+	InstanceID string   `json:"instance_id,omitempty"`
+}
+
+type AccountSecretsSearchRequest struct {
+	Keywords string `json:"keywords"`
+	HostID   string `json:"host_id,omitempty"`
+	Username string `json:"username,omitempty"`
+}
+
+type Checkout struct {
+	ID               string         `json:"id"`
+	Path             string         `json:"path"`
+	Type             string         `json:"type"`
+	Expires          string         `json:"expires"`
+	Created          string         `json:"created"`
+	ExplicitCheckout bool           `json:"explicit_checkout"`
+	Secrets          []Secrets      `json:"secrets"`
+	Username         string         `json:"username"`
+	Email            string         `json:"email,omitempty"`
+	FullName         string         `json:"full_name,omitempty"`
+	Host             HostPrincipals `json:"host,omitempty"`
+	TargetDomain     TargetDomain   `json:"target_domain,omitempty"`
+	ManagedAccountID string         `json:"managed_account_id,omitempty"`
+	UserID           string         `json:"user_id"`
+}
+
+type CheckoutRequest struct {
+	Path string `json:"path"`
+}
+
+type Secrets struct {
+	Version int       `json:"version"`
+	Secret  string    `json:"secret"`
+	Created time.Time `json:"created"`
+}
+
+type TargetDomain struct {
+	ID      string `json:"id"`
+	Name    string `json:"name,omitempty"`
+	Deleted bool   `json:"deleted,omitempty"`
+}

@@ -9,27 +9,13 @@ package authorizer
 import (
 	"net/url"
 
+	"github.com/SSHcom/privx-sdk-go/common"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
 // Client is a authorizer client instance.
 type Client struct {
 	api restapi.Connector
-}
-
-type templatesResult struct {
-	Count int            `json:"count"`
-	Items []CertTemplate `json:"items"`
-}
-
-type accessGroupResult struct {
-	Count int           `json:"count"`
-	Items []AccessGroup `json:"items"`
-}
-
-type apiCertificateResult struct {
-	Count int              `json:"count"`
-	Items []APICertificate `json:"items"`
 }
 
 // New creates a new authorizer client instance
@@ -319,8 +305,8 @@ func (auth *Client) DownloadWebProxyConfig(trustedClientID, sessionID, filename 
 }
 
 // CertTemplates returns the certificate authentication templates for the service
-func (auth *Client) CertTemplates(service string) ([]CertTemplate, error) {
-	result := templatesResult{}
+func (auth *Client) CertTemplates(service string) (common.Result[CertTemplate], error) {
+	result := common.Result[CertTemplate]{}
 	filters := Params{
 		Service: service,
 	}
@@ -330,7 +316,7 @@ func (auth *Client) CertTemplates(service string) ([]CertTemplate, error) {
 		Query(&filters).
 		Get(&result)
 
-	return result.Items, err
+	return result, err
 }
 
 // SSLTrustAnchor returns the SSL trust anchor (PrivX TLS CA certificate)
@@ -355,22 +341,23 @@ func (auth *Client) ExtenderTrustAnchor() (*TrustAnchor, error) {
 	return anchor, err
 }
 
+// MARK: Access Groups
 // AccessGroups lists all access group
-func (auth *Client) AccessGroups(offset, limit int, sortkey, sortdir string) ([]AccessGroup, error) {
+func (auth *Client) AccessGroups(offset, limit int, sortkey, sortdir string) (common.Result[AccessGroup], error) {
 	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
 		Sortkey: sortkey,
 		Sortdir: sortdir,
 	}
-	result := accessGroupResult{}
+	result := common.Result[AccessGroup]{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/accessgroups").
 		Query(&filters).
 		Get(&result)
 
-	return result.Items, err
+	return result, err
 }
 
 // CreateAccessGroup create a access group
@@ -387,21 +374,21 @@ func (auth *Client) CreateAccessGroup(accessGroup *AccessGroup) (string, error) 
 }
 
 // SearchAccessGroup search for access groups
-func (auth *Client) SearchAccessGroup(offset, limit int, sortkey, sortdir string, search *SearchParams) ([]AccessGroup, error) {
+func (auth *Client) SearchAccessGroup(offset, limit int, sortkey, sortdir string, search *SearchParams) (common.Result[AccessGroup], error) {
 	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
 		Sortkey: sortkey,
 		Sortdir: sortdir,
 	}
-	result := accessGroupResult{}
+	result := common.Result[AccessGroup]{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/accessgroups/search").
 		Query(&filters).
 		Post(search, &result)
 
-	return result.Items, err
+	return result, err
 }
 
 // AccessGroup get access group
@@ -453,27 +440,28 @@ func (auth *Client) DeleteAccessGroupsIdCas(accessGroupID string, caID string) e
 	return err
 }
 
+// MARK: Certs
 // SearchCert search for certificates
-func (auth *Client) SearchCert(offset, limit int, sortkey, sortdir string, cert *APICertificateSearch) ([]APICertificate, error) {
+func (auth *Client) SearchCert(offset, limit int, sortkey, sortdir string, cert *APICertificateSearch) (common.Result[APICertificate], error) {
 	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
 		Sortkey: sortkey,
 		Sortdir: sortdir,
 	}
-	result := apiCertificateResult{}
+	result := common.Result[APICertificate]{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/cert/search").
 		Query(&filters).
 		Post(cert, &result)
 
-	return result.Items, err
+	return result, err
 }
 
 // Get all Certificates
-func (auth *Client) GetAllCertificates() (apiCertificateResult, error) {
-	certificates := apiCertificateResult{}
+func (auth *Client) GetAllCertificates() (common.Result[APICertificate], error) {
+	certificates := common.Result[APICertificate]{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/cert").
@@ -491,4 +479,87 @@ func (auth *Client) GetCertByID(ID string) (ApiCertificateObject, error) {
 		Get(&cert)
 
 	return cert, err
+}
+
+// MARK: Secrets
+// AccountSecrets lists all account secrets
+func (auth *Client) AccountSecrets(limit int, sortdir string) (common.Result[AccountSecrets], error) {
+	filters := Params{
+		Limit:   limit,
+		Sortdir: sortdir,
+	}
+	result := common.Result[AccountSecrets]{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/secrets").
+		Query(&filters).
+		Get(&result)
+
+	return result, err
+}
+
+// SearchAccountSecrets search for account secrets
+func (auth *Client) SearchAccountSecrets(limit int, sortdir string, search *AccountSecretsSearchRequest) (common.Result[AccountSecrets], error) {
+	filters := Params{
+		Limit:   limit,
+		Sortdir: sortdir,
+	}
+	result := common.Result[AccountSecrets]{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/secrets/search").
+		Query(&filters).
+		Post(search, &result)
+
+	return result, err
+}
+
+// CheckoutAccountSecret checkout account secret
+func (auth *Client) CheckoutAccountSecret(path string) (common.Result[Checkout], error) {
+	checkoutReq := CheckoutRequest{
+		Path: path,
+	}
+	result := common.Result[Checkout]{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/secrets/checkouts").
+		Post(checkoutReq, &result)
+
+	return result, err
+}
+
+// Checkouts lists secret checkouts
+func (auth *Client) Checkouts(limit int, sortdir string) (common.Result[Checkout], error) {
+	filters := Params{
+		Limit:   limit,
+		Sortdir: sortdir,
+	}
+	result := common.Result[Checkout]{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/secrets/checkouts").
+		Query(&filters).
+		Get(&result)
+
+	return result, err
+}
+
+// Checkout get checkout by id
+func (auth *Client) Checkout(checkoutId string) (*Checkout, error) {
+	checkout := &Checkout{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/secrets/checkouts/%s", url.PathEscape(checkoutId)).
+		Get(&checkout)
+
+	return checkout, err
+}
+
+// ReleaseCheckout release secret checkout
+func (auth *Client) ReleaseCheckout(checkoutId string) error {
+	_, err := auth.api.
+		URL("/authorizer/api/v1/secrets/checkouts/%s/release", url.PathEscape(checkoutId)).
+		Post(nil)
+
+	return err
 }

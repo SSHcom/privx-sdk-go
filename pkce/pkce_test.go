@@ -9,8 +9,6 @@ package pkce
 import (
 	"reflect"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestPKCE(t *testing.T) {
@@ -20,7 +18,9 @@ func TestPKCE(t *testing.T) {
 	}
 
 	challenge, method := verifier.ChallengeS256()
-	assert.True(t, verifier.Verify(challenge, method), "Should return true")
+	if !verifier.Verify(challenge, method) {
+		t.Error("Expected verifier.Verify to return true")
+	}
 }
 
 func TestPKCEVerify(t *testing.T) {
@@ -30,7 +30,9 @@ func TestPKCEVerify(t *testing.T) {
 	}
 
 	challenge, _ := verifier.ChallengeS256()
-	assert.False(t, verifier.Verify(challenge, "S512"), "Should return false")
+	if verifier.Verify(challenge, "S512") {
+		t.Error("Expected verifier.Verify to return false")
+	}
 }
 
 func TestString(t *testing.T) {
@@ -41,5 +43,7 @@ func TestString(t *testing.T) {
 
 	result := reflect.TypeOf(verifier.String()).Kind()
 
-	assert.EqualValues(t, reflect.String, result, "Expected type string")
+	if result != reflect.String {
+		t.Errorf("Expected type string, but got %v", result)
+	}
 }
