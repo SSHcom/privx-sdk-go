@@ -2,12 +2,6 @@ package common
 
 import "time"
 
-// Generic results struct
-type Result[T any] struct {
-	Count int `json:"count"`
-	Items []T `json:"items"`
-}
-
 // KeyValue key value definition
 type KeyValue struct {
 	Key   string `json:"k"`

@@ -9,7 +9,6 @@ package authorizer
 import (
 	"net/url"
 
-	"github.com/SSHcom/privx-sdk-go/common"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -305,8 +304,8 @@ func (auth *Client) DownloadWebProxyConfig(trustedClientID, sessionID, filename 
 }
 
 // CertTemplates returns the certificate authentication templates for the service
-func (auth *Client) CertTemplates(service string) (common.Result[CertTemplate], error) {
-	result := common.Result[CertTemplate]{}
+func (auth *Client) CertTemplates(service string) ([]CertTemplate, error) {
+	result := templatesResult{}
 	filters := Params{
 		Service: service,
 	}
@@ -316,7 +315,7 @@ func (auth *Client) CertTemplates(service string) (common.Result[CertTemplate], 
 		Query(&filters).
 		Get(&result)
 
-	return result, err
+	return result.Items, err
 }
 
 // SSLTrustAnchor returns the SSL trust anchor (PrivX TLS CA certificate)
@@ -343,21 +342,21 @@ func (auth *Client) ExtenderTrustAnchor() (*TrustAnchor, error) {
 
 // MARK: Access Groups
 // AccessGroups lists all access group
-func (auth *Client) AccessGroups(offset, limit int, sortkey, sortdir string) (common.Result[AccessGroup], error) {
+func (auth *Client) AccessGroups(offset, limit int, sortkey, sortdir string) ([]AccessGroup, error) {
 	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
 		Sortkey: sortkey,
 		Sortdir: sortdir,
 	}
-	result := common.Result[AccessGroup]{}
+	result := accessGroupResult{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/accessgroups").
 		Query(&filters).
 		Get(&result)
 
-	return result, err
+	return result.Items, err
 }
 
 // CreateAccessGroup create a access group
@@ -374,21 +373,21 @@ func (auth *Client) CreateAccessGroup(accessGroup *AccessGroup) (string, error) 
 }
 
 // SearchAccessGroup search for access groups
-func (auth *Client) SearchAccessGroup(offset, limit int, sortkey, sortdir string, search *SearchParams) (common.Result[AccessGroup], error) {
+func (auth *Client) SearchAccessGroup(offset, limit int, sortkey, sortdir string, search *SearchParams) ([]AccessGroup, error) {
 	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
 		Sortkey: sortkey,
 		Sortdir: sortdir,
 	}
-	result := common.Result[AccessGroup]{}
+	result := accessGroupResult{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/accessgroups/search").
 		Query(&filters).
 		Post(search, &result)
 
-	return result, err
+	return result.Items, err
 }
 
 // AccessGroup get access group
@@ -442,26 +441,26 @@ func (auth *Client) DeleteAccessGroupsIdCas(accessGroupID string, caID string) e
 
 // MARK: Certs
 // SearchCert search for certificates
-func (auth *Client) SearchCert(offset, limit int, sortkey, sortdir string, cert *APICertificateSearch) (common.Result[APICertificate], error) {
+func (auth *Client) SearchCert(offset, limit int, sortkey, sortdir string, cert *APICertificateSearch) ([]APICertificate, error) {
 	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
 		Sortkey: sortkey,
 		Sortdir: sortdir,
 	}
-	result := common.Result[APICertificate]{}
+	result := apiCertificateResult{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/cert/search").
 		Query(&filters).
 		Post(cert, &result)
 
-	return result, err
+	return result.Items, err
 }
 
 // Get all Certificates
-func (auth *Client) GetAllCertificates() (common.Result[APICertificate], error) {
-	certificates := common.Result[APICertificate]{}
+func (auth *Client) GetAllCertificates() (apiCertificateResult, error) {
+	certificates := apiCertificateResult{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/cert").
@@ -483,65 +482,65 @@ func (auth *Client) GetCertByID(ID string) (ApiCertificateObject, error) {
 
 // MARK: Secrets
 // AccountSecrets lists all account secrets
-func (auth *Client) AccountSecrets(limit int, sortdir string) (common.Result[AccountSecrets], error) {
+func (auth *Client) AccountSecrets(limit int, sortdir string) ([]AccountSecrets, error) {
 	filters := Params{
 		Limit:   limit,
 		Sortdir: sortdir,
 	}
-	result := common.Result[AccountSecrets]{}
+	result := accountSecretsResult{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/secrets").
 		Query(&filters).
 		Get(&result)
 
-	return result, err
+	return result.Items, err
 }
 
 // SearchAccountSecrets search for account secrets
-func (auth *Client) SearchAccountSecrets(limit int, sortdir string, search *AccountSecretsSearchRequest) (common.Result[AccountSecrets], error) {
+func (auth *Client) SearchAccountSecrets(limit int, sortdir string, search *AccountSecretsSearchRequest) ([]AccountSecrets, error) {
 	filters := Params{
 		Limit:   limit,
 		Sortdir: sortdir,
 	}
-	result := common.Result[AccountSecrets]{}
+	result := accountSecretsResult{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/secrets/search").
 		Query(&filters).
 		Post(search, &result)
 
-	return result, err
+	return result.Items, err
 }
 
 // CheckoutAccountSecret checkout account secret
-func (auth *Client) CheckoutAccountSecret(path string) (common.Result[Checkout], error) {
+func (auth *Client) CheckoutAccountSecret(path string) ([]Checkout, error) {
 	checkoutReq := CheckoutRequest{
 		Path: path,
 	}
-	result := common.Result[Checkout]{}
+	result := checkoutResult{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/secrets/checkouts").
 		Post(checkoutReq, &result)
 
-	return result, err
+	return result.Items, err
 }
 
 // Checkouts lists secret checkouts
-func (auth *Client) Checkouts(limit int, sortdir string) (common.Result[Checkout], error) {
+func (auth *Client) Checkouts(limit int, sortdir string) ([]Checkout, error) {
 	filters := Params{
 		Limit:   limit,
 		Sortdir: sortdir,
 	}
-	result := common.Result[Checkout]{}
+	result := checkoutResult{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/secrets/checkouts").
 		Query(&filters).
 		Get(&result)
 
-	return result, err
+	return result.Items, err
 }
 
 // Checkout get checkout by id

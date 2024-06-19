@@ -250,3 +250,28 @@ type ManagedAccountChangeSet struct {
 type ManagedAccountBatch struct {
 	IDs []string `json:"ids"`
 }
+
+type pwPolicyResult struct {
+	Count int              `json:"count"`
+	Items []PasswordPolicy `json:"items"`
+}
+
+type scriptTemplateResult struct {
+	Count int              `json:"count"`
+	Items []ScriptTemplate `json:"items"`
+}
+
+type tdResult struct {
+	Count int            `json:"count"`
+	Items []TargetDomain `json:"items"`
+}
+
+type scannedAccountResult struct {
+	Count int              `json:"count"`
+	Items []ScannedAccount `json:"items"`
+}
+
+type managedAccountResult struct {
+	Count int              `json:"count"`
+	Items []ManagedAccount `json:"items"`
+}

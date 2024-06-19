@@ -246,3 +246,28 @@ type TargetDomain struct {
 	Name    string `json:"name,omitempty"`
 	Deleted bool   `json:"deleted,omitempty"`
 }
+
+type templatesResult struct {
+	Count int            `json:"count"`
+	Items []CertTemplate `json:"items"`
+}
+
+type accessGroupResult struct {
+	Count int           `json:"count"`
+	Items []AccessGroup `json:"items"`
+}
+
+type apiCertificateResult struct {
+	Count int              `json:"count"`
+	Items []APICertificate `json:"items"`
+}
+
+type accountSecretsResult struct {
+	Count int              `json:"count"`
+	Items []AccountSecrets `json:"items"`
+}
+
+type checkoutResult struct {
+	Count int        `json:"count"`
+	Items []Checkout `json:"items"`
+}

@@ -30,14 +30,14 @@ func (s *Client) SecretsManagerStatus() (*common.ServiceStatus, error) {
 
 // MARK: Password Policies
 // PasswordPolicies lists all password policies
-func (s *Client) PasswordPolicies() (common.Result[PasswordPolicy], error) {
-	result := common.Result[PasswordPolicy]{}
+func (s *Client) PasswordPolicies() ([]PasswordPolicy, error) {
+	result := pwPolicyResult{}
 
 	_, err := s.api.
 		URL("/secrets-manager/api/v1/password-policies").
 		Get(&result)
 
-	return result, err
+	return result.Items, err
 }
 
 // CreatePasswordPolicy create a password policy
@@ -94,14 +94,14 @@ func (s *Client) RotatePassword(hostId, account string) error {
 
 // MARK: Manage rotation scripts
 // ScriptTemplates lists all script templates
-func (s *Client) ScriptTemplates() (common.Result[ScriptTemplate], error) {
-	result := common.Result[ScriptTemplate]{}
+func (s *Client) ScriptTemplates() ([]ScriptTemplate, error) {
+	result := scriptTemplateResult{}
 
 	_, err := s.api.
 		URL("/secrets-manager/api/v1/script-templates").
 		Get(&result)
 
-	return result, err
+	return result.Items, err
 }
 
 // CreateScriptTemplate create a script template
@@ -161,8 +161,8 @@ func (s *Client) CompileScript(r CompileScriptRequest) (string, error) {
 
 // MARK: Target domains
 // TargetDomains lists all target domains
-func (s *Client) TargetDomains(offset, limit int, sortkey, sortdir string) (common.Result[TargetDomain], error) {
-	result := common.Result[TargetDomain]{}
+func (s *Client) TargetDomains(offset, limit int, sortkey, sortdir string) ([]TargetDomain, error) {
+	result := tdResult{}
 	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
@@ -175,7 +175,7 @@ func (s *Client) TargetDomains(offset, limit int, sortkey, sortdir string) (comm
 		Query(&filters).
 		Get(&result)
 
-	return result, err
+	return result.Items, err
 }
 
 // CreateTargetDomain create a target domain
@@ -192,8 +192,8 @@ func (s *Client) CreateTargetDomain(td TargetDomain) (string, error) {
 }
 
 // SearchTargetDomain search for existing target domain
-func (s *Client) SearchTargetDomain(sortkey, sortdir string, offset, limit int, searchObject TargetDomainsSearch) (common.Result[TargetDomain], error) {
-	result := common.Result[TargetDomain]{}
+func (s *Client) SearchTargetDomain(sortkey, sortdir string, offset, limit int, searchObject TargetDomainsSearch) ([]TargetDomain, error) {
+	result := tdResult{}
 	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
@@ -206,7 +206,7 @@ func (s *Client) SearchTargetDomain(sortkey, sortdir string, offset, limit int, 
 		Query(&filters).
 		Post(&searchObject, &result)
 
-	return result, err
+	return result.Items, err
 }
 
 // TargetDomain get target domain by id
@@ -249,8 +249,8 @@ func (s *Client) RefreshTargetDomain(tdId string) error {
 
 // MARK: Target domain accounts
 // TargetDomainAccounts lists all accounts in target domain
-func (s *Client) TargetDomainAccounts(offset, limit int, sortkey, sortdir, tdId string) (common.Result[ScannedAccount], error) {
-	result := common.Result[ScannedAccount]{}
+func (s *Client) TargetDomainAccounts(offset, limit int, sortkey, sortdir, tdId string) ([]ScannedAccount, error) {
+	result := scannedAccountResult{}
 	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
@@ -263,12 +263,12 @@ func (s *Client) TargetDomainAccounts(offset, limit int, sortkey, sortdir, tdId 
 		Query(&filters).
 		Get(&result)
 
-	return result, err
+	return result.Items, err
 }
 
 // SearchTargetDomainAccounts search accounts in target domain
-func (s *Client) SearchTargetDomainAccounts(sortkey, sortdir, tdId string, offset, limit int, searchObject ScannedAccountsSearch) (common.Result[ScannedAccount], error) {
-	result := common.Result[ScannedAccount]{}
+func (s *Client) SearchTargetDomainAccounts(sortkey, sortdir, tdId string, offset, limit int, searchObject ScannedAccountsSearch) ([]ScannedAccount, error) {
+	result := scannedAccountResult{}
 	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
@@ -281,7 +281,7 @@ func (s *Client) SearchTargetDomainAccounts(sortkey, sortdir, tdId string, offse
 		Query(&filters).
 		Post(&searchObject, &result)
 
-	return result, err
+	return result.Items, err
 }
 
 // TargetDomainAccount get target domain account
@@ -315,8 +315,8 @@ func (s *Client) BatchUpdateTargetDomain(tdId string, change ScannedAccountEditB
 
 // MARK: Managed accounts
 // ManagedAccounts lists all managed accounts in a target domain
-func (s *Client) ManagedAccounts(offset, limit int, sortkey, sortdir, tdId string) (common.Result[ManagedAccount], error) {
-	result := common.Result[ManagedAccount]{}
+func (s *Client) ManagedAccounts(offset, limit int, sortkey, sortdir, tdId string) ([]ManagedAccount, error) {
+	result := managedAccountResult{}
 	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
@@ -329,7 +329,7 @@ func (s *Client) ManagedAccounts(offset, limit int, sortkey, sortdir, tdId strin
 		Query(&filters).
 		Get(&result)
 
-	return result, err
+	return result.Items, err
 }
 
 // CreateManagedAccount create a managed account
@@ -346,8 +346,8 @@ func (s *Client) CreateManagedAccount(tdId string, ma ManagedAccount) (string, e
 }
 
 // SearchManagedAccounts search managed accounts in a target domain
-func (s *Client) SearchManagedAccounts(sortkey, sortdir, tdId string, offset, limit int, searchObject ManagedAccountsSearch) (common.Result[ManagedAccount], error) {
-	result := common.Result[ManagedAccount]{}
+func (s *Client) SearchManagedAccounts(sortkey, sortdir, tdId string, offset, limit int, searchObject ManagedAccountsSearch) ([]ManagedAccount, error) {
+	result := managedAccountResult{}
 	filters := Params{
 		Offset:  offset,
 		Limit:   limit,
@@ -360,7 +360,7 @@ func (s *Client) SearchManagedAccounts(sortkey, sortdir, tdId string, offset, li
 		Query(&filters).
 		Post(&searchObject, &result)
 
-	return result, err
+	return result.Items, err
 }
 
 // ManagedAccount get managed account
