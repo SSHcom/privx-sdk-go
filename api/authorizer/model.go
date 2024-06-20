@@ -262,12 +262,12 @@ type apiCertificateResult struct {
 	Items []APICertificate `json:"items"`
 }
 
-type accountSecretsResult struct {
+type AccountSecretsResult struct {
 	Count int              `json:"count"`
 	Items []AccountSecrets `json:"items"`
 }
 
-type checkoutResult struct {
+type CheckoutResult struct {
 	Count int        `json:"count"`
 	Items []Checkout `json:"items"`
 }

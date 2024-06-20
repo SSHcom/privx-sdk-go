@@ -251,27 +251,27 @@ type ManagedAccountBatch struct {
 	IDs []string `json:"ids"`
 }
 
-type pwPolicyResult struct {
+type PwPolicyResult struct {
 	Count int              `json:"count"`
 	Items []PasswordPolicy `json:"items"`
 }
 
-type scriptTemplateResult struct {
+type ScriptTemplateResult struct {
 	Count int              `json:"count"`
 	Items []ScriptTemplate `json:"items"`
 }
 
-type tdResult struct {
+type TdResult struct {
 	Count int            `json:"count"`
 	Items []TargetDomain `json:"items"`
 }
 
-type scannedAccountResult struct {
+type ScannedAccountResult struct {
 	Count int              `json:"count"`
 	Items []ScannedAccount `json:"items"`
 }
 
-type managedAccountResult struct {
+type ManagedAccountResult struct {
 	Count int              `json:"count"`
 	Items []ManagedAccount `json:"items"`
 }

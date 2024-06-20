@@ -482,65 +482,65 @@ func (auth *Client) GetCertByID(ID string) (ApiCertificateObject, error) {
 
 // MARK: Secrets
 // AccountSecrets lists all account secrets
-func (auth *Client) AccountSecrets(limit int, sortdir string) ([]AccountSecrets, error) {
+func (auth *Client) AccountSecrets(limit int, sortdir string) (AccountSecretsResult, error) {
 	filters := Params{
 		Limit:   limit,
 		Sortdir: sortdir,
 	}
-	result := accountSecretsResult{}
+	result := AccountSecretsResult{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/secrets").
 		Query(&filters).
 		Get(&result)
 
-	return result.Items, err
+	return result, err
 }
 
 // SearchAccountSecrets search for account secrets
-func (auth *Client) SearchAccountSecrets(limit int, sortdir string, search *AccountSecretsSearchRequest) ([]AccountSecrets, error) {
+func (auth *Client) SearchAccountSecrets(limit int, sortdir string, search *AccountSecretsSearchRequest) (AccountSecretsResult, error) {
 	filters := Params{
 		Limit:   limit,
 		Sortdir: sortdir,
 	}
-	result := accountSecretsResult{}
+	result := AccountSecretsResult{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/secrets/search").
 		Query(&filters).
 		Post(search, &result)
 
-	return result.Items, err
+	return result, err
 }
 
 // CheckoutAccountSecret checkout account secret
-func (auth *Client) CheckoutAccountSecret(path string) ([]Checkout, error) {
+func (auth *Client) CheckoutAccountSecret(path string) (CheckoutResult, error) {
 	checkoutReq := CheckoutRequest{
 		Path: path,
 	}
-	result := checkoutResult{}
+	result := CheckoutResult{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/secrets/checkouts").
 		Post(checkoutReq, &result)
 
-	return result.Items, err
+	return result, err
 }
 
 // Checkouts lists secret checkouts
-func (auth *Client) Checkouts(limit int, sortdir string) ([]Checkout, error) {
+func (auth *Client) Checkouts(limit int, sortdir string) (CheckoutResult, error) {
 	filters := Params{
 		Limit:   limit,
 		Sortdir: sortdir,
 	}
-	result := checkoutResult{}
+	result := CheckoutResult{}
 
 	_, err := auth.api.
 		URL("/authorizer/api/v1/secrets/checkouts").
 		Query(&filters).
 		Get(&result)
 
-	return result.Items, err
+	return result, err
 }
 
 // Checkout get checkout by id
