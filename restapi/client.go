@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net"
 	"net/http"
 	"net/url"
@@ -19,8 +20,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/dustin/go-humanize"
 )
 
 // tClient is an HTTP client instance.
@@ -219,7 +218,28 @@ func (wc *WriteCounter) Write(p []byte) (int, error) {
 func (wc *WriteCounter) printProgress() {
 	fmt.Printf("\r%s", strings.Repeat(" ", 50))
 
-	fmt.Printf("\rDownloading... %s complete", humanize.Bytes(wc.Total))
+	fmt.Printf("\rDownloading... %s complete", fBytes(wc.Total))
+}
+
+// Func insp: https://github.com/dustin/go-humanize
+func fBytes(s uint64) string {
+	sizes := []string{"B", "kB", "MB", "GB", "TB", "PB", "EB"}
+	return humanateBytes(s, 1000, sizes)
+}
+
+func humanateBytes(s uint64, base float64, sizes []string) string {
+	if s < 10 {
+		return fmt.Sprintf("%d B", s)
+	}
+	e := math.Floor(math.Log(float64(s)) / math.Log(base))
+	suffix := sizes[int(e)]
+	val := math.Floor(float64(s)/math.Pow(base, e)*10+0.5) / 10
+	f := "%.0f %s"
+	if val < 10 {
+		f = "%.1f %s"
+	}
+
+	return fmt.Sprintf(f, val, suffix)
 }
 
 func writeToFile(filename string, resp *http.Response) error {

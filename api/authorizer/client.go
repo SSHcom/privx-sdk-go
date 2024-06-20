@@ -17,21 +17,6 @@ type Client struct {
 	api restapi.Connector
 }
 
-type templatesResult struct {
-	Count int            `json:"count"`
-	Items []CertTemplate `json:"items"`
-}
-
-type accessGroupResult struct {
-	Count int           `json:"count"`
-	Items []AccessGroup `json:"items"`
-}
-
-type apiCertificateResult struct {
-	Count int              `json:"count"`
-	Items []APICertificate `json:"items"`
-}
-
 // New creates a new authorizer client instance
 func New(api restapi.Connector) *Client {
 	return &Client{api: api}
@@ -355,6 +340,7 @@ func (auth *Client) ExtenderTrustAnchor() (*TrustAnchor, error) {
 	return anchor, err
 }
 
+// MARK: Access Groups
 // AccessGroups lists all access group
 func (auth *Client) AccessGroups(offset, limit int, sortkey, sortdir string) ([]AccessGroup, error) {
 	filters := Params{
@@ -453,6 +439,7 @@ func (auth *Client) DeleteAccessGroupsIdCas(accessGroupID string, caID string) e
 	return err
 }
 
+// MARK: Certs
 // SearchCert search for certificates
 func (auth *Client) SearchCert(offset, limit int, sortkey, sortdir string, cert *APICertificateSearch) ([]APICertificate, error) {
 	filters := Params{
@@ -491,4 +478,87 @@ func (auth *Client) GetCertByID(ID string) (ApiCertificateObject, error) {
 		Get(&cert)
 
 	return cert, err
+}
+
+// MARK: Secrets
+// AccountSecrets lists all account secrets
+func (auth *Client) AccountSecrets(limit int, sortdir string) (AccountSecretsResult, error) {
+	filters := Params{
+		Limit:   limit,
+		Sortdir: sortdir,
+	}
+	result := AccountSecretsResult{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/secrets").
+		Query(&filters).
+		Get(&result)
+
+	return result, err
+}
+
+// SearchAccountSecrets search for account secrets
+func (auth *Client) SearchAccountSecrets(limit int, sortdir string, search *AccountSecretsSearchRequest) (AccountSecretsResult, error) {
+	filters := Params{
+		Limit:   limit,
+		Sortdir: sortdir,
+	}
+	result := AccountSecretsResult{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/secrets/search").
+		Query(&filters).
+		Post(search, &result)
+
+	return result, err
+}
+
+// CheckoutAccountSecret checkout account secret
+func (auth *Client) CheckoutAccountSecret(path string) (CheckoutResult, error) {
+	checkoutReq := CheckoutRequest{
+		Path: path,
+	}
+	result := CheckoutResult{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/secrets/checkouts").
+		Post(checkoutReq, &result)
+
+	return result, err
+}
+
+// Checkouts lists secret checkouts
+func (auth *Client) Checkouts(limit int, sortdir string) (CheckoutResult, error) {
+	filters := Params{
+		Limit:   limit,
+		Sortdir: sortdir,
+	}
+	result := CheckoutResult{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/secrets/checkouts").
+		Query(&filters).
+		Get(&result)
+
+	return result, err
+}
+
+// Checkout get checkout by id
+func (auth *Client) Checkout(checkoutId string) (*Checkout, error) {
+	checkout := &Checkout{}
+
+	_, err := auth.api.
+		URL("/authorizer/api/v1/secrets/checkouts/%s", url.PathEscape(checkoutId)).
+		Get(&checkout)
+
+	return checkout, err
+}
+
+// ReleaseCheckout release secret checkout
+func (auth *Client) ReleaseCheckout(checkoutId string) error {
+	_, err := auth.api.
+		URL("/authorizer/api/v1/secrets/checkouts/%s/release", url.PathEscape(checkoutId)).
+		Post(nil)
+
+	return err
 }

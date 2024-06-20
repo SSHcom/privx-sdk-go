@@ -13,8 +13,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestEmptyResponseBody(t *testing.T) {
@@ -23,15 +21,20 @@ func TestEmptyResponseBody(t *testing.T) {
 	resp, _ := mockResponse()
 	result := ErrorFromResponse(resp, emptyRespBody)
 
-	assert.EqualValues(t, fmt.Errorf("HTTP error: %s", resp.Status), result, "Expected to be equal error status")
+	expectedError := fmt.Errorf("HTTP error: %s", resp.Status)
+	if result.Error() != expectedError.Error() {
+		t.Errorf("Expected error %v, but got %v", expectedError, result)
+	}
 }
 
 func TestUnexpectedResponseBody(t *testing.T) {
 	resp, body := mockResponse()
 	result := ErrorFromResponse(resp, body)
 
-	assert.EqualValues(t, fmt.Errorf("HTTP error: 200 OK (unexpected response body: invalid character '<' looking for beginning of value)"),
-		result, "Expected to be equal error status")
+	expectedError := fmt.Errorf("HTTP error: 200 OK (unexpected response body: invalid character '<' looking for beginning of value)")
+	if result.Error() != expectedError.Error() {
+		t.Errorf("Expected error %v, but got %v", expectedError, result)
+	}
 }
 
 func TestDetailsErrorMessage(t *testing.T) {
@@ -39,8 +42,8 @@ func TestDetailsErrorMessage(t *testing.T) {
 		ErrorCode:    "42",
 		ErrorMessage: "DtlTest",
 		Property:     "Detail",
-	},
-	}
+	}}
+
 	body, _ := json.Marshal(ErrorResponse{
 		ErrorCode:    "42",
 		ErrorMessage: "ErrRspTest",
@@ -51,8 +54,10 @@ func TestDetailsErrorMessage(t *testing.T) {
 	resp, _ := mockResponse()
 	result := ErrorFromResponse(resp, body)
 
-	assert.EqualValues(t, fmt.Errorf("error: 42, message: ErrRspTest, property: ErrRsp, {error: 42, message: DtlTest, property: Detail}"),
-		result, "Expected to be equal error status")
+	expectedError := fmt.Errorf("error: 42, message: ErrRspTest, property: ErrRsp, {error: 42, message: DtlTest, property: Detail}")
+	if result.Error() != expectedError.Error() {
+		t.Errorf("Expected error %v, but got %v", expectedError, result)
+	}
 }
 
 func mockResponse() (*http.Response, []byte) {
