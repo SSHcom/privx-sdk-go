@@ -39,7 +39,7 @@ func TestGetFails(t *testing.T) {
 	if err == nil {
 		t.Errorf("client get is not failing.")
 	} else if err.Error() !=
-		"error: error42, message: borken request, property: mock" {
+		"error: error42, message: broken request, property: mock" {
 		t.Errorf("unexpected error: %s", err)
 	}
 }
@@ -133,7 +133,7 @@ func mockStatus() *httptest.Server {
 				w.WriteHeader(http.StatusBadRequest)
 				body, _ := json.Marshal(map[string]string{
 					"error_code":    "error42",
-					"error_message": "borken request",
+					"error_message": "broken request",
 					"property":      "mock",
 				})
 				w.Write(body)
