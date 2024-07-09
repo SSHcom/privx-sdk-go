@@ -666,7 +666,7 @@ func (store *RoleStore) ResolveAuthorizedKey(resolve ResolveAuthorizedKey) ([]Au
 ///////////////////////////
 
 // List all identity providers.
-func (store *RoleStore) GetAllIdendityProviders(offset, limit int) (IdentityProviderResponse, error) {
+func (store *RoleStore) GetAllIdentityProviders(offset, limit int) (IdentityProviderResponse, error) {
 	result := IdentityProviderResponse{}
 
 	filters := Params{
@@ -682,7 +682,7 @@ func (store *RoleStore) GetAllIdendityProviders(offset, limit int) (IdentityProv
 }
 
 // Create a new Identity Provider.
-func (store *RoleStore) CreateIdendityProvider(newIP IdentityProvider) (IdentityProviderCreateResponse, error) {
+func (store *RoleStore) CreateIdentityProvider(newIP IdentityProvider) (IdentityProviderCreateResponse, error) {
 	result := IdentityProviderCreateResponse{}
 
 	_, err := store.api.
@@ -693,7 +693,7 @@ func (store *RoleStore) CreateIdendityProvider(newIP IdentityProvider) (Identity
 }
 
 // Get Identity Provider by ID.
-func (store *RoleStore) GetIdendityProviderByID(ID string) (IdentityProvider, error) {
+func (store *RoleStore) GetIdentityProviderByID(ID string) (IdentityProvider, error) {
 	result := IdentityProvider{}
 
 	_, err := store.api.
@@ -704,7 +704,7 @@ func (store *RoleStore) GetIdendityProviderByID(ID string) (IdentityProvider, er
 }
 
 // Delete Identity Provider by ID.
-func (store *RoleStore) DeleteIdendityProviderByID(ID string) error {
+func (store *RoleStore) DeleteIdentityProviderByID(ID string) error {
 
 	_, err := store.api.
 		URL("/role-store/api/v1/identity-providers/%s", url.PathEscape(ID)).
@@ -714,7 +714,7 @@ func (store *RoleStore) DeleteIdendityProviderByID(ID string) error {
 }
 
 // Update a Identity Provider.
-func (store *RoleStore) UpdateIdendityProvider(UpdatedIP IdentityProvider, ID string) error {
+func (store *RoleStore) UpdateIdentityProvider(UpdatedIP IdentityProvider, ID string) error {
 
 	_, err := store.api.
 		URL("/role-store/api/v1/identity-providers/%s", url.PathEscape(ID)).
@@ -724,7 +724,7 @@ func (store *RoleStore) UpdateIdendityProvider(UpdatedIP IdentityProvider, ID st
 }
 
 // Search Identity Providers.
-func (store *RoleStore) SearchIdendityProviders(offset, limit int, sortkey, sortdir, keywords string) (IdentityProviderResponse, error) {
+func (store *RoleStore) SearchIdentityProviders(offset, limit int, sortkey, sortdir, keywords string) (IdentityProviderResponse, error) {
 	result := IdentityProviderResponse{}
 
 	filters := Params{
