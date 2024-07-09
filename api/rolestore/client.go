@@ -270,11 +270,18 @@ func (store *RoleStore) UpdateRole(roleID string, role *Role) error {
 }
 
 // GetRoleMembers gets all members (users) of the argument role ID.
-func (store *RoleStore) GetRoleMembers(roleID string) ([]User, error) {
+func (store *RoleStore) GetRoleMembers(roleID string, offset, limit int, sortkey, sortdir string) ([]User, error) {
 	result := usersResult{}
+	filters := Params{
+		Offset:  offset,
+		Limit:   limit,
+		Sortkey: sortkey,
+		Sortdir: sortdir,
+	}
 
 	_, err := store.api.
 		URL("/role-store/api/v1/roles/%s/members", url.PathEscape(roleID)).
+		Query(&filters).
 		Get(&result)
 
 	return result.Items, err
