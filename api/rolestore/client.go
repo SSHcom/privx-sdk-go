@@ -513,7 +513,7 @@ func (store *RoleStore) SearchUsers(offset, limit int, sortkey, sortdir string, 
 	return result.Items, err
 }
 
-// SearchUsersExternal searche users with user search parameters.
+// SearchUsersExternal searches users with user search parameters.
 func (store *RoleStore) SearchUsersExternal(keywords, sourceID string) ([]User, error) {
 	result := usersResult{}
 	_, err := store.api.
@@ -662,7 +662,7 @@ func (store *RoleStore) ResolveAuthorizedKey(resolve ResolveAuthorizedKey) ([]Au
 }
 
 /////////////////////////////
-//// Idendity providers ////
+//// Identity providers ////
 ///////////////////////////
 
 // List all identity providers.

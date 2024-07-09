@@ -27,7 +27,7 @@ type ResolveAuthorizedKey struct {
 	PublicKey string `json:"public_key,omitempty"`
 }
 
-// PrivateKey principal privat key definition
+// PrivateKey principal private key definition
 type PrivateKey struct {
 	ID         string `json:"id,omitempty"`
 	PrivateKey string `json:"private_key,omitempty"`
