@@ -34,18 +34,20 @@ type FilterUser struct {
 
 // TrustedClient definition
 type TrustedClient struct {
-	ID              string     `json:"id,omitempty"`
-	Secret          string     `json:"secret,omitempty"`
-	Name            string     `json:"name,omitempty"`
-	WebProxyAddress string     `json:"web_proxy_address,omitempty"`
-	Registered      bool       `json:"registered,omitempty"`
-	Enabled         bool       `json:"enabled,omitempty"`
-	Type            ClientType `json:"type,omitempty"`
-	Permissions     []string   `json:"permissions,omitempty"`
-	ExtenderAddress []string   `json:"extender_address,omitempty"`
-	Subnets         []string   `json:"subnets,omitempty"`
-	RoutingPrefix   string     `json:"routing_prefix,omitempty"`
-	AccessGroupId   string     `json:"access_group_id,omitempty"`
+	ID                            string     `json:"id,omitempty"`
+	Secret                        string     `json:"secret,omitempty"`
+	Name                          string     `json:"name,omitempty"`
+	WebProxyAddress               string     `json:"web_proxy_address,omitempty"`
+	Registered                    bool       `json:"registered,omitempty"`
+	Enabled                       bool       `json:"enabled,omitempty"`
+	Type                          ClientType `json:"type,omitempty"`
+	Permissions                   []string   `json:"permissions,omitempty"`
+	WebProxyExtenderRoutePatterns []string   `json:"web_proxy_extender_route_patterns,omitempty"`
+	ExtenderAddress               []string   `json:"extender_address,omitempty"`
+	Subnets                       []string   `json:"subnets,omitempty"`
+	RoutingPrefix                 string     `json:"routing_prefix,omitempty"`
+	AccessGroupId                 string     `json:"access_group_id,omitempty"`
+	GroupId                       string     `json:"group_id,omitempty"`
 }
 
 // Extender creates new trusted client
