@@ -21,7 +21,7 @@ type ServiceStatus struct {
 	StartTime     time.Time  `json:"start_time,omitempty"`
 }
 
-// ListResult generic list result struct.
+// ListResult a generic paginated list response definition.
 type ListResult[T any] struct {
 	Count int `json:"count"`
 	Items []T `json:"items"`
