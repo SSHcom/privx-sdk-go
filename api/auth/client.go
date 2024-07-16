@@ -9,7 +9,7 @@ package auth
 import (
 	"net/url"
 
-	"github.com/SSHcom/privx-sdk-go/common"
+	"github.com/SSHcom/privx-sdk-go/privxapi"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -18,15 +18,15 @@ type Auth struct {
 	api restapi.Connector
 }
 
-// New creates a new auth client instance, using the
-// argument SDK API client.
+// New auth client constructor.
 func New(api restapi.Connector) *Auth {
 	return &Auth{api: api}
 }
 
+// MARK: Status
 // AuthStatus get microservice status
-func (store *Auth) AuthStatus() (*common.ServiceStatus, error) {
-	status := &common.ServiceStatus{}
+func (store *Auth) AuthStatus() (*privxapi.ServiceStatus, error) {
+	status := &privxapi.ServiceStatus{}
 
 	_, err := store.api.
 		URL("/auth/api/v1/status").
@@ -35,9 +35,10 @@ func (store *Auth) AuthStatus() (*common.ServiceStatus, error) {
 	return status, err
 }
 
+// MARK: Identity Provider
 // CreateIdpClient creates a new identity provider client configuration.
-func (store *Auth) CreateIdpClient(idpClient *IDPClient) (IDstruct, error) {
-	idpClientId := IDstruct{}
+func (store *Auth) CreateIdpClient(idpClient *IdpClient) (IdpResponse, error) {
+	idpClientId := IdpResponse{}
 
 	_, err := store.api.
 		URL("/auth/api/v1/idp/clients").
@@ -47,8 +48,7 @@ func (store *Auth) CreateIdpClient(idpClient *IDPClient) (IDstruct, error) {
 }
 
 // UpdateIdpClient updates existing identity provider client configuration definition.
-func (store *Auth) UpdateIdpClient(idpClient *IDPClient, idpID string) error {
-
+func (store *Auth) UpdateIdpClient(idpClient *IdpClient, idpID string) error {
 	_, err := store.api.
 		URL("/auth/api/v1/idp/clients/%s", idpID).
 		Put(&idpClient)
@@ -57,8 +57,8 @@ func (store *Auth) UpdateIdpClient(idpClient *IDPClient, idpID string) error {
 }
 
 // IdpClient fetches existing identity provider client configuration.
-func (store *Auth) IdpClient(idpID string) (*IDPClient, error) {
-	idpClient := &IDPClient{}
+func (store *Auth) IdpClient(idpID string) (*IdpClient, error) {
+	idpClient := &IdpClient{}
 
 	_, err := store.api.
 		URL("/auth/api/v1/idp/clients/%s", idpID).
@@ -69,7 +69,6 @@ func (store *Auth) IdpClient(idpID string) (*IDPClient, error) {
 
 // DeleteIdpClient delete identity provider client configuration by ID.
 func (store *Auth) DeleteIdpClient(idpID string) error {
-
 	_, err := store.api.
 		URL("/auth/api/v1/idp/clients/%s", idpID).
 		Delete()
@@ -89,15 +88,16 @@ func (store *Auth) RegenerateIdpClientConfig(idpID string) (*IdpClientConfig, er
 	return clientConfig, err
 }
 
-// UserSessions fetches valid sessions by userID.
-func (store *Auth) UserSessions(offset, limit int, sortkey, sortdir, userID string) (*sessionsResult, error) {
-	filters := Params{
+// MARK: Session Storage
+// UserSessions fetches valid sessions by user ID.
+func (store *Auth) UserSessions(offset, limit int, sortkey, sortdir, userID string) (*privxapi.ListResult[Session], error) {
+	filters := params{
 		Offset:  offset,
 		Limit:   limit,
 		Sortkey: sortkey,
 		Sortdir: sortdir,
 	}
-	userSessions := &sessionsResult{}
+	userSessions := &privxapi.ListResult[Session]{}
 
 	_, err := store.api.
 		URL("/auth/api/v1/sessionstorage/users/%s/sessions", userID).
@@ -107,15 +107,15 @@ func (store *Auth) UserSessions(offset, limit int, sortkey, sortdir, userID stri
 	return userSessions, err
 }
 
-// SourceSessions fetches valid sessions by sourceID.
-func (store *Auth) SourceSessions(offset, limit int, sortkey, sortdir, sourceID string) (*sessionsResult, error) {
-	filters := Params{
+// SourceSessions fetches valid sessions by source ID.
+func (store *Auth) SourceSessions(offset, limit int, sortkey, sortdir, sourceID string) (*privxapi.ListResult[Session], error) {
+	filters := params{
 		Offset:  offset,
 		Limit:   limit,
 		Sortkey: sortkey,
 		Sortdir: sortdir,
 	}
-	sourceSessions := &sessionsResult{}
+	sourceSessions := &privxapi.ListResult[Session]{}
 
 	_, err := store.api.
 		URL("/auth/api/v1/sessionstorage/sources/%s/sessions", sourceID).
@@ -125,15 +125,15 @@ func (store *Auth) SourceSessions(offset, limit int, sortkey, sortdir, sourceID 
 	return sourceSessions, err
 }
 
-// SearchSessions searches for sessions
-func (store *Auth) SearchSessions(offset, limit int, sortkey, sortdir string, search *SearchParams) (*sessionsResult, error) {
-	filters := Params{
+// SearchSessions search for valid sessions.
+func (store *Auth) SearchSessions(offset, limit int, sortkey, sortdir string, search *SessionSearchRequest) (*privxapi.ListResult[Session], error) {
+	filters := params{
 		Offset:  offset,
 		Limit:   limit,
 		Sortkey: sortkey,
 		Sortdir: sortdir,
 	}
-	sessions := &sessionsResult{}
+	sessions := &privxapi.ListResult[Session]{}
 
 	_, err := store.api.
 		URL("/auth/api/v1/sessionstorage/sessions/search").
@@ -143,35 +143,37 @@ func (store *Auth) SearchSessions(offset, limit int, sortkey, sortdir string, se
 	return sessions, err
 }
 
-// TerminateSession terminates single session by ID.
+// TerminateSession terminates single session by session ID.
 func (store *Auth) TerminateSession(sessionID string) error {
-
 	_, err := store.api.
 		URL("/auth/api/v1/sessionstorage/sessions/%s/terminate", sessionID).
 		Post(nil)
+
 	return err
 }
 
 // TerminateUserSessions terminates all sessions for a user.
 func (store *Auth) TerminateUserSessions(userID string) error {
-
 	_, err := store.api.
 		URL("/auth/api/v1/sessionstorage/users/%s/sessions/terminate", userID).
 		Post(nil)
+
 	return err
 }
 
+// MARK: Users
 // Logout logs out user.
 func (store *Auth) Logout() error {
-
 	_, err := store.api.
 		URL("/auth/api/v1/logout").
 		Post(nil)
+
 	return err
 }
 
-func (store *Auth) GetUserPairedDevices(userID string) (*PairedDevices, error) {
-	devices := &PairedDevices{}
+// GetUserPairedDevices return a list of paired devices for a user.
+func (store *Auth) GetUserPairedDevices(userID string) (*privxapi.ListResult[Device], error) {
+	devices := &privxapi.ListResult[Device]{}
 
 	_, err := store.api.
 		URL("/auth/api/v1/users/%s/devices", userID).
@@ -180,6 +182,7 @@ func (store *Auth) GetUserPairedDevices(userID string) (*PairedDevices, error) {
 	return devices, err
 }
 
+// UnpairUserDevice unpair a device from a users device list.
 func (store *Auth) UnpairUserDevice(userID, deviceID string) error {
 	_, err := store.api.
 		URL("/auth/api/v1/users/%s/devices/%s", userID, deviceID).
