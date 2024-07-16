@@ -168,7 +168,7 @@ func (store *HostStore) UpdateDisabledHostStatus(hostID string, status bool) err
 	return err
 }
 
-// ServiceOptions returns default serivce options
+// ServiceOptions returns default service options
 func (store *HostStore) ServiceOptions() (*DefaultServiceOptions, error) {
 	options := &DefaultServiceOptions{}
 

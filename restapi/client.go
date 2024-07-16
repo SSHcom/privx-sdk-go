@@ -263,7 +263,7 @@ func writeToFile(filename string, resp *http.Response) error {
 	return nil
 }
 
-// Download dowmload file via http from endpoint
+// Download download file via http from endpoint
 func (curl *tCURL) Download(filename string) error {
 	curl.method = http.MethodGet
 

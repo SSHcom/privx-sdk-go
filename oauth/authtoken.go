@@ -23,6 +23,6 @@ func (auth *tAuthExplicit) AccessToken() (string, error) {
 }
 
 func (auth *tAuthExplicit) Cookie() string {
-	// Session cookies not suppoted for explicit auth
+	// Session cookies not supported for explicit auth
 	return ""
 }
