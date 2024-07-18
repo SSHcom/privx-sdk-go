@@ -63,28 +63,33 @@ type User struct {
 	DisplayName string `json:"display_name,omitempty"`
 }
 
-// Workflow workflow response definition
+// Workflow workflow definition
 type Workflow struct {
-	ID                   string `json:"id,omitempty"`
-	Author               string `json:"author,omitempty"`
-	Created              string `json:"created,omitempty"`
-	Updated              string `json:"updated,omitempty"`
-	UpdatedBy            string `json:"updated_by,omitempty"`
-	Name                 string `json:"name,omitempty"`
-	RequestJustification string `json:"request_justification,omitempty"`
-	GrantType            string `json:"grant_type,omitempty"`
-	GrantStart           string `json:"grant_start,omitempty"`
-	GrantEnd             string `json:"grant_end,omitempty"`
-	Action               string `json:"action,omitempty"`
-	Status               string `json:"status,omitempty"`
-	Comment              string `json:"comment,omitempty"`
-	WorkflowID           string `json:"workflow,omitempty"`
-	FloatingLength       int    `json:"floating_length,omitempty"`
-	TargetRoles          []Role `json:"target_roles,omitempty"`
-	Steps                []Step `json:"steps,omitempty"`
-	TargetUser           User   `json:"target_user,omitempty"`
-	Requester            User   `json:"requester,omitempty"`
-	RequestedRole        Role   `json:"requested_role,omitempty"`
+	ID                        string   `json:"id"`
+	Author                    string   `json:"author"`
+	Created                   string   `json:"created"`
+	Updated                   string   `json:"updated"`
+	UpdatedBy                 string   `json:"updated_by"`
+	Name                      string   `json:"name"`
+	Requester                 User     `json:"requester"`
+	RequestedRole             Role     `json:"requested_role"`
+	RequestJustification      string   `json:"request_justification"`
+	GrantTypes                []string `json:"grant_types,omitempty"`
+	GrantStart                string   `json:"grant_start,omitempty"`
+	GrantEnd                  string   `json:"grant_end,omitempty"`
+	FloatingLength            int64    `json:"floating_length,omitempty"`
+	MaxTimeRestrictedDuration int64    `json:"max_time_restricted_duration,omitempty"`
+	MaxFloatingDuration       int64    `json:"max_floating_duration,omitempty"`
+	MaxActiveRequests         int64    `json:"max_active_requests"`
+	TargetUser                User     `json:"target_user,omitempty"`
+	TargetRoles               []Role   `json:"target_roles,omitempty"`
+	RequestorRoles            []Role   `json:"requester_roles,omitempty"`
+	Action                    string   `json:"action,omitempty"`
+	CanBypassRevokeWF         bool     `json:"can_bypass_revoke_workflow"`
+	Status                    string   `json:"status,omitempty"`
+	Comment                   string   `json:"comment,omitempty"`
+	Steps                     []Step   `json:"steps,omitempty"`
+	Count                     int      `json:"-"`
 }
 
 // Search request search definition
@@ -119,26 +124,34 @@ type RequestStep struct {
 	Approvers []RequestStepApprover `json:"approvers,omitempty"`
 }
 
-// Request request response definition
+// Request access request definition
 type Request struct {
-	ID                   string        `json:"id,omitempty"`
-	Author               string        `json:"author,omitempty"`
-	Created              string        `json:"created,omitempty"`
-	Updated              string        `json:"updated,omitempty"`
-	UpdatedBy            string        `json:"updated_by,omitempty"`
-	Name                 string        `json:"name,omitempty"`
-	RequestJustification string        `json:"request_justification,omitempty"`
-	GrantType            string        `json:"grant_type,omitempty"`
-	GrantStart           string        `json:"grant_start,omitempty"`
-	GrantEnd             string        `json:"grant_end,omitempty"`
-	Action               string        `json:"action,omitempty"`
-	Status               string        `json:"status,omitempty"`
-	Comment              string        `json:"comment,omitempty"`
-	WorkflowID           string        `json:"workflow,omitempty"`
-	FloatingLength       int           `json:"floating_length,omitempty"`
-	TargetRoles          []string      `json:"target_roles,omitempty"`
-	Steps                []RequestStep `json:"steps,omitempty"`
-	TargetUser           User          `json:"target_user,omitempty"`
-	Requester            User          `json:"requester,omitempty"`
-	RequestedRole        Role          `json:"requested_role,omitempty"`
+	ID                        string        `json:"id"`
+	Author                    string        `json:"author"`
+	Created                   string        `json:"created"`
+	Updated                   string        `json:"updated"`
+	UpdatedBy                 string        `json:"updated_by"`
+	Name                      string        `json:"name"`
+	Requester                 User          `json:"requester"`
+	RequestedRole             Role          `json:"requested_role"`
+	RequestJustification      string        `json:"request_justification"`
+	GrantType                 string        `json:"grant_type,omitempty"`
+	GrantStart                string        `json:"grant_start,omitempty"`
+	GrantEnd                  string        `json:"grant_end,omitempty"`
+	FloatingLength            int64         `json:"floating_length,omitempty"`
+	MaxTimeRestrictedDuration int64         `json:"max_time_restricted_duration,omitempty"`
+	MaxFloatingDuration       int64         `json:"max_floating_duration,omitempty"`
+	TargetUser                User          `json:"target_user,omitempty"`
+	TargetRoles               []Role        `json:"target_roles,omitempty"`
+	RequestorRoles            []Role        `json:"requester_roles,omitempty"`
+	Action                    string        `json:"action,omitempty"`
+	CanBypassRevokeWF         bool          `json:"can_bypass_revoke_workflow"`
+	Status                    string        `json:"status,omitempty"`
+	Comment                   string        `json:"comment,omitempty"`
+	Steps                     []RequestStep `json:"steps,omitempty"`
+	WorkflowID                string        `json:"-"`
+	ApproverCanRevoke         bool          `json:"approver_can_revoke"`
+	TargetRoleRevoked         bool          `json:"target_role_revoked"`
+	TargetRoleRevokeTime      *string       `json:"target_role_revocation_time,omitempty"`
+	TargetRoleRevokedBy       User          `json:"target_role_revoked_by,omitempty"`
 }
