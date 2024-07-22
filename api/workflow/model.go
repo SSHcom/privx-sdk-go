@@ -80,7 +80,7 @@ type Workflow struct {
 	FloatingLength            int64    `json:"floating_length,omitempty"`
 	MaxTimeRestrictedDuration int64    `json:"max_time_restricted_duration,omitempty"`
 	MaxFloatingDuration       int64    `json:"max_floating_duration,omitempty"`
-	MaxActiveRequests         *int64   `json:"max_active_requests"`
+	MaxActiveRequests         *int64   `json:"max_active_requests,omitempty"`
 	TargetUser                User     `json:"target_user,omitempty"`
 	TargetRoles               []Role   `json:"target_roles,omitempty"`
 	RequestorRoles            []Role   `json:"requester_roles,omitempty"`
