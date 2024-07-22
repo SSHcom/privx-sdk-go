@@ -65,15 +65,15 @@ type User struct {
 
 // Workflow workflow definition
 type Workflow struct {
-	ID                        string   `json:"id"`
-	Author                    string   `json:"author"`
-	Created                   string   `json:"created"`
-	Updated                   string   `json:"updated"`
-	UpdatedBy                 string   `json:"updated_by"`
-	Name                      string   `json:"name"`
+	ID                        string   `json:"id,omitempty"`
+	Author                    string   `json:"author,omitempty"`
+	Created                   string   `json:"created,omitempty"`
+	Updated                   string   `json:"updated,omitempty"`
+	UpdatedBy                 string   `json:"updated_by,omitempty"`
+	Name                      string   `json:"name,omitempty"`
 	Requester                 User     `json:"requester"`
 	RequestedRole             Role     `json:"requested_role"`
-	RequestJustification      string   `json:"request_justification"`
+	RequestJustification      string   `json:"request_justification,omitempty"`
 	GrantTypes                []string `json:"grant_types,omitempty"`
 	GrantStart                string   `json:"grant_start,omitempty"`
 	GrantEnd                  string   `json:"grant_end,omitempty"`
@@ -89,7 +89,6 @@ type Workflow struct {
 	Status                    string   `json:"status,omitempty"`
 	Comment                   string   `json:"comment,omitempty"`
 	Steps                     []Step   `json:"steps,omitempty"`
-	Count                     int      `json:"-"`
 }
 
 // Search request search definition
@@ -126,15 +125,15 @@ type RequestStep struct {
 
 // Request access request definition
 type Request struct {
-	ID                        string        `json:"id"`
-	Author                    string        `json:"author"`
-	Created                   string        `json:"created"`
-	Updated                   string        `json:"updated"`
-	UpdatedBy                 string        `json:"updated_by"`
-	Name                      string        `json:"name"`
-	Requester                 User          `json:"requester"`
-	RequestedRole             Role          `json:"requested_role"`
-	RequestJustification      string        `json:"request_justification"`
+	ID                        string        `json:"id,omitempty"`
+	Author                    string        `json:"author,omitempty"`
+	Created                   string        `json:"created,omitempty"`
+	Updated                   string        `json:"updated,omitempty"`
+	UpdatedBy                 string        `json:"updated_by,omitempty"`
+	Name                      string        `json:"name,omitempty"`
+	Requester                 User          `json:"requester,omitempty"`
+	RequestedRole             Role          `json:"requested_role,omitempty"`
+	RequestJustification      string        `json:"request_justification,omitempty"`
 	GrantType                 string        `json:"grant_type,omitempty"`
 	GrantStart                string        `json:"grant_start,omitempty"`
 	GrantEnd                  string        `json:"grant_end,omitempty"`
@@ -149,7 +148,6 @@ type Request struct {
 	Status                    string        `json:"status,omitempty"`
 	Comment                   string        `json:"comment,omitempty"`
 	Steps                     []RequestStep `json:"steps,omitempty"`
-	WorkflowID                string        `json:"-"`
 	ApproverCanRevoke         bool          `json:"approver_can_revoke"`
 	TargetRoleRevoked         bool          `json:"target_role_revoked"`
 	TargetRoleRevokeTime      *string       `json:"target_role_revocation_time,omitempty"`
