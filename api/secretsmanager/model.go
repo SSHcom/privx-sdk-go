@@ -52,6 +52,7 @@ type TargetDomain struct {
 	ID                   string                 `json:"id"`
 	Name                 string                 `json:"name"`
 	Enabled              bool                   `json:"enabled"`
+	DomainName           string                 `json:"domain_name"`
 	PeriodicScan         bool                   `json:"periodic_scan"`
 	PeriodicScanInterval int                    `json:"periodic_scan_interval,omitempty"`
 	ScanStatus           string                 `json:"scan_status,omitempty"`
@@ -152,6 +153,7 @@ type ManagedAccount struct {
 	Username         string                `json:"username"`
 	Email            string                `json:"email,omitempty"`
 	FullName         string                `json:"full_name,omitempty"`
+	SamAccountName   string                `json:"sam_account_name"`
 	SourceID         string                `json:"source_id,omitempty"`
 	SecurityID       string                `json:"security_id,omitempty"`
 	AdditionalData   map[string]string     `json:"additional_data,omitempty"`
