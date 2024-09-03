@@ -17,12 +17,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: golang
+      - name: Setup Go
         uses: actions/setup-go@v2
         with:
-          go-version: '1.20'
+          go-version: '1.21'
 
-      - name: checkout
+      - name: Checkout code
         uses: actions/checkout@v2
         with:
           path: src/github.com/SSHcom/privx-sdk-go
@@ -31,30 +31,28 @@ jobs:
         run: |
           go mod download -json
 
-      - name: go get CI tools
+      - name: Install CI tools
         run: |
-          go get github.com/mattn/goveralls
-          go get github.com/lawrencewoodman/roveralls
-        env:
-          GO111MODULE: off
+          go install github.com/mattn/goveralls@latest
+          go install github.com/lawrencewoodman/roveralls@latest
 
-      - name: go install staticcheck
+      - name: Install staticcheck
         run: |
           go install honnef.co/go/tools/cmd/staticcheck@latest
 
-      - name: go vet
+      - name: Run go vet
         run: |
           go vet ./...
 
-      - name: staticcheck
+      - name: Run staticcheck
         run: |
           staticcheck ./...
 
-      - name: go test
+      - name: Run go test
         run: |
           go test ./...
 
-      - name: coverage
+      - name: Run coverage
         env:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
