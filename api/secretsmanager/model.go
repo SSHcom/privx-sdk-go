@@ -51,9 +51,10 @@ type CompileScriptRequest struct {
 type TargetDomain struct {
 	ID                   string                 `json:"id"`
 	Name                 string                 `json:"name"`
+	DomainName           string                 `json:"domain_name"`
 	Enabled              bool                   `json:"enabled"`
 	PeriodicScan         bool                   `json:"periodic_scan"`
-	PeriodicScanInterval int                    `json:"periodic_scan_interval,omitempty"`
+	PeriodicScanInterval int                    `json:"periodic_scan_interval"`
 	ScanStatus           string                 `json:"scan_status,omitempty"`
 	ScanMessage          string                 `json:"scan_message,omitempty"`
 	LastScanned          *time.Time             `json:"last_scanned,omitempty"`
@@ -148,29 +149,31 @@ type ScannedAccountEditBatch struct {
 }
 
 type ManagedAccount struct {
-	ID               string                `json:"id"`
-	Username         string                `json:"username"`
-	Email            string                `json:"email,omitempty"`
-	FullName         string                `json:"full_name,omitempty"`
-	SourceID         string                `json:"source_id,omitempty"`
-	SecurityID       string                `json:"security_id,omitempty"`
-	AdditionalData   map[string]string     `json:"additional_data,omitempty"`
-	TargetDomain     TargetDomainHandle    `json:"target_domain"`
-	PasswordPolicy   *PasswordPolicyHandle `json:"password_policy,omitempty"`
-	Enabled          bool                  `json:"enabled"`
-	RotationEnabled  bool                  `json:"rotation_enabled"`
-	ExplicitCheckout bool                  `json:"explicit_checkout"`
-	State            string                `json:"state"`
-	Comment          string                `json:"comment,omitempty"`
-	SecretName       string                `json:"secret_name,omitempty"`
-	Locked           bool                  `json:"locked"`
-	LockedTimestamp  *time.Time            `json:"locked_timestamp,omitempty"`
-	RotationHistory  []SecretRotationEvent `json:"rotation_history,omitempty"`
-	SecretCheckouts  []SecretCheckout      `json:"checkouts,omitempty"`
-	Created          time.Time             `json:"created,omitempty"`
-	Author           string                `json:"author,omitempty"`
-	Updated          *time.Time            `json:"updated,omitempty"`
-	UpdatedBy        string                `json:"updated_by,omitempty"`
+	ID                 string                `json:"id"`
+	Username           string                `json:"username"`
+	Email              string                `json:"email,omitempty"`
+	FullName           string                `json:"full_name,omitempty"`
+	SamAccountName     string                `json:"sam_account_name,omitempty"`
+	SourceID           string                `json:"source_id,omitempty"`
+	SecurityID         string                `json:"security_id,omitempty"`
+	AdditionalData     map[string]string     `json:"additional_data,omitempty"`
+	TargetDomain       TargetDomainHandle    `json:"target_domain"`
+	PasswordPolicy     *PasswordPolicyHandle `json:"password_policy,omitempty"`
+	Enabled            bool                  `json:"enabled"`
+	RotationEnabled    bool                  `json:"rotation_enabled"`
+	ExplicitCheckout   bool                  `json:"explicit_checkout"`
+	State              string                `json:"state"`
+	Comment            string                `json:"comment,omitempty"`
+	SecretName         string                `json:"secret_name,omitempty"`
+	Locked             bool                  `json:"locked"`
+	LockedTimestamp    *time.Time            `json:"locked_timestamp,omitempty"`
+	RotationHistory    []SecretRotationEvent `json:"rotation_history,omitempty"`
+	SecretCheckouts    []SecretCheckout      `json:"checkouts,omitempty"`
+	Created            time.Time             `json:"created,omitempty"`
+	Author             string                `json:"author,omitempty"`
+	Updated            *time.Time            `json:"updated,omitempty"`
+	UpdatedBy          string                `json:"updated_by,omitempty"`
+	DisableRdpCertAuth bool                  `json:"disable_rdp_cert_auth"`
 }
 
 type SecretRotationEvent struct {
@@ -226,12 +229,13 @@ type ManagedAccountCreateBatch struct {
 }
 
 type ManagedAccountCreateData struct {
-	Enabled          bool                 `json:"enabled"`
-	RotationEnabled  bool                 `json:"rotation_enabled"`
-	Rotate           bool                 `json:"rotate"`
-	ExplicitCheckout bool                 `json:"explicit_checkout"`
-	PasswordPolicy   PasswordPolicyHandle `json:"password_policy,omitempty"`
-	Comment          string               `json:"comment,omitempty"`
+	Enabled            bool                 `json:"enabled"`
+	RotationEnabled    bool                 `json:"rotation_enabled"`
+	Rotate             bool                 `json:"rotate"`
+	ExplicitCheckout   bool                 `json:"explicit_checkout"`
+	DisableRdpCertAuth bool                 `json:"disable_rdp_cert_auth"`
+	PasswordPolicy     PasswordPolicyHandle `json:"password_policy,omitempty"`
+	Comment            string               `json:"comment,omitempty"`
 }
 
 type ManagedAccountEditBatch struct {
@@ -240,11 +244,12 @@ type ManagedAccountEditBatch struct {
 }
 
 type ManagedAccountChangeSet struct {
-	Enabled          *bool                 `json:"enabled"`
-	RotationEnabled  *bool                 `json:"rotation_enabled"`
-	ExplicitCheckout *bool                 `json:"explicit_checkout"`
-	PasswordPolicy   *PasswordPolicyHandle `json:"password_policy,omitempty"`
-	Comment          *string               `json:"comment,omitempty"`
+	Enabled            *bool                 `json:"enabled"`
+	RotationEnabled    *bool                 `json:"rotation_enabled"`
+	ExplicitCheckout   *bool                 `json:"explicit_checkout"`
+	DisableRdpCertAuth *bool                 `json:"disable_rdp_cert_auth"`
+	PasswordPolicy     *PasswordPolicyHandle `json:"password_policy,omitempty"`
+	Comment            *string               `json:"comment,omitempty"`
 }
 
 type ManagedAccountBatch struct {

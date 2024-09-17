@@ -38,6 +38,7 @@ type TrustedClient struct {
 	Secret                        string     `json:"secret,omitempty"`
 	Name                          string     `json:"name,omitempty"`
 	WebProxyAddress               string     `json:"web_proxy_address,omitempty"`
+	WebProxyPort                  string     `json:"web_proxy_port,omitempty"`
 	Registered                    bool       `json:"registered,omitempty"`
 	Enabled                       bool       `json:"enabled,omitempty"`
 	Type                          ClientType `json:"type,omitempty"`
@@ -48,6 +49,13 @@ type TrustedClient struct {
 	RoutingPrefix                 string     `json:"routing_prefix,omitempty"`
 	AccessGroupId                 string     `json:"access_group_id,omitempty"`
 	GroupId                       string     `json:"group_id,omitempty"`
+	OAuthClientID                 string     `json:"oauth_client_id,omitempty"`
+	OAuthClientSecret             string     `json:"oauth_client_secret,omitempty"`
+	Data                          string     `json:"data,omitempty"`
+	Created                       string     `json:"created,omitempty"`
+	Updated                       string     `json:"updated,omitempty"`
+	UpdatedBy                     string     `json:"updated_by,omitempty"`
+	Author                        string     `json:"author,omitempty"`
 }
 
 // Extender creates new trusted client
@@ -82,23 +90,30 @@ type APIClient struct {
 
 // LocalUser definition
 type LocalUser struct {
-	ID         string   `json:"id,omitempty"`
-	Created    string   `json:"created,omitempty"`
-	Updated    string   `json:"updated,omitempty"`
-	UpdatedBy  string   `json:"updated_by,omitempty"`
-	Author     string   `json:"author,omitempty"`
-	Comment    string   `json:"comment,omitempty"`
-	Tags       []string `json:"tags,omitempty"`
-	Username   string   `json:"username,omitempty"`
-	GivenName  string   `json:"given_name,omitempty"`
-	FullName   string   `json:"full_name,omitempty"`
-	JobTitle   string   `json:"job_title,omitempty"`
-	Company    string   `json:"company,omitempty"`
-	Department string   `json:"department,omitempty"`
-	Email      string   `json:"email,omitempty"`
-	Telephone  string   `json:"telephone,omitempty"`
-	Locale     string   `json:"locale,omitempty"`
-	Password   Password `json:"password,omitempty"`
+	ID         string      `json:"id,omitempty"`
+	Created    string      `json:"created,omitempty"`
+	Updated    string      `json:"updated,omitempty"`
+	UpdatedBy  string      `json:"updated_by,omitempty"`
+	Author     string      `json:"author,omitempty"`
+	Comment    string      `json:"comment,omitempty"`
+	Tags       []string    `json:"tags,omitempty"`
+	Username   string      `json:"username,omitempty"`
+	GivenName  string      `json:"given_name,omitempty"`
+	FullName   string      `json:"full_name,omitempty"`
+	JobTitle   string      `json:"job_title,omitempty"`
+	Company    string      `json:"company,omitempty"`
+	Department string      `json:"department,omitempty"`
+	Email      string      `json:"email,omitempty"`
+	Telephone  string      `json:"telephone,omitempty"`
+	Locale     string      `json:"locale,omitempty"`
+	Password   Password    `json:"password,omitempty"`
+	Attributes []Attribute `json:"attributes,omitempty"`
+}
+
+// User attribute
+type Attribute struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 // Password definition
