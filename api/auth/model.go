@@ -14,10 +14,10 @@ type IdpClient struct {
 	Name                           string            `json:"name"`
 	Created                        time.Time         `json:"created,omitempty"`
 	Updated                        time.Time         `json:"updated,omitempty"`
-	IDPType                        string            `json:"idp_type"`
+	IdpType                        string            `json:"idp_type"`
 	OIDCIssuer                     string            `json:"oidc_issuer,omitempty"`
 	OIDCAudience                   []string          `json:"oidc_audience"`
-	OIDCClientID                   string            `json:"oidc_client_id,omitempty"`
+	OIDCClientId                   string            `json:"oidc_client_id,omitempty"`
 	OIDCClientSecret               string            `json:"oidc_client_secret,omitempty"`
 	OIDCScopesEnabled              []string          `json:"oidc_scopes_enabled"`
 	OIDCResponseTypesSupported     []string          `json:"oidc_response_types_supported,omitempty"`

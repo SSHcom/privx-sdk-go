@@ -97,7 +97,16 @@ func (client *tClient) do(req *http.Request) (*http.Response, error) {
 // URL creates a connector to specified endpoint. It is either absolute
 // URL or relative path to base url
 func (client *tClient) URL(templatePath string, args ...interface{}) CURL {
-	target := fmt.Sprintf(templatePath, args...)
+	escapedArgs := make([]interface{}, len(args))
+	for i, arg := range args {
+		if str, ok := arg.(string); ok {
+			escapedArgs[i] = url.PathEscape(str)
+		} else {
+			escapedArgs[i] = arg
+		}
+	}
+
+	target := fmt.Sprintf(templatePath, escapedArgs...)
 	if target[0] == '/' {
 		target = client.baseURL + target
 	}

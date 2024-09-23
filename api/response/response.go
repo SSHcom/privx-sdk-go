@@ -21,21 +21,13 @@ type ServiceStatus struct {
 	StartTime     time.Time  `json:"start_time,omitempty"`
 }
 
-// Page a generic paginated response definition.
-type Page[T any] struct {
+// ResultSet a generic response definition.
+type ResultSet[T any] struct {
 	Count int `json:"count"`
 	Items []T `json:"items"`
 }
 
-// Id id response definition.
-type Id struct {
+// Identifier id response definition.
+type Identifier struct {
 	Id string `json:"id"`
-}
-
-// FilterParams defines optional query params.
-type FilterParams struct {
-	Offset  int    `json:"offset,omitempty"`
-	Limit   int    `json:"limit,omitempty"`
-	Sortkey string `json:"sortkey,omitempty"`
-	Sortdir string `json:"sortdir,omitempty"`
 }

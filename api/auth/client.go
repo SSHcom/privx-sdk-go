@@ -7,8 +7,7 @@
 package auth
 
 import (
-	"net/url"
-
+	"github.com/SSHcom/privx-sdk-go/api/filters"
 	"github.com/SSHcom/privx-sdk-go/api/response"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
@@ -37,8 +36,8 @@ func (c *Auth) Status() (*response.ServiceStatus, error) {
 
 // MARK: Identity Provider
 // CreateIdpClient creates a new identity provider client configuration.
-func (c *Auth) CreateIdpClient(idpClient *IdpClient) (*response.Id, error) {
-	idpClientResponse := &response.Id{}
+func (c *Auth) CreateIdpClient(idpClient *IdpClient) (response.Identifier, error) {
+	idpClientResponse := response.Identifier{}
 
 	_, err := c.api.
 		URL("/auth/api/v1/idp/clients").
@@ -50,7 +49,7 @@ func (c *Auth) CreateIdpClient(idpClient *IdpClient) (*response.Id, error) {
 // UpdateIdpClient updates existing identity provider client configuration definition.
 func (c *Auth) UpdateIdpClient(idpClient *IdpClient, idpId string) error {
 	_, err := c.api.
-		URL("/auth/api/v1/idp/clients/%s", url.PathEscape(idpId)).
+		URL("/auth/api/v1/idp/clients/%s", idpId).
 		Put(&idpClient)
 
 	return err
@@ -61,7 +60,7 @@ func (c *Auth) GetIdpClient(idpId string) (*IdpClient, error) {
 	idpClient := &IdpClient{}
 
 	_, err := c.api.
-		URL("/auth/api/v1/idp/clients/%s", url.PathEscape(idpId)).
+		URL("/auth/api/v1/idp/clients/%s", idpId).
 		Get(&idpClient)
 
 	return idpClient, err
@@ -70,7 +69,7 @@ func (c *Auth) GetIdpClient(idpId string) (*IdpClient, error) {
 // DeleteIdpClient delete identity provider client configuration by Id.
 func (c *Auth) DeleteIdpClient(idpId string) error {
 	_, err := c.api.
-		URL("/auth/api/v1/idp/clients/%s", url.PathEscape(idpId)).
+		URL("/auth/api/v1/idp/clients/%s", idpId).
 		Delete()
 
 	return err
@@ -82,7 +81,7 @@ func (c *Auth) RegenerateIdpClientConfig(idpId string) (*IdpClientConfig, error)
 	clientConfig := &IdpClientConfig{}
 
 	_, err := c.api.
-		URL("/auth/api/v1/idp/clients/%s/regenerate", url.PathEscape(idpId)).
+		URL("/auth/api/v1/idp/clients/%s/regenerate", idpId).
 		Post(nil, &clientConfig)
 
 	return clientConfig, err
@@ -90,36 +89,36 @@ func (c *Auth) RegenerateIdpClientConfig(idpId string) (*IdpClientConfig, error)
 
 // MARK: Session Storage
 // GetUserSessions get valid sessions by userID.
-func (c *Auth) GetUserSessions(filters *response.FilterParams, userId string) (*response.Page[Session], error) {
-	userSessions := &response.Page[Session]{}
+func (c *Auth) GetUserSessions(filters filters.Params, userId string) (*response.ResultSet[Session], error) {
+	userSessions := &response.ResultSet[Session]{}
 
 	_, err := c.api.
-		URL("/auth/api/v1/sessionstorage/users/%s/sessions", url.PathEscape(userId)).
-		Query(&filters).
+		URL("/auth/api/v1/sessionstorage/users/%s/sessions", userId).
+		Query(filters).
 		Get(&userSessions)
 
 	return userSessions, err
 }
 
 // GetSourceSessions get valid sessions by sourceID.
-func (c *Auth) GetSourceSessions(filters *response.FilterParams, sourceId string) (*response.Page[Session], error) {
-	sourceSessions := &response.Page[Session]{}
+func (c *Auth) GetSourceSessions(filters filters.Params, sourceId string) (*response.ResultSet[Session], error) {
+	sourceSessions := &response.ResultSet[Session]{}
 
 	_, err := c.api.
-		URL("/auth/api/v1/sessionstorage/sources/%s/sessions", url.PathEscape(sourceId)).
-		Query(&filters).
+		URL("/auth/api/v1/sessionstorage/sources/%s/sessions", sourceId).
+		Query(filters).
 		Get(&sourceSessions)
 
 	return sourceSessions, err
 }
 
 // SearchSessions searches for sessions
-func (c *Auth) SearchSessions(filters *response.FilterParams, search *SessionSearchRequest) (*response.Page[Session], error) {
-	sessions := &response.Page[Session]{}
+func (c *Auth) SearchSessions(filters filters.Params, search *SessionSearchRequest) (*response.ResultSet[Session], error) {
+	sessions := &response.ResultSet[Session]{}
 
 	_, err := c.api.
 		URL("/auth/api/v1/sessionstorage/sessions/search").
-		Query(&filters).
+		Query(filters).
 		Post(search, &sessions)
 
 	return sessions, err
@@ -128,7 +127,7 @@ func (c *Auth) SearchSessions(filters *response.FilterParams, search *SessionSea
 // TerminateSession terminates single session by Id.
 func (c *Auth) TerminateSession(sessionId string) error {
 	_, err := c.api.
-		URL("/auth/api/v1/sessionstorage/sessions/%s/terminate", url.PathEscape(sessionId)).
+		URL("/auth/api/v1/sessionstorage/sessions/%s/terminate", sessionId).
 		Post(nil)
 
 	return err
@@ -137,7 +136,7 @@ func (c *Auth) TerminateSession(sessionId string) error {
 // TerminateUserSessions terminates all sessions for a user.
 func (store *Auth) TerminateUserSessions(userId string) error {
 	_, err := store.api.
-		URL("/auth/api/v1/sessionstorage/users/%s/sessions/terminate", url.PathEscape(userId)).
+		URL("/auth/api/v1/sessionstorage/users/%s/sessions/terminate", userId).
 		Post(nil)
 
 	return err
@@ -155,11 +154,11 @@ func (store *Auth) Logout() error {
 
 // MARK: Mobile Gateway
 // GetUserPairedDevices get users paired devices.
-func (store *Auth) GetUserPairedDevices(userId string) (*response.Page[Device], error) {
-	devices := &response.Page[Device]{}
+func (store *Auth) GetUserPairedDevices(userId string) (*response.ResultSet[Device], error) {
+	devices := &response.ResultSet[Device]{}
 
 	_, err := store.api.
-		URL("/auth/api/v1/users/%s/devices", url.PathEscape(userId)).
+		URL("/auth/api/v1/users/%s/devices", userId).
 		Get(devices)
 
 	return devices, err
@@ -168,7 +167,7 @@ func (store *Auth) GetUserPairedDevices(userId string) (*response.Page[Device], 
 // UnpairUserDevice unpair users device.
 func (store *Auth) UnpairUserDevice(userId, deviceId string) error {
 	_, err := store.api.
-		URL("/auth/api/v1/users/%s/devices/%s", url.PathEscape(userId), url.PathEscape(deviceId)).
+		URL("/auth/api/v1/users/%s/devices/%s", userId, deviceId).
 		Delete()
 
 	return err
