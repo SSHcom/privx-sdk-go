@@ -74,8 +74,8 @@ type SessionPasswordPolicy struct {
 	PasswordStrength     string `json:"password_strength,omitempty"`
 }
 
-// SessionSearchRequest session search request parameter definition.
-type SessionSearchRequest struct {
+// SessionSearch session search request parameter definition.
+type SessionSearch struct {
 	Keywords string `json:"keywords,omitempty"`
 	UserId   string `json:"user_id,omitempty"`
 	Type     string `json:"type,omitempty"`

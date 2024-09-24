@@ -89,36 +89,51 @@ func (c *Auth) RegenerateIdpClientConfig(idpId string) (*IdpClientConfig, error)
 
 // MARK: Session Storage
 // GetUserSessions get valid sessions by userID.
-func (c *Auth) GetUserSessions(filters filters.Params, userId string) (*response.ResultSet[Session], error) {
+func (c *Auth) GetUserSessions(userId string, opts ...filters.Option) (*response.ResultSet[Session], error) {
 	userSessions := &response.ResultSet[Session]{}
+	params := filters.Default()
+
+	for _, opt := range opts {
+		opt(&params)
+	}
 
 	_, err := c.api.
 		URL("/auth/api/v1/sessionstorage/users/%s/sessions", userId).
-		Query(filters).
+		Query(params).
 		Get(&userSessions)
 
 	return userSessions, err
 }
 
 // GetSourceSessions get valid sessions by sourceID.
-func (c *Auth) GetSourceSessions(filters filters.Params, sourceId string) (*response.ResultSet[Session], error) {
+func (c *Auth) GetSourceSessions(sourceId string, opts ...filters.Option) (*response.ResultSet[Session], error) {
 	sourceSessions := &response.ResultSet[Session]{}
+	params := filters.Default()
+
+	for _, opt := range opts {
+		opt(&params)
+	}
 
 	_, err := c.api.
 		URL("/auth/api/v1/sessionstorage/sources/%s/sessions", sourceId).
-		Query(filters).
+		Query(params).
 		Get(&sourceSessions)
 
 	return sourceSessions, err
 }
 
 // SearchSessions searches for sessions
-func (c *Auth) SearchSessions(filters filters.Params, search *SessionSearchRequest) (*response.ResultSet[Session], error) {
+func (c *Auth) SearchSessions(search *SessionSearch, opts ...filters.Option) (*response.ResultSet[Session], error) {
 	sessions := &response.ResultSet[Session]{}
+	params := filters.Default()
+
+	for _, opt := range opts {
+		opt(&params)
+	}
 
 	_, err := c.api.
 		URL("/auth/api/v1/sessionstorage/sessions/search").
-		Query(filters).
+		Query(params).
 		Post(search, &sessions)
 
 	return sessions, err
