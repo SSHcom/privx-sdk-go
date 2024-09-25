@@ -9,8 +9,8 @@ const (
 type Params struct {
 	Offset  int    `json:"offset,omitempty"`
 	Limit   int    `json:"limit,omitempty"`
-	Sortkey string `json:"sortkey,omitempty"`
-	Sortdir string `json:"sortdir,omitempty"`
+	SortKey string `json:"sortkey,omitempty"`
+	SortDir string `json:"sortdir,omitempty"`
 }
 
 // Default constructor for default filters.
@@ -18,7 +18,7 @@ func Default() Params {
 	return Params{
 		Offset:  0,
 		Limit:   50,
-		Sortdir: "ASC",
+		SortDir: "ASC",
 	}
 }
 
@@ -26,43 +26,43 @@ func Default() Params {
 type Option func(p *Params)
 
 // Offset sets the offset for Params.
-func Offset(o int) Option {
-	return func(p *Params) { p.Offset = o }
+func Offset(offset int) Option {
+	return func(p *Params) { p.Offset = offset }
 }
 
 // Limit sets the limit for Params.
-func Limit(l int) Option {
-	return func(p *Params) { p.Limit = l }
+func Limit(limit int) Option {
+	return func(p *Params) { p.Limit = limit }
 }
 
 // Paging sets both the offset and limit for Params.
-func Paging(o, l int) Option {
+func Paging(offset, limit int) Option {
 	return func(p *Params) {
-		p.Offset = o
-		p.Limit = l
+		p.Offset = offset
+		p.Limit = limit
 	}
 }
 
 // Sort sets the sort key and direction for Params.
 func Sort(key, dir string) Option {
 	return func(p *Params) {
-		p.Sortkey = key
-		p.Sortdir = dir
+		p.SortKey = key
+		p.SortDir = dir
 	}
 }
 
 // SortAsc sets the sort key with ascending order for Params.
 func SortAsc(key string) Option {
 	return func(p *Params) {
-		p.Sortkey = key
-		p.Sortdir = ASC
+		p.SortKey = key
+		p.SortDir = ASC
 	}
 }
 
 // SortDesc sets the sort key with descending order for Params.
 func SortDesc(key string) Option {
 	return func(p *Params) {
-		p.Sortkey = key
-		p.Sortdir = DESC
+		p.SortKey = key
+		p.SortDir = DESC
 	}
 }
