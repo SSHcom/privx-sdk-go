@@ -7,9 +7,8 @@
 package auth
 
 import (
-	"net/url"
-
-	"github.com/SSHcom/privx-sdk-go/common"
+	"github.com/SSHcom/privx-sdk-go/api/filters"
+	"github.com/SSHcom/privx-sdk-go/api/response"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -18,60 +17,59 @@ type Auth struct {
 	api restapi.Connector
 }
 
-// New creates a new auth client instance, using the
-// argument SDK API client.
+// New auth client constructor.
 func New(api restapi.Connector) *Auth {
 	return &Auth{api: api}
 }
 
-// AuthStatus get microservice status
-func (store *Auth) AuthStatus() (*common.ServiceStatus, error) {
-	status := &common.ServiceStatus{}
+// MARK: Status
+// Status get auth microservice status.
+func (c *Auth) Status() (*response.ServiceStatus, error) {
+	status := &response.ServiceStatus{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/auth/api/v1/status").
 		Get(status)
 
 	return status, err
 }
 
+// MARK: Identity Provider
 // CreateIdpClient creates a new identity provider client configuration.
-func (store *Auth) CreateIdpClient(idpClient *IDPClient) (IDstruct, error) {
-	idpClientId := IDstruct{}
+func (c *Auth) CreateIdpClient(idpClient *IdpClient) (response.Identifier, error) {
+	idpClientResponse := response.Identifier{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/auth/api/v1/idp/clients").
-		Post(&idpClient, &idpClientId)
+		Post(&idpClient, &idpClientResponse)
 
-	return idpClientId, err
+	return idpClientResponse, err
 }
 
 // UpdateIdpClient updates existing identity provider client configuration definition.
-func (store *Auth) UpdateIdpClient(idpClient *IDPClient, idpID string) error {
-
-	_, err := store.api.
-		URL("/auth/api/v1/idp/clients/%s", idpID).
+func (c *Auth) UpdateIdpClient(idpClient *IdpClient, idpId string) error {
+	_, err := c.api.
+		URL("/auth/api/v1/idp/clients/%s", idpId).
 		Put(&idpClient)
 
 	return err
 }
 
-// IdpClient fetches existing identity provider client configuration.
-func (store *Auth) IdpClient(idpID string) (*IDPClient, error) {
-	idpClient := &IDPClient{}
+// GetIdpClient get existing identity provider client configuration.
+func (c *Auth) GetIdpClient(idpId string) (*IdpClient, error) {
+	idpClient := &IdpClient{}
 
-	_, err := store.api.
-		URL("/auth/api/v1/idp/clients/%s", idpID).
+	_, err := c.api.
+		URL("/auth/api/v1/idp/clients/%s", idpId).
 		Get(&idpClient)
 
 	return idpClient, err
 }
 
-// DeleteIdpClient delete identity provider client configuration by ID.
-func (store *Auth) DeleteIdpClient(idpID string) error {
-
-	_, err := store.api.
-		URL("/auth/api/v1/idp/clients/%s", idpID).
+// DeleteIdpClient delete identity provider client configuration by Id.
+func (c *Auth) DeleteIdpClient(idpId string) error {
+	_, err := c.api.
+		URL("/auth/api/v1/idp/clients/%s", idpId).
 		Delete()
 
 	return err
@@ -79,110 +77,112 @@ func (store *Auth) DeleteIdpClient(idpID string) error {
 
 // RegenerateIdpClientConfig regenerates client_id and client_secret
 // for OIDC identity provider client configuration.
-func (store *Auth) RegenerateIdpClientConfig(idpID string) (*IdpClientConfig, error) {
+func (c *Auth) RegenerateIdpClientConfig(idpId string) (*IdpClientConfig, error) {
 	clientConfig := &IdpClientConfig{}
 
-	_, err := store.api.
-		URL("/auth/api/v1/idp/clients/%s/regenerate", url.PathEscape(idpID)).
+	_, err := c.api.
+		URL("/auth/api/v1/idp/clients/%s/regenerate", idpId).
 		Post(nil, &clientConfig)
 
 	return clientConfig, err
 }
 
-// UserSessions fetches valid sessions by userID.
-func (store *Auth) UserSessions(offset, limit int, sortkey, sortdir, userID string) (*sessionsResult, error) {
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
-	}
-	userSessions := &sessionsResult{}
+// MARK: Session Storage
+// GetUserSessions get valid sessions by userID.
+func (c *Auth) GetUserSessions(userId string, opts ...filters.Option) (*response.ResultSet[Session], error) {
+	userSessions := &response.ResultSet[Session]{}
+	params := filters.Default()
 
-	_, err := store.api.
-		URL("/auth/api/v1/sessionstorage/users/%s/sessions", userID).
-		Query(&filters).
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/auth/api/v1/sessionstorage/users/%s/sessions", userId).
+		Query(params).
 		Get(&userSessions)
 
 	return userSessions, err
 }
 
-// SourceSessions fetches valid sessions by sourceID.
-func (store *Auth) SourceSessions(offset, limit int, sortkey, sortdir, sourceID string) (*sessionsResult, error) {
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
-	}
-	sourceSessions := &sessionsResult{}
+// GetSourceSessions get valid sessions by sourceID.
+func (c *Auth) GetSourceSessions(sourceId string, opts ...filters.Option) (*response.ResultSet[Session], error) {
+	sourceSessions := &response.ResultSet[Session]{}
+	params := filters.Default()
 
-	_, err := store.api.
-		URL("/auth/api/v1/sessionstorage/sources/%s/sessions", sourceID).
-		Query(&filters).
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/auth/api/v1/sessionstorage/sources/%s/sessions", sourceId).
+		Query(params).
 		Get(&sourceSessions)
 
 	return sourceSessions, err
 }
 
 // SearchSessions searches for sessions
-func (store *Auth) SearchSessions(offset, limit int, sortkey, sortdir string, search *SearchParams) (*sessionsResult, error) {
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
-	}
-	sessions := &sessionsResult{}
+func (c *Auth) SearchSessions(search *SessionSearch, opts ...filters.Option) (*response.ResultSet[Session], error) {
+	sessions := &response.ResultSet[Session]{}
+	params := filters.Default()
 
-	_, err := store.api.
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
 		URL("/auth/api/v1/sessionstorage/sessions/search").
-		Query(&filters).
+		Query(params).
 		Post(search, &sessions)
 
 	return sessions, err
 }
 
-// TerminateSession terminates single session by ID.
-func (store *Auth) TerminateSession(sessionID string) error {
-
-	_, err := store.api.
-		URL("/auth/api/v1/sessionstorage/sessions/%s/terminate", sessionID).
+// TerminateSession terminates single session by Id.
+func (c *Auth) TerminateSession(sessionId string) error {
+	_, err := c.api.
+		URL("/auth/api/v1/sessionstorage/sessions/%s/terminate", sessionId).
 		Post(nil)
+
 	return err
 }
 
 // TerminateUserSessions terminates all sessions for a user.
-func (store *Auth) TerminateUserSessions(userID string) error {
-
+func (store *Auth) TerminateUserSessions(userId string) error {
 	_, err := store.api.
-		URL("/auth/api/v1/sessionstorage/users/%s/sessions/terminate", userID).
+		URL("/auth/api/v1/sessionstorage/users/%s/sessions/terminate", userId).
 		Post(nil)
+
 	return err
 }
 
-// Logout logs out user.
+// MARK: Users
+// Logout log out user.
 func (store *Auth) Logout() error {
-
 	_, err := store.api.
 		URL("/auth/api/v1/logout").
 		Post(nil)
+
 	return err
 }
 
-func (store *Auth) GetUserPairedDevices(userID string) (*PairedDevices, error) {
-	devices := &PairedDevices{}
+// MARK: Mobile Gateway
+// GetUserPairedDevices get users paired devices.
+func (store *Auth) GetUserPairedDevices(userId string) (*response.ResultSet[Device], error) {
+	devices := &response.ResultSet[Device]{}
 
 	_, err := store.api.
-		URL("/auth/api/v1/users/%s/devices", userID).
+		URL("/auth/api/v1/users/%s/devices", userId).
 		Get(devices)
 
 	return devices, err
 }
 
-func (store *Auth) UnpairUserDevice(userID, deviceID string) error {
+// UnpairUserDevice unpair users device.
+func (store *Auth) UnpairUserDevice(userId, deviceId string) error {
 	_, err := store.api.
-		URL("/auth/api/v1/users/%s/devices/%s", userID, deviceID).
+		URL("/auth/api/v1/users/%s/devices/%s", userId, deviceId).
 		Delete()
 
 	return err
