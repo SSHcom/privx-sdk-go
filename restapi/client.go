@@ -20,6 +20,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/SSHcom/privx-sdk-go/api/filters"
 )
 
 // tClient is an HTTP client instance.
@@ -151,25 +153,53 @@ func (curl *tCURL) encodeURL(query interface{}) (url.Values, error) {
 		return nil, err
 	}
 
-	var values url.Values = make(map[string][]string)
-	for key, param := range params {
-		var val string
-		switch v := param.(type) {
-		case int:
-			val = strconv.Itoa(v)
-		case float64:
-			val = fmt.Sprintf("%g", v)
-		case string:
-			val = v
-		case bool:
-			val = strconv.FormatBool(v)
-		default:
-			return nil, fmt.Errorf("wrong format: %T", v)
+	values := make(url.Values)
+
+	// Add standard params to values
+	if err := addParamsToUrlValues(params, values); err != nil {
+		return nil, err
+	}
+
+	// Add custom params if defined
+	if p, ok := query.(filters.Params); ok {
+		for _, custom := range p.Custom {
+			customBin, err := json.Marshal(custom)
+			if err != nil {
+				return nil, err
+			}
+
+			var customParams map[string]interface{}
+			if err = json.Unmarshal(customBin, &customParams); err != nil {
+				return nil, err
+			}
+
+			// Add custom params to values
+			if err := addParamsToUrlValues(customParams, values); err != nil {
+				return nil, err
+			}
 		}
-		values[key] = []string{val}
 	}
 
 	return values, nil
+}
+
+func addParamsToUrlValues(params map[string]interface{}, values url.Values) error {
+	for key, param := range params {
+		switch v := param.(type) {
+		case int:
+			values.Set(key, strconv.Itoa(v))
+		case float64:
+			values.Set(key, fmt.Sprintf("%g", v))
+		case string:
+			values.Set(key, v)
+		case bool:
+			values.Set(key, strconv.FormatBool(v))
+		default:
+			return fmt.Errorf("unsupported type for query param '%s': %T", key, v)
+		}
+	}
+
+	return nil
 }
 
 // Header defines request header

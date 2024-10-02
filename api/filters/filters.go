@@ -7,10 +7,12 @@ const (
 
 // Params defines optional query parameters.
 type Params struct {
-	Offset  int    `json:"offset,omitempty"`
-	Limit   int    `json:"limit,omitempty"`
-	SortKey string `json:"sortkey,omitempty"`
-	SortDir string `json:"sortdir,omitempty"`
+	Offset  int           `json:"offset,omitempty"`
+	Limit   int           `json:"limit,omitempty"`
+	SortKey string        `json:"sortkey,omitempty"`
+	SortDir string        `json:"sortdir,omitempty"`
+	Filter  string        `json:"filter,omitempty"`
+	Custom  []interface{} `json:"-"`
 }
 
 // Default constructor for default filters.
@@ -64,5 +66,15 @@ func SortDesc(key string) Option {
 	return func(p *Params) {
 		p.SortKey = key
 		p.SortDir = DESC
+	}
+}
+
+func Filter(filter string) Option {
+	return func(p *Params) { p.Filter = filter }
+}
+
+func AddCustomParams(obj interface{}) Option {
+	return func(p *Params) {
+		p.Custom = append(p.Custom, obj)
 	}
 }
