@@ -7,6 +7,8 @@
 package authorizer
 
 import (
+	"net/url"
+
 	"github.com/SSHcom/privx-sdk-go/api/filters"
 	"github.com/SSHcom/privx-sdk-go/api/response"
 	"github.com/SSHcom/privx-sdk-go/restapi"
@@ -38,7 +40,7 @@ func (c *Authorizer) Status() (*response.ServiceStatus, error) {
 // GetCACertificates get authorizers root certificates.
 func (c *Authorizer) GetCACertificates(opts ...filters.Option) ([]CA, error) {
 	cas := []CA{}
-	params := filters.Params{}
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)
@@ -116,7 +118,7 @@ func (c *Authorizer) GetPrincipals() (*Principal, error) {
 // GetPrincipal get principal by its group id.
 func (c *Authorizer) GetPrincipal(groupId string, opts ...filters.Option) (*Principal, error) {
 	principal := &Principal{}
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)
@@ -132,7 +134,7 @@ func (c *Authorizer) GetPrincipal(groupId string, opts ...filters.Option) (*Prin
 
 // DeletePrincipalKey delete the principal key by its group Id.
 func (c *Authorizer) DeletePrincipalKey(groupId string, opts ...filters.Option) error {
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)
@@ -171,7 +173,7 @@ func (c *Authorizer) ImportPrincipalKey(groupId string, key *PrincipalKeyImport)
 // SignPrincipalKey get a principal key signature.
 func (c *Authorizer) SignPrincipalKey(groupId string, sign *PrincipalKeySign, opts ...filters.Option) (*Signature, error) {
 	signature := &Signature{}
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)
@@ -189,7 +191,7 @@ func (c *Authorizer) SignPrincipalKey(groupId string, sign *PrincipalKeySign, op
 // GetExtenderCACertificates gets authorizers extender CA certificates.
 func (c *Authorizer) GetExtenderCACertificates(opts ...filters.Option) ([]CA, error) {
 	certificates := []CA{}
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)
@@ -320,7 +322,7 @@ func (c *Authorizer) DownloadCarrierConfig(trustedClientId, sessionId, filename 
 // GetWebProxyCACertificates gets authorizer's web proxy CA certificates.
 func (c *Authorizer) GetWebProxyCACertificates(opts ...filters.Option) ([]CA, error) {
 	certificates := []CA{}
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)
@@ -400,7 +402,7 @@ func (c *Authorizer) DownloadWebProxyConfig(trustedClientId, sessionId, filename
 // GetCertTemplates returns the certificate authentication templates.
 func (c *Authorizer) GetCertTemplates(opts ...filters.Option) (*response.ResultSet[CertTemplate], error) {
 	templates := &response.ResultSet[CertTemplate]{}
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)
@@ -441,7 +443,7 @@ func (c *Authorizer) GetExtenderTrustAnchor() (*TrustAnchor, error) {
 // GetAccessGroups get all access group.
 func (c *Authorizer) GetAccessGroups(opts ...filters.Option) (*response.ResultSet[AccessGroup], error) {
 	accessGroups := &response.ResultSet[AccessGroup]{}
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)
@@ -469,7 +471,7 @@ func (c *Authorizer) CreateAccessGroup(accessGroup *AccessGroup) (response.Ident
 // SearchAccessGroups search for access groups.
 func (c *Authorizer) SearchAccessGroups(search *AccessGroupSearch, opts ...filters.Option) (*response.ResultSet[AccessGroup], error) {
 	accessGroups := &response.ResultSet[AccessGroup]{}
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)
@@ -536,7 +538,7 @@ func (c *Authorizer) RevokeAccessGroupCAKey(accessGroupId string, caId string) e
 // SearchCerts search certificates.
 func (c *Authorizer) SearchCerts(search *ApiCertificateSearch, opts ...filters.Option) (*response.ResultSet[ApiCertificate], error) {
 	certs := &response.ResultSet[ApiCertificate]{}
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)
@@ -576,7 +578,7 @@ func (c *Authorizer) GetCert(certId string) (*ApiCertificate, error) {
 // GetAccountSecrets get all account secrets.
 func (c *Authorizer) GetAccountSecrets(opts ...filters.Option) (*response.ResultSet[AccountSecret], error) {
 	secrets := &response.ResultSet[AccountSecret]{}
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)
@@ -593,7 +595,7 @@ func (c *Authorizer) GetAccountSecrets(opts ...filters.Option) (*response.Result
 // SearchAccountSecrets search for account secrets.
 func (c *Authorizer) SearchAccountSecrets(search *AccountSecretSearch, opts ...filters.Option) (*response.ResultSet[AccountSecret], error) {
 	secrets := &response.ResultSet[AccountSecret]{}
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)
@@ -610,7 +612,7 @@ func (c *Authorizer) SearchAccountSecrets(search *AccountSecretSearch, opts ...f
 // GetSecretCheckouts get secret checkouts.
 func (c *Authorizer) GetSecretCheckouts(opts ...filters.Option) (*response.ResultSet[Checkout], error) {
 	checkouts := &response.ResultSet[Checkout]{}
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)

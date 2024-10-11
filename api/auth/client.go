@@ -7,6 +7,8 @@
 package auth
 
 import (
+	"net/url"
+
 	"github.com/SSHcom/privx-sdk-go/api/filters"
 	"github.com/SSHcom/privx-sdk-go/api/response"
 	"github.com/SSHcom/privx-sdk-go/restapi"
@@ -91,7 +93,7 @@ func (c *Auth) RegenerateIdpClientConfig(idpId string) (*IdpClientConfig, error)
 // GetUserSessions get valid sessions by userID.
 func (c *Auth) GetUserSessions(userId string, opts ...filters.Option) (*response.ResultSet[Session], error) {
 	userSessions := &response.ResultSet[Session]{}
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)
@@ -108,7 +110,7 @@ func (c *Auth) GetUserSessions(userId string, opts ...filters.Option) (*response
 // GetSourceSessions get valid sessions by sourceID.
 func (c *Auth) GetSourceSessions(sourceId string, opts ...filters.Option) (*response.ResultSet[Session], error) {
 	sourceSessions := &response.ResultSet[Session]{}
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)
@@ -125,7 +127,7 @@ func (c *Auth) GetSourceSessions(sourceId string, opts ...filters.Option) (*resp
 // SearchSessions searches for sessions
 func (c *Auth) SearchSessions(search *SessionSearch, opts ...filters.Option) (*response.ResultSet[Session], error) {
 	sessions := &response.ResultSet[Session]{}
-	params := filters.Default()
+	params := url.Values{}
 
 	for _, opt := range opts {
 		opt(&params)

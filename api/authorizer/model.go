@@ -6,21 +6,23 @@
 
 package authorizer
 
-import "time"
+import (
+	"time"
+)
 
 // CAparams ca query parameter definition.
 type CAParams struct {
-	AccessGroupId string `json:"access_group_id,omitempty"`
+	AccessGroupId string `url:"access_group_id"`
 }
 
 // PrincipalParams principal query parameter definition.
 type PrincipalParams struct {
-	KeyId string `json:"key_id,omitempty"`
+	KeyId string `url:"key_id"`
 }
 
 // CertTemplateParams certificate template query parameter definition.
 type CertTemplateParams struct {
-	Service string `json:"service,omitempty"`
+	Service string `url:"service"`
 }
 
 // ApiCertificate api certificate definition.
