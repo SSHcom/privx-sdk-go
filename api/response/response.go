@@ -29,5 +29,5 @@ type ResultSet[T any] struct {
 
 // Identifier id response definition.
 type Identifier struct {
-	Id string `json:"id"`
+	ID string `json:"id"`
 }
