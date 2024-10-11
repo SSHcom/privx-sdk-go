@@ -55,38 +55,38 @@ func (c *Authorizer) GetCACertificates(opts ...filters.Option) ([]CA, error) {
 }
 
 // DownloadCACertificate fetch authorizers root certificate as a download object.
-func (c *Authorizer) DownloadCACertificate(caId, filename string) error {
+func (c *Authorizer) DownloadCACertificate(caID, filename string) error {
 	err := c.api.
-		URL("/authorizer/api/v1/cas/%s", caId).
+		URL("/authorizer/api/v1/cas/%s", caID).
 		Download(filename)
 
 	return err
 }
 
 // DownloadCertificateRevocationList fetch authorizer CA certificate revocation list as a download object.
-func (c *Authorizer) DownloadCertificateRevocationList(caId, filename string) error {
+func (c *Authorizer) DownloadCertificateRevocationList(caID, filename string) error {
 	err := c.api.
-		URL("/authorizer/api/v1/cas/%s/crl", caId).
+		URL("/authorizer/api/v1/cas/%s/crl", caID).
 		Download(filename)
 
 	return err
 }
 
 // RenewCAKey renew a CA key.
-func (c *Authorizer) RenewCAKey(accessGroupId string) (response.Identifier, error) {
+func (c *Authorizer) RenewCAKey(accessGroupID string) (response.Identifier, error) {
 	caResponse := response.Identifier{}
 
 	_, err := c.api.
-		URL("/authorizer/api/v1/accessgroups/%s/cas", accessGroupId).
+		URL("/authorizer/api/v1/accessgroups/%s/cas", accessGroupID).
 		Post(nil, &caResponse)
 
 	return caResponse, err
 }
 
 // RevokeCAKey revoke a CA key.
-func (c *Authorizer) RevokeCAKey(accessGroupId, caId string) error {
+func (c *Authorizer) RevokeCAKey(accessGroupID, caID string) error {
 	_, err := c.api.
-		URL("/authorizer/api/v1/accessgroups/%s/cas/%s", accessGroupId, caId).
+		URL("/authorizer/api/v1/accessgroups/%s/cas/%s", accessGroupID, caID).
 		Delete()
 
 	return err
@@ -116,7 +116,7 @@ func (c *Authorizer) GetPrincipals() (*Principal, error) {
 }
 
 // GetPrincipal get principal by its group id.
-func (c *Authorizer) GetPrincipal(groupId string, opts ...filters.Option) (*Principal, error) {
+func (c *Authorizer) GetPrincipal(groupID string, opts ...filters.Option) (*Principal, error) {
 	principal := &Principal{}
 	params := url.Values{}
 
@@ -125,15 +125,15 @@ func (c *Authorizer) GetPrincipal(groupId string, opts ...filters.Option) (*Prin
 	}
 
 	_, err := c.api.
-		URL("/authorizer/api/v1/principals/%s", groupId).
+		URL("/authorizer/api/v1/principals/%s", groupID).
 		Query(params).
 		Get(&principal)
 
 	return principal, err
 }
 
-// DeletePrincipalKey delete the principal key by its group Id.
-func (c *Authorizer) DeletePrincipalKey(groupId string, opts ...filters.Option) error {
+// DeletePrincipalKey delete the principal key by its group id.
+func (c *Authorizer) DeletePrincipalKey(groupID string, opts ...filters.Option) error {
 	params := url.Values{}
 
 	for _, opt := range opts {
@@ -141,7 +141,7 @@ func (c *Authorizer) DeletePrincipalKey(groupId string, opts ...filters.Option) 
 	}
 
 	_, err := c.api.
-		URL("/authorizer/api/v1/principals/%s", groupId).
+		URL("/authorizer/api/v1/principals/%s", groupID).
 		Query(params).
 		Delete()
 
@@ -149,29 +149,29 @@ func (c *Authorizer) DeletePrincipalKey(groupId string, opts ...filters.Option) 
 }
 
 // CreatePrincipalKey create a principal key pair.
-func (c *Authorizer) CreatePrincipalKey(groupId string) (*Principal, error) {
+func (c *Authorizer) CreatePrincipalKey(groupID string) (*Principal, error) {
 	principal := &Principal{}
 
 	_, err := c.api.
-		URL("/authorizer/api/v1/principals/%s/create", groupId).
+		URL("/authorizer/api/v1/principals/%s/create", groupID).
 		Post(nil, &principal)
 
 	return principal, err
 }
 
 // ImportPrincipalKey import a principal key pair.
-func (c *Authorizer) ImportPrincipalKey(groupId string, key *PrincipalKeyImport) (*Principal, error) {
+func (c *Authorizer) ImportPrincipalKey(groupID string, key *PrincipalKeyImport) (*Principal, error) {
 	principal := &Principal{}
 
 	_, err := c.api.
-		URL("/authorizer/api/v1/principals/%s/import", groupId).
+		URL("/authorizer/api/v1/principals/%s/import", groupID).
 		Post(&key, &principal)
 
 	return principal, err
 }
 
 // SignPrincipalKey get a principal key signature.
-func (c *Authorizer) SignPrincipalKey(groupId string, sign *PrincipalKeySign, opts ...filters.Option) (*Signature, error) {
+func (c *Authorizer) SignPrincipalKey(groupID string, sign *PrincipalKeySign, opts ...filters.Option) (*Signature, error) {
 	signature := &Signature{}
 	params := url.Values{}
 
@@ -180,7 +180,7 @@ func (c *Authorizer) SignPrincipalKey(groupId string, sign *PrincipalKeySign, op
 	}
 
 	_, err := c.api.
-		URL("/authorizer/api/v1/principals/%s/sign", groupId).
+		URL("/authorizer/api/v1/principals/%s/sign", groupID).
 		Query(params).
 		Post(&sign, &signature)
 
@@ -248,20 +248,20 @@ func (c *Authorizer) RevokeExtenderCertificate(request *CertificateRevocation) (
 }
 
 // GetExtenderConfigSessions get extenders config session ids.
-func (c *Authorizer) GetExtenderConfigSessions(trustedClientId string) (*SessionIdResponse, error) {
-	sessionIds := &SessionIdResponse{}
+func (c *Authorizer) GetExtenderConfigSessions(trustedClientID string) (*SessionIDResponse, error) {
+	sessionIDs := &SessionIDResponse{}
 
 	_, err := c.api.
-		URL("/authorizer/api/v1/extender/conf/%s", trustedClientId).
-		Post(nil, &sessionIds)
+		URL("/authorizer/api/v1/extender/conf/%s", trustedClientID).
+		Post(nil, &sessionIDs)
 
-	return sessionIds, err
+	return sessionIDs, err
 }
 
 // DownloadExtenderConfig fetch a pre-configured extender config as a download object.
-func (c *Authorizer) DownloadExtenderConfig(trustedClientId, sessionId, filename string) error {
+func (c *Authorizer) DownloadExtenderConfig(trustedClientID, sessionID, filename string) error {
 	err := c.api.
-		URL("/authorizer/api/v1/extender/conf/%s/%s", trustedClientId, sessionId).
+		URL("/authorizer/api/v1/extender/conf/%s/%s", trustedClientID, sessionID).
 		Download(filename)
 
 	return err
@@ -269,20 +269,20 @@ func (c *Authorizer) DownloadExtenderConfig(trustedClientId, sessionId, filename
 
 // MARK: Deploy
 // GetDeployScriptSessions get deploy script session ids.
-func (c *Authorizer) GetDeployScriptSessions(trustedClientId string) (*SessionIdResponse, error) {
-	sessionIds := &SessionIdResponse{}
+func (c *Authorizer) GetDeployScriptSessions(trustedClientID string) (*SessionIDResponse, error) {
+	sessionIDs := &SessionIDResponse{}
 
 	_, err := c.api.
-		URL("/authorizer/api/v1/deploy/%s", trustedClientId).
-		Post(nil, &sessionIds)
+		URL("/authorizer/api/v1/deploy/%s", trustedClientID).
+		Post(nil, &sessionIDs)
 
-	return sessionIds, err
+	return sessionIDs, err
 }
 
 // DownloadDeployScript fetch a pre-configured deployment script.
-func (c *Authorizer) DownloadDeployScript(trustedClientId, sessionId, filename string) error {
+func (c *Authorizer) DownloadDeployScript(trustedClientID, sessionID, filename string) error {
 	err := c.api.
-		URL("/authorizer/api/v1/deploy/%s/%s", trustedClientId, sessionId).
+		URL("/authorizer/api/v1/deploy/%s/%s", trustedClientID, sessionID).
 		Download(filename)
 
 	return err
@@ -299,20 +299,20 @@ func (c *Authorizer) DownloadPrincipalCommandScript(filename string) error {
 
 // MARK: Carrier
 // // GetCarrierConfigSessions get carrier config session ids.
-func (c *Authorizer) GetCarrierConfigSessions(trustedClientId string) (*SessionIdResponse, error) {
-	sessionIds := &SessionIdResponse{}
+func (c *Authorizer) GetCarrierConfigSessions(trustedClientID string) (*SessionIDResponse, error) {
+	sessionIDs := &SessionIDResponse{}
 
 	_, err := c.api.
-		URL("/authorizer/api/v1/carrier/conf/%s", trustedClientId).
-		Post(nil, &sessionIds)
+		URL("/authorizer/api/v1/carrier/conf/%s", trustedClientID).
+		Post(nil, &sessionIDs)
 
-	return sessionIds, err
+	return sessionIDs, err
 }
 
 // DownloadCarrierConfig fetch a pre-configured carrier config.
-func (c *Authorizer) DownloadCarrierConfig(trustedClientId, sessionId, filename string) error {
+func (c *Authorizer) DownloadCarrierConfig(trustedClientID, sessionID, filename string) error {
 	err := c.api.
-		URL("/authorizer/api/v1/carrier/conf/%s/%s", trustedClientId, sessionId).
+		URL("/authorizer/api/v1/carrier/conf/%s/%s", trustedClientID, sessionID).
 		Download(filename)
 
 	return err
@@ -379,20 +379,20 @@ func (c *Authorizer) RevokeWebProxyCertificate(request *CertificateRevocation) (
 }
 
 // GetWebProxyConfigSessions get web proxy config session ids.
-func (c *Authorizer) GetWebProxyConfigSessions(trustedClientId string) (*SessionIdResponse, error) {
-	sessionIds := &SessionIdResponse{}
+func (c *Authorizer) GetWebProxyConfigSessions(trustedClientID string) (*SessionIDResponse, error) {
+	sessionIDs := &SessionIDResponse{}
 
 	_, err := c.api.
-		URL("/authorizer/api/v1/icap/conf/%s", trustedClientId).
-		Post(nil, &sessionIds)
+		URL("/authorizer/api/v1/icap/conf/%s", trustedClientID).
+		Post(nil, &sessionIDs)
 
-	return sessionIds, err
+	return sessionIDs, err
 }
 
 // DownloadWebProxyConfig fetch a pre-configured web proxy config as a download object.
-func (c *Authorizer) DownloadWebProxyConfig(trustedClientId, sessionId, filename string) error {
+func (c *Authorizer) DownloadWebProxyConfig(trustedClientID, sessionID, filename string) error {
 	err := c.api.
-		URL("/authorizer/api/v1/icap/conf/%s/%s", trustedClientId, sessionId).
+		URL("/authorizer/api/v1/icap/conf/%s/%s", trustedClientID, sessionID).
 		Download(filename)
 
 	return err
@@ -486,49 +486,49 @@ func (c *Authorizer) SearchAccessGroups(search *AccessGroupSearch, opts ...filte
 }
 
 // GetAccessGroup get access group by id.
-func (c *Authorizer) GetAccessGroup(accessGroupId string) (*AccessGroup, error) {
+func (c *Authorizer) GetAccessGroup(accessGroupID string) (*AccessGroup, error) {
 	accessGroup := &AccessGroup{}
 
 	_, err := c.api.
-		URL("/authorizer/api/v1/accessgroups/%s", accessGroupId).
+		URL("/authorizer/api/v1/accessgroups/%s", accessGroupID).
 		Get(&accessGroup)
 
 	return accessGroup, err
 }
 
 // UpdateAccessGroup update access group by id.
-func (c *Authorizer) UpdateAccessGroup(accessGroupId string, update *AccessGroup) error {
+func (c *Authorizer) UpdateAccessGroup(accessGroupID string, update *AccessGroup) error {
 	_, err := c.api.
-		URL("/authorizer/api/v1/accessgroups/%s", accessGroupId).
+		URL("/authorizer/api/v1/accessgroups/%s", accessGroupID).
 		Put(update)
 
 	return err
 }
 
 // DeleteAccessGroup delete access group by id.
-func (c *Authorizer) DeleteAccessGroup(accessGroupId string) error {
+func (c *Authorizer) DeleteAccessGroup(accessGroupID string) error {
 	_, err := c.api.
-		URL("/authorizer/api/v1/accessgroups/%s", accessGroupId).
+		URL("/authorizer/api/v1/accessgroups/%s", accessGroupID).
 		Delete()
 
 	return err
 }
 
 // RenewAccessGroupCAKey renew access group CA key.
-func (c *Authorizer) RenewAccessGroupCAKey(accessGroupId string) (string, error) {
-	var keyId string
+func (c *Authorizer) RenewAccessGroupCAKey(accessGroupID string) (string, error) {
+	var keyID string
 
 	_, err := c.api.
-		URL("/authorizer/api/v1/accessgroups/%s/cas", accessGroupId).
-		Post(nil, &keyId)
+		URL("/authorizer/api/v1/accessgroups/%s/cas", accessGroupID).
+		Post(nil, &keyID)
 
-	return keyId, err
+	return keyID, err
 }
 
 // RevokeAccessGroupCAKey revoke access group CA key.
-func (c *Authorizer) RevokeAccessGroupCAKey(accessGroupId string, caId string) error {
+func (c *Authorizer) RevokeAccessGroupCAKey(accessGroupID string, caID string) error {
 	_, err := c.api.
-		URL("/authorizer/api/v1/accessgroups/%s/cas/%s", accessGroupId, caId).
+		URL("/authorizer/api/v1/accessgroups/%s/cas/%s", accessGroupID, caID).
 		Delete()
 
 	return err
@@ -564,11 +564,11 @@ func (c *Authorizer) GetAllCertificates() (*response.ResultSet[ApiCertificate], 
 }
 
 // GetCert get certificate by id.
-func (c *Authorizer) GetCert(certId string) (*ApiCertificate, error) {
+func (c *Authorizer) GetCert(certID string) (*ApiCertificate, error) {
 	cert := &ApiCertificate{}
 
 	_, err := c.api.
-		URL("/authorizer/api/v1/cert/%s", certId).
+		URL("/authorizer/api/v1/cert/%s", certID).
 		Get(&cert)
 
 	return cert, err
@@ -638,20 +638,20 @@ func (c *Authorizer) CheckoutAccountSecret(checkout CheckoutRequest) (*response.
 }
 
 // GetSecretCheckout get secret checkout by id.
-func (c *Authorizer) GetSecretCheckout(checkoutId string) (*Checkout, error) {
+func (c *Authorizer) GetSecretCheckout(checkoutID string) (*Checkout, error) {
 	checkout := &Checkout{}
 
 	_, err := c.api.
-		URL("/authorizer/api/v1/secrets/checkouts/%s", checkoutId).
+		URL("/authorizer/api/v1/secrets/checkouts/%s", checkoutID).
 		Get(&checkout)
 
 	return checkout, err
 }
 
 // ReleaseSecretCheckout release secret checkout.
-func (c *Authorizer) ReleaseSecretCheckout(checkoutId string) error {
+func (c *Authorizer) ReleaseSecretCheckout(checkoutID string) error {
 	_, err := c.api.
-		URL("/authorizer/api/v1/secrets/checkouts/%s/release", checkoutId).
+		URL("/authorizer/api/v1/secrets/checkouts/%s/release", checkoutID).
 		Post(nil)
 
 	return err

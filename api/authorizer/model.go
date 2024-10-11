@@ -12,12 +12,12 @@ import (
 
 // CAparams ca query parameter definition.
 type CAParams struct {
-	AccessGroupId string `url:"access_group_id"`
+	AccessGroupID string `url:"access_group_id"`
 }
 
 // PrincipalParams principal query parameter definition.
 type PrincipalParams struct {
-	KeyId string `url:"key_id"`
+	KeyID string `url:"key_id"`
 }
 
 // CertTemplateParams certificate template query parameter definition.
@@ -28,9 +28,9 @@ type CertTemplateParams struct {
 // ApiCertificate api certificate definition.
 type ApiCertificate struct {
 	Type              string `json:"type,omitempty"`
-	Id                string `json:"id,omitempty"`
+	ID                string `json:"id,omitempty"`
 	Serial            string `json:"serial"`
-	OwnerId           string `json:"owner_id,omitempty"`
+	OwnerID           string `json:"owner_id,omitempty"`
 	Revoked           string `json:"revoked,omitempty"`
 	RevocationReason  string `json:"revocation_reason,omitempty"`
 	Cert              string `json:"cert,omitempty"`
@@ -44,17 +44,17 @@ type ApiCertificate struct {
 	Extensions        string `json:"extensions,omitempty"`
 	FingerPrintSHA1   string `json:"fingerprint_sha1,omitempty"`
 	FingerPrintSHA256 string `json:"fingerprint_sha256,omitempty"`
-	SubjectKeyId      string `json:"subject_key_id,omitempty"`
-	AuthorityKeyId    string `json:"authority_key_id,omitempty"`
+	SubjectKeyID      string `json:"subject_key_id,omitempty"`
+	AuthorityKeyID    string `json:"authority_key_id,omitempty"`
 	Status            string `json:"status"`
 }
 
 // ApiCertificateSearch api certificate search definition.
 type ApiCertificateSearch struct {
 	Type           string `json:"type"`
-	Id             string `json:"id,omitempty"`
-	KeyId          string `json:"key_id,omitempty"`
-	OwnerId        string `json:"owner_id,omitempty"`
+	ID             string `json:"id,omitempty"`
+	KeyID          string `json:"key_id,omitempty"`
+	OwnerID        string `json:"owner_id,omitempty"`
 	Subject        string `json:"subject,omitempty"`
 	Issuer         string `json:"issuer,omitempty"`
 	NotBefore      string `json:"not_before,omitempty"`
@@ -76,15 +76,15 @@ type CertTemplate struct {
 	Description       string   `json:"description"`
 	Service           string   `json:"service"`
 	Type              string   `json:"type"`
-	KeyId             string   `json:"key_id,omitempty"`
+	KeyID             string   `json:"key_id,omitempty"`
 	RsaSignatureTypes []string `json:"rsa_signature_types,omitempty"`
 	Principals        []string `json:"principals,omitempty"`
 	Extensions        []string `json:"extensions,omitempty"`
 }
 
-// SessionIdResponse session id response definition.
-type SessionIdResponse struct {
-	SessionId string `json:"session_id"`
+// SessionIDResponse session id response definition.
+type SessionIDResponse struct {
+	SessionID string `json:"session_id"`
 }
 
 // Signature principal key signature response definition.
@@ -96,8 +96,8 @@ type Signature struct {
 
 // PrincipalKeySign principal key sign request definition.
 type PrincipalKeySign struct {
-	Id        string `json:"id"`
-	GroupId   string `json:"group_id"`
+	ID        string `json:"id"`
+	GroupID   string `json:"group_id"`
 	PublicKey string `json:"publicKey"`
 	Type      string `json:"type"`
 	Data      string `json:"data"`
@@ -112,11 +112,11 @@ type PrincipalKeyImport struct {
 // ApiIdentities end user authorization request definition.
 type ApiIdentities struct {
 	PublicKey string `json:"public_key,omitempty"`
-	HostId    string `json:"host_id,omitempty"`
+	HostID    string `json:"host_id,omitempty"`
 	Hostname  string `json:"hostname,omitempty"`
 	Username  string `json:"username,omitempty"`
 	Service   string `json:"service,omitempty"`
-	RoleId    string `json:"role_id,omitempty"`
+	RoleID    string `json:"role_id,omitempty"`
 }
 
 // ApiIdentitiesResponse api identities response definition.
@@ -138,8 +138,8 @@ type ApiSshCertificate struct {
 
 // ApiSshKey api ssh key definition.
 type ApiSshKey struct {
-	Id              string `json:"id"`
-	GroupId         string `json:"group_id,omitempty"`
+	ID              string `json:"id"`
+	GroupID         string `json:"group_id,omitempty"`
 	Type            string `json:"type,omitempty"`
 	Comment         string `json:"comment,omitempty"`
 	PublicKey       string `json:"public_key,omitempty"`
@@ -149,9 +149,9 @@ type ApiSshKey struct {
 
 // CA root certificate definition.
 type CA struct {
-	Id                string `json:"id"`
-	GroupId           string `json:"group_id"`
-	AccessGroupId     string `json:"access_group_id,omitempty"`
+	ID                string `json:"id"`
+	GroupID           string `json:"group_id"`
+	AccessGroupID     string `json:"access_group_id,omitempty"`
 	Type              string `json:"type"`
 	Size              int    `json:"size"`
 	PublicKey         string `json:"public_key"`
@@ -170,8 +170,8 @@ type CA struct {
 // Principal principal definition.
 type Principal struct {
 	Type            string `json:"type"`
-	Id              string `json:"id"`
-	GroupId         string `json:"group_id"`
+	ID              string `json:"id"`
+	GroupID         string `json:"group_id"`
 	Comment         string `json:"comment,omitempty"`
 	PublicKey       string `json:"public_key"`
 	PublicKeyString string `json:"public_key_string"`
@@ -180,14 +180,14 @@ type Principal struct {
 
 // CertificateEnroll certificate enroll request definition.
 type CertificateEnroll struct {
-	CAId  string `json:"ca_id,omitempty"`
+	CAID  string `json:"ca_id,omitempty"`
 	CSR   string `json:"csr"`
 	Owner string `json:"owner"`
 }
 
 // CertificateEnrollResponse certificate enroll response definition.
 type CertificateEnrollResponse struct {
-	Id   string `json:"id"`
+	ID   string `json:"id"`
 	Cert string `json:"cert"`
 	CA   string `json:"ca"`
 }
@@ -201,7 +201,7 @@ type CertificateRevocation struct {
 
 // CertificateRevocationResponse certificate revocation response definition.
 type CertificateRevocationResponse struct {
-	Ids []string `json:"ids"`
+	IDs []string `json:"ids"`
 }
 
 // AccessGroup access group definition.
@@ -212,8 +212,8 @@ type AccessGroup struct {
 	HostCertificateTrustAnchors      string `json:"host_certificate_trust_anchors"`
 	WinRMHostCertificateTrustAnchors string `json:"winrm_host_certificate_trust_anchors"`
 	DBHostCertificateTrustAnchors    string `json:"db_host_certificate_trust_anchors"`
-	CAId                             string `json:"ca_id,omitempty"`
-	PrimaryCAId                      string `json:"primary_ca_id"`
+	CAID                             string `json:"ca_id,omitempty"`
+	PrimaryCAID                      string `json:"primary_ca_id"`
 	Author                           string `json:"author,omitempty"`
 	Created                          string `json:"created,omitempty"`
 	Updated                          string `json:"updated,omitempty"`
@@ -241,30 +241,30 @@ type AccountSecret struct {
 
 // TargetDomainHandle target domain handle definition.
 type TargetDomainHandle struct {
-	Id      string `json:"id"`
+	ID      string `json:"id"`
 	Name    string `json:"name,omitempty"`
 	Deleted bool   `json:"deleted,omitempty"`
 }
 
 // HostPrincipals host principals definition.
 type HostPrincipals struct {
-	Id         string   `json:"id"`
+	ID         string   `json:"id"`
 	Addresses  []string `json:"addresses"`
 	CommonName string   `json:"common_name,omitempty"`
-	ExternalId string   `json:"external_id,omitempty"`
-	InstanceId string   `json:"instance_id,omitempty"`
+	ExternalID string   `json:"external_id,omitempty"`
+	InstanceID string   `json:"instance_id,omitempty"`
 }
 
 // AccountSecretSearch account secret search request definition.
 type AccountSecretSearch struct {
 	Keywords string `json:"keywords"`
-	HostId   string `json:"host_id,omitempty"`
+	HostID   string `json:"host_id,omitempty"`
 	Username string `json:"username,omitempty"`
 }
 
 // Checkout checkout definition.
 type Checkout struct {
-	Id               string         `json:"id"`
+	ID               string         `json:"id"`
 	Path             string         `json:"path"`
 	Type             string         `json:"type"`
 	Expires          string         `json:"expires"`
@@ -276,8 +276,8 @@ type Checkout struct {
 	FullName         string         `json:"full_name,omitempty"`
 	Host             HostPrincipals `json:"host,omitempty"`
 	TargetDomain     TargetDomain   `json:"target_domain,omitempty"`
-	ManagedAccountId string         `json:"managed_account_id,omitempty"`
-	UserId           string         `json:"user_id"`
+	ManagedAccountID string         `json:"managed_account_id,omitempty"`
+	UserID           string         `json:"user_id"`
 }
 
 // CheckoutRequest checkout request definition.

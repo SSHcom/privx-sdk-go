@@ -10,14 +10,14 @@ import "time"
 
 // IdpClient identity provider client definition.
 type IdpClient struct {
-	Id                             string            `json:"id"`
+	ID                             string            `json:"id"`
 	Name                           string            `json:"name"`
 	Created                        time.Time         `json:"created,omitempty"`
 	Updated                        time.Time         `json:"updated,omitempty"`
 	IdpType                        string            `json:"idp_type"`
 	OIDCIssuer                     string            `json:"oidc_issuer,omitempty"`
 	OIDCAudience                   []string          `json:"oidc_audience"`
-	OIDCClientId                   string            `json:"oidc_client_id,omitempty"`
+	OIDCClientID                   string            `json:"oidc_client_id,omitempty"`
 	OIDCClientSecret               string            `json:"oidc_client_secret,omitempty"`
 	OIDCScopesEnabled              []string          `json:"oidc_scopes_enabled"`
 	OIDCResponseTypesSupported     []string          `json:"oidc_response_types_supported,omitempty"`
@@ -39,21 +39,21 @@ type IdpClient struct {
 
 // IdpClientConfig identity provider client config definition.
 type IdpClientConfig struct {
-	ClientId     string `json:"client_id"`
+	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 }
 
 // Session session definition
 type Session struct {
-	Id              string    `json:"id"`
-	UserId          string    `json:"user_id"`
-	SourceId        string    `json:"source_id"`
+	ID              string    `json:"id"`
+	UserID          string    `json:"user_id"`
+	SourceID        string    `json:"source_id"`
 	Domain          string    `json:"domain"`
 	Username        string    `json:"username"`
 	RemoteAddr      string    `json:"remote_addr"`
 	UserAgent       string    `json:"user_agent"`
 	Type            string    `json:"type"`
-	ParentSessionId string    `json:"parent_session_id,omitempty"`
+	ParentSessionID string    `json:"parent_session_id,omitempty"`
 	Created         time.Time `json:"created"`
 	Updated         time.Time `json:"updated"`
 	Expires         time.Time `json:"expires"`
@@ -77,13 +77,13 @@ type SessionPasswordPolicy struct {
 // SessionSearch session search request parameter definition.
 type SessionSearch struct {
 	Keywords string `json:"keywords,omitempty"`
-	UserId   string `json:"user_id,omitempty"`
+	UserID   string `json:"user_id,omitempty"`
 	Type     string `json:"type,omitempty"`
 }
 
 // Device paired mobile gateway device definition.
 type Device struct {
-	Id        string `json:"id"`
+	ID        string `json:"id"`
 	OS        string `json:"os"`
 	Name      string `json:"name"`
 	Activated string `json:"activated"`
