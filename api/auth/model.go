@@ -14,7 +14,7 @@ type IdpClient struct {
 	Name                           string            `json:"name"`
 	Created                        time.Time         `json:"created,omitempty"`
 	Updated                        time.Time         `json:"updated,omitempty"`
-	IdpType                        string            `json:"idp_type"`
+	IDPType                        string            `json:"idp_type"`
 	OIDCIssuer                     string            `json:"oidc_issuer,omitempty"`
 	OIDCAudience                   []string          `json:"oidc_audience"`
 	OIDCClientID                   string            `json:"oidc_client_id,omitempty"`
@@ -35,11 +35,12 @@ type IdpClient struct {
 	OIDCRefreshTokenValidInMinutes int               `json:"oidc_refresh_token_valid_in_minutes,omitempty"`
 	UserFilter                     string            `json:"user_filter,omitempty"`
 	Enabled                        bool              `json:"enabled"`
+	ContainerRequired              bool              `json:"container_required,omitempty"`
 }
 
 // IdpClientConfig identity provider client config definition.
 type IdpClientConfig struct {
-	ClientID     string `json:"client_id"`
+	ClientId     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 }
 

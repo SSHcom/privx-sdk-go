@@ -8,6 +8,8 @@ package authorizer
 
 import (
 	"time"
+
+	"github.com/SSHcom/privx-sdk-go/api/secretsmanager"
 )
 
 // CAparams ca query parameter definition.
@@ -201,7 +203,7 @@ type CertificateRevocation struct {
 
 // CertificateRevocationResponse certificate revocation response definition.
 type CertificateRevocationResponse struct {
-	IDs []string `json:"ids"`
+	IDS []string `json:"ids"`
 }
 
 // AccessGroup access group definition.
@@ -226,17 +228,17 @@ type AccessGroupSearch struct {
 	Keywords string `json:"keywords,omitempty"`
 }
 
-// AccountSecret account secret definition.
-type AccountSecret struct {
-	Path         string             `json:"path"`
-	Type         string             `json:"type"`
-	Username     string             `json:"username"`
-	Email        string             `json:"email,omitempty"`
-	FullName     string             `json:"full_name,omitempty"`
-	TargetDomain TargetDomainHandle `json:"target_domain,omitempty"`
-	Host         HostPrincipals     `json:"host,omitempty"`
-	Created      string             `json:"created,omitempty"`
-	Updated      string             `json:"updated,omitempty"`
+// HostAccountSecret host account secret definition.
+type HostAccountSecret struct {
+	Path         string               `json:"path"`
+	Type         string               `json:"type"`
+	Username     string               `json:"username"`
+	Email        string               `json:"email,omitempty"`
+	FullName     string               `json:"full_name,omitempty"`
+	TargetDomain TargetDomainHandle   `json:"target_domain,omitempty"`
+	Host         HostPrincipalsHandle `json:"host,omitempty"`
+	Created      string               `json:"created,omitempty"`
+	Updated      string               `json:"updated,omitempty"`
 }
 
 // TargetDomainHandle target domain handle definition.
@@ -246,8 +248,8 @@ type TargetDomainHandle struct {
 	Deleted bool   `json:"deleted,omitempty"`
 }
 
-// HostPrincipals host principals definition.
-type HostPrincipals struct {
+// HostPrincipalsHandle host principals handle definition.
+type HostPrincipalsHandle struct {
 	ID         string   `json:"id"`
 	Addresses  []string `json:"addresses"`
 	CommonName string   `json:"common_name,omitempty"`
@@ -264,20 +266,20 @@ type AccountSecretSearch struct {
 
 // Checkout checkout definition.
 type Checkout struct {
-	ID               string         `json:"id"`
-	Path             string         `json:"path"`
-	Type             string         `json:"type"`
-	Expires          string         `json:"expires"`
-	Created          string         `json:"created"`
-	ExplicitCheckout bool           `json:"explicit_checkout"`
-	Secrets          []Secrets      `json:"secrets"`
-	Username         string         `json:"username"`
-	Email            string         `json:"email,omitempty"`
-	FullName         string         `json:"full_name,omitempty"`
-	Host             HostPrincipals `json:"host,omitempty"`
-	TargetDomain     TargetDomain   `json:"target_domain,omitempty"`
-	ManagedAccountID string         `json:"managed_account_id,omitempty"`
-	UserID           string         `json:"user_id"`
+	ID               string                            `json:"id"`
+	Path             string                            `json:"path"`
+	Type             string                            `json:"type"`
+	Expires          string                            `json:"expires"`
+	Created          string                            `json:"created"`
+	ExplicitCheckout bool                              `json:"explicit_checkout"`
+	Secrets          []Secrets                         `json:"secrets"`
+	Username         string                            `json:"username"`
+	Email            string                            `json:"email,omitempty"`
+	FullName         string                            `json:"full_name,omitempty"`
+	Host             HostPrincipalsHandle              `json:"host,omitempty"`
+	TargetDomain     secretsmanager.TargetDomainHandle `json:"target_domain,omitempty"`
+	ManagedAccountID string                            `json:"managed_account_id,omitempty"`
+	UserID           string                            `json:"user_id"`
 }
 
 // CheckoutRequest checkout request definition.
@@ -290,11 +292,4 @@ type Secrets struct {
 	Version int       `json:"version"`
 	Secret  string    `json:"secret"`
 	Created time.Time `json:"created"`
-}
-
-// TargetDomain target domain definition.
-type TargetDomain struct {
-	ID      string `json:"id"`
-	Name    string `json:"name,omitempty"`
-	Deleted bool   `json:"deleted,omitempty"`
 }

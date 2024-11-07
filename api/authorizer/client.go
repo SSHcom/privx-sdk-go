@@ -38,7 +38,9 @@ func (c *Authorizer) Status() (*response.ServiceStatus, error) {
 
 // MARK: CAS
 // GetCACertificates get authorizers root certificates.
-func (c *Authorizer) GetCACertificates(opts ...filters.Option) ([]CA, error) {
+// Note, the v1 endpoint doesn't return the count as part of the response body,
+// this will change with v2. Until then, we will handle it internally within the SDK.
+func (c *Authorizer) GetCACertificates(opts ...filters.Option) (*response.ResultSet[CA], error) {
 	cas := []CA{}
 	params := url.Values{}
 
@@ -51,7 +53,14 @@ func (c *Authorizer) GetCACertificates(opts ...filters.Option) ([]CA, error) {
 		Query(params).
 		Get(&cas)
 
-	return cas, err
+	// v1 endpoint does not return count,
+	// return count internally in sdk until v2 is introduced
+	certs := &response.ResultSet[CA]{
+		Items: cas,
+		Count: len(cas),
+	}
+
+	return certs, err
 }
 
 // DownloadCACertificate fetch authorizers root certificate as a download object.
@@ -72,26 +81,6 @@ func (c *Authorizer) DownloadCertificateRevocationList(caID, filename string) er
 	return err
 }
 
-// RenewCAKey renew a CA key.
-func (c *Authorizer) RenewCAKey(accessGroupID string) (response.Identifier, error) {
-	caResponse := response.Identifier{}
-
-	_, err := c.api.
-		URL("/authorizer/api/v1/accessgroups/%s/cas", accessGroupID).
-		Post(nil, &caResponse)
-
-	return caResponse, err
-}
-
-// RevokeCAKey revoke a CA key.
-func (c *Authorizer) RevokeCAKey(accessGroupID, caID string) error {
-	_, err := c.api.
-		URL("/authorizer/api/v1/accessgroups/%s/cas/%s", accessGroupID, caID).
-		Delete()
-
-	return err
-}
-
 // GetTargetHostCredentials get target host credentials for the user.
 func (c *Authorizer) GetTargetHostCredentials(request *ApiIdentities) (*ApiIdentitiesResponse, error) {
 	principal := &ApiIdentitiesResponse{}
@@ -105,12 +94,21 @@ func (c *Authorizer) GetTargetHostCredentials(request *ApiIdentities) (*ApiIdent
 
 // MARK: Principals
 // GetPrincipals get defined principals.
-func (c *Authorizer) GetPrincipals() (*Principal, error) {
-	principals := &Principal{}
+// Note, the v1 endpoint doesn't return the count as part of the response body,
+// this will change with v2. Until then, we will handle it internally within the SDK.
+func (c *Authorizer) GetPrincipals() (*response.ResultSet[Principal], error) {
+	p := []Principal{}
 
 	_, err := c.api.
 		URL("/authorizer/api/v1/principals").
-		Get(&principals)
+		Get(&p)
+
+	// v1 endpoint does not return count,
+	// return count internally in sdk until v2 is introduced
+	principals := &response.ResultSet[Principal]{
+		Count: len(p),
+		Items: p,
+	}
 
 	return principals, err
 }
@@ -189,8 +187,10 @@ func (c *Authorizer) SignPrincipalKey(groupID string, sign *PrincipalKeySign, op
 
 // MARK: Extender
 // GetExtenderCACertificates gets authorizers extender CA certificates.
-func (c *Authorizer) GetExtenderCACertificates(opts ...filters.Option) ([]CA, error) {
-	certificates := []CA{}
+// Note, the v1 endpoint doesn't return the count as part of the response body,
+// this will change with v2. Until then, we will handle it internally within the SDK.
+func (c *Authorizer) GetExtenderCACertificates(opts ...filters.Option) (*response.ResultSet[CA], error) {
+	cs := []CA{}
 	params := url.Values{}
 
 	for _, opt := range opts {
@@ -200,20 +200,25 @@ func (c *Authorizer) GetExtenderCACertificates(opts ...filters.Option) ([]CA, er
 	_, err := c.api.
 		URL("/authorizer/api/v1/extender/cas").
 		Query(params).
-		Get(&certificates)
+		Get(&cs)
+
+	// v1 endpoint does not return count,
+	// return count internally in sdk until v2 is introduced
+	certificates := &response.ResultSet[CA]{
+		Count: len(cs),
+		Items: cs,
+	}
 
 	return certificates, err
 }
 
-// GetExtenderCACertificate gets authorizers extender CA certificate by id.
-func (c *Authorizer) GetExtenderCACertificate(id string) (*CA, error) {
-	certificate := &CA{}
-
-	_, err := c.api.
+// DownloadExtenderCACertificate fetch authorizers extender CA certificate by id as a download object.
+func (c *Authorizer) DownloadExtenderCACertificate(filename, id string) error {
+	err := c.api.
 		URL("/authorizer/api/v1/extender/cas/%s", id).
-		Get(&certificate)
+		Download(filename)
 
-	return certificate, err
+	return err
 }
 
 // DownloadExtenderCertificateCRL fetch authorizer CA certificate revocation list as a download object.
@@ -223,28 +228,6 @@ func (c *Authorizer) DownloadExtenderCertificateCRL(filename, id string) error {
 		Download(filename)
 
 	return err
-}
-
-// EnrollExtenderCertificate enroll certificate from extender CA.
-func (c *Authorizer) EnrollExtenderCertificate(request *CertificateEnroll) (*CertificateEnrollResponse, error) {
-	enroll := &CertificateEnrollResponse{}
-
-	_, err := c.api.
-		URL("/authorizer/api/v1/extender/enroll").
-		Post(&request, &enroll)
-
-	return enroll, err
-}
-
-// RevokeExtenderCertificate revoke certificate.
-func (c *Authorizer) RevokeExtenderCertificate(request *CertificateRevocation) (*CertificateRevocationResponse, error) {
-	revoke := &CertificateRevocationResponse{}
-
-	_, err := c.api.
-		URL("/authorizer/api/v1/extender/revoke").
-		Post(&request, &revoke)
-
-	return revoke, err
 }
 
 // GetExtenderConfigSessions get extenders config session ids.
@@ -320,8 +303,10 @@ func (c *Authorizer) DownloadCarrierConfig(trustedClientID, sessionID, filename 
 
 // MARK: Web-Proxy
 // GetWebProxyCACertificates gets authorizer's web proxy CA certificates.
-func (c *Authorizer) GetWebProxyCACertificates(opts ...filters.Option) ([]CA, error) {
-	certificates := []CA{}
+// Note, the v1 endpoint doesn't return the count as part of the response body,
+// this will change with v2. Until then, we will handle it internally within the SDK.
+func (c *Authorizer) GetWebProxyCACertificates(opts ...filters.Option) (*response.ResultSet[CA], error) {
+	cs := []CA{}
 	params := url.Values{}
 
 	for _, opt := range opts {
@@ -331,7 +316,14 @@ func (c *Authorizer) GetWebProxyCACertificates(opts ...filters.Option) ([]CA, er
 	_, err := c.api.
 		URL("/authorizer/api/v1/icap/cas").
 		Query(params).
-		Get(&certificates)
+		Get(&cs)
+
+	// v1 endpoint does not return count,
+	// return count internally in sdk until v2 is introduced
+	certificates := &response.ResultSet[CA]{
+		Count: len(cs),
+		Items: cs,
+	}
 
 	return certificates, err
 }
@@ -354,28 +346,6 @@ func (c *Authorizer) DownloadWebProxyCertificateCRL(filename, id string) error {
 		Download(filename)
 
 	return err
-}
-
-// EnrollWebProxyCertificate enroll certificate from web proxy CA.
-func (c *Authorizer) EnrollWebProxyCertificate(request *CertificateEnroll) (*CertificateEnrollResponse, error) {
-	enroll := &CertificateEnrollResponse{}
-
-	_, err := c.api.
-		URL("/authorizer/api/v1/icap/enroll").
-		Post(&request, &enroll)
-
-	return enroll, err
-}
-
-// RevokeWebProxyCertificate revoke certificate.
-func (c *Authorizer) RevokeWebProxyCertificate(request *CertificateRevocation) (*CertificateRevocationResponse, error) {
-	revoke := &CertificateRevocationResponse{}
-
-	_, err := c.api.
-		URL("/authorizer/api/v1/icap/revoke").
-		Post(&request, &revoke)
-
-	return revoke, err
 }
 
 // GetWebProxyConfigSessions get web proxy config session ids.
@@ -576,8 +546,8 @@ func (c *Authorizer) GetCert(certID string) (*ApiCertificate, error) {
 
 // MARK: Secrets
 // GetAccountSecrets get all account secrets.
-func (c *Authorizer) GetAccountSecrets(opts ...filters.Option) (*response.ResultSet[AccountSecret], error) {
-	secrets := &response.ResultSet[AccountSecret]{}
+func (c *Authorizer) GetAccountSecrets(opts ...filters.Option) (*response.ResultSet[HostAccountSecret], error) {
+	secrets := &response.ResultSet[HostAccountSecret]{}
 	params := url.Values{}
 
 	for _, opt := range opts {
@@ -593,8 +563,8 @@ func (c *Authorizer) GetAccountSecrets(opts ...filters.Option) (*response.Result
 }
 
 // SearchAccountSecrets search for account secrets.
-func (c *Authorizer) SearchAccountSecrets(search *AccountSecretSearch, opts ...filters.Option) (*response.ResultSet[AccountSecret], error) {
-	secrets := &response.ResultSet[AccountSecret]{}
+func (c *Authorizer) SearchAccountSecrets(search *AccountSecretSearch, opts ...filters.Option) (*response.ResultSet[HostAccountSecret], error) {
+	secrets := &response.ResultSet[HostAccountSecret]{}
 	params := url.Values{}
 
 	for _, opt := range opts {

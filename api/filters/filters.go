@@ -61,6 +61,11 @@ func Filter(filter string) Option {
 	return func(v *url.Values) { v.Set("filter", filter) }
 }
 
+// FuzzyCount sets the fuzzy count for url values.
+func FuzzyCount(fuzzycount bool) Option {
+	return func(v *url.Values) { v.Set("fuzzycount", strconv.FormatBool(fuzzycount)) }
+}
+
 // SetCustomParams set custom key-value parameter pairs freely.
 func SetCustomParams(key, value string) Option {
 	return func(v *url.Values) { v.Set(key, value) }
