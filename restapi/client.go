@@ -141,6 +141,16 @@ func (curl *tCURL) Query(data interface{}) CURL {
 }
 
 func (curl *tCURL) encodeURL(query interface{}) (url.Values, error) {
+	// If interface is of type url.Values, return it. Values have
+	// processed already in the new filters package.
+	urlValues, ok := query.(url.Values)
+	if ok {
+		return urlValues, nil
+	}
+
+	// TODO: remove the json marshal and unmarshal operation.
+	// Those operations still remain inside encodeURL as some packages
+	// still rely on it e.g. "oauth" package.
 	bin, err := json.Marshal(query)
 	if err != nil {
 		return nil, err
