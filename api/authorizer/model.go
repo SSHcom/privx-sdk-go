@@ -294,6 +294,7 @@ type Secrets struct {
 	Created time.Time `json:"created"`
 }
 
+// ComponentCaConfig component ca config response definition.
 type ComponentCaConfig struct {
 	Name        string    `json:"name"`
 	CAID        string    `json:"ca_id"`
