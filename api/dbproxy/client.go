@@ -7,37 +7,38 @@
 package dbproxy
 
 import (
-	"github.com/SSHcom/privx-sdk-go/common"
+	"github.com/SSHcom/privx-sdk-go/api/response"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-// DbProxy is a db proxy instance.
+// DbProxy is a db proxy client instance.
 type DbProxy struct {
 	api restapi.Connector
 }
 
-// New creates a new db proxy client instance, using the
-// argument SDK API client.
+// New db proxy client constructor.
 func New(api restapi.Connector) *DbProxy {
 	return &DbProxy{api: api}
 }
 
-// DbProxyStatus get microservice status
-func (store *DbProxy) DbProxyStatus() (*common.ServiceStatus, error) {
-	status := &common.ServiceStatus{}
+// MARK: Status
+// Status get db proxy microservice status.
+func (c *DbProxy) Status() (*response.ServiceStatus, error) {
+	status := &response.ServiceStatus{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/db-proxy/api/v1/status").
 		Get(status)
 
 	return status, err
 }
 
-// DbProxyConf get db proxy configuration
-func (store *DbProxy) DbProxyConf() (*DBProxyConf, error) {
-	config := &DBProxyConf{}
+// MARK: Config
+// GetDbProxyConfig get db proxy configuration.
+func (c *DbProxy) GetDbProxyConfig() (*DBProxyAPIConf, error) {
+	config := &DBProxyAPIConf{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/db-proxy/api/v1/conf").
 		Get(config)
 
