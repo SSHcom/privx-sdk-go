@@ -7,34 +7,42 @@
 package vault
 
 import (
-	"encoding/json"
+	"time"
 
 	"github.com/SSHcom/privx-sdk-go/api/rolestore"
 )
 
-// Params struct for pagination queries.
-type Params struct {
-	Offset  int    `json:"offset,omitempty"`
-	Limit   int    `json:"limit,omitempty"`
-	Sortkey string `json:"sortkey,omitempty"`
-	Sortdir string `json:"sortdir,omitempty"`
-}
-
-// Secret contains PrivX metadata about secret and its vault
+// Secret secret definition.
 type Secret struct {
-	ID         string              `json:"name"`
-	Author     string              `json:"author,omitempty"`
-	Editor     string              `json:"updated_by,omitempty"`
-	Created    string              `json:"created,omitempty"`
-	Updated    string              `json:"updated,omitempty"`
-	AllowRead  []rolestore.RoleRef `json:"read_roles,omitempty"`
-	AllowWrite []rolestore.RoleRef `json:"write_roles,omitempty"`
-	Data       json.RawMessage     `json:"data,omitempty"`
+	SecretRequest
+	Created   time.Time `json:"created"`
+	Updated   time.Time `json:"updated"`
+	UpdatedBy string    `json:"updated_by"`
+	Author    string    `json:"author"`
+	Path      string    `json:"path"`
 }
 
-// Search criteria for secrets
-type SecretSearchRequest struct {
+// SecretRequest secret request definition.
+type SecretRequest struct {
+	Name       string                  `json:"name"`
+	ReadRoles  []rolestore.RoleHandle  `json:"read_roles"`
+	WriteRoles []rolestore.RoleHandle  `json:"write_roles"`
+	Data       *map[string]interface{} `json:"data,omitempty"`
+	OwnerID    string                  `json:"owner_id,omitempty"`
+}
+
+// SecretCreate secret create create response definition.
+type SecretCreate struct {
+	Name string `json:"name"`
+}
+
+// SecretSearch secret search request definition.
+type SecretSearch struct {
 	Keywords string   `json:"keywords"`
+	SortDir  string   `json:"sortdir"`
+	SortKey  string   `json:"sortkey"`
 	Filter   string   `json:"filter"`
 	OwnerIDs []string `json:"owner_id"`
+	Limit    int      `json:"limit"`
+	Offset   int      `json:"offset"`
 }
