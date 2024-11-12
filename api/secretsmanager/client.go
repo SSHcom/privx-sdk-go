@@ -3,25 +3,27 @@ package secretsmanager
 import (
 	"net/url"
 
-	"github.com/SSHcom/privx-sdk-go/common"
+	"github.com/SSHcom/privx-sdk-go/api/filters"
+	"github.com/SSHcom/privx-sdk-go/api/response"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-// Client is a secrets-manager client instance.
-type Client struct {
+// SecretsManager is a secrets-manager client instance.
+type SecretsManager struct {
 	api restapi.Connector
 }
 
-// New creates a new secrets-manager client instance
-func New(api restapi.Connector) *Client {
-	return &Client{api: api}
+// New secrets manager client constructor.
+func New(api restapi.Connector) *SecretsManager {
+	return &SecretsManager{api: api}
 }
 
-// SecretsManagerStatus get microservice status
-func (s *Client) SecretsManagerStatus() (*common.ServiceStatus, error) {
-	status := &common.ServiceStatus{}
+// MARK: STATUS
+// Status get secrets manager microservice status.
+func (c *SecretsManager) Status() (*response.ServiceStatus, error) {
+	status := &response.ServiceStatus{}
 
-	_, err := s.api.
+	_, err := c.api.
 		URL("/secrets-manager/api/v1/status").
 		Get(status)
 
@@ -29,426 +31,436 @@ func (s *Client) SecretsManagerStatus() (*common.ServiceStatus, error) {
 }
 
 // MARK: Password Policies
-// PasswordPolicies lists all password policies
-func (s *Client) PasswordPolicies() (PwPolicyResult, error) {
-	result := PwPolicyResult{}
+// GetPasswordPolicies get password policies.
+func (c *SecretsManager) GetPasswordPolicies() (*response.ResultSet[PasswordPolicy], error) {
+	policies := &response.ResultSet[PasswordPolicy]{}
 
-	_, err := s.api.
+	_, err := c.api.
 		URL("/secrets-manager/api/v1/password-policies").
-		Get(&result)
+		Get(&policies)
 
-	return result, err
+	return policies, err
 }
 
-// CreatePasswordPolicy create a password policy
-func (s *Client) CreatePasswordPolicy(p PasswordPolicy) (string, error) {
-	var object struct {
-		ID string `json:"id"`
-	}
+// CreatePasswordPolicy create password policy.
+func (c *SecretsManager) CreatePasswordPolicy(policy *PasswordPolicy) (response.Identifier, error) {
+	identifier := response.Identifier{}
 
-	_, err := s.api.
+	_, err := c.api.
 		URL("/secrets-manager/api/v1/password-policy").
-		Post(&p, &object)
+		Post(&policy, &identifier)
 
-	return object.ID, err
+	return identifier, err
 }
 
-// PasswordPolicy get password policy by id
-func (s *Client) PasswordPolicy(policyId string) (*PasswordPolicy, error) {
-	p := &PasswordPolicy{}
+// GetPasswordPolicy get password policy by id.
+func (c *SecretsManager) GetPasswordPolicy(policyID string) (*PasswordPolicy, error) {
+	policy := &PasswordPolicy{}
 
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/password-policy/%s", url.PathEscape(policyId)).
-		Get(&p)
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/password-policy/%s", policyID).
+		Get(&policy)
 
-	return p, err
+	return policy, err
 }
 
-// UpdatePasswordPolicy update existing password policy
-func (s *Client) UpdatePasswordPolicy(policyId string, p PasswordPolicy) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/password-policy/%s", url.PathEscape(policyId)).
-		Put(p)
+// UpdatePasswordPolicy update password policy.
+func (c *SecretsManager) UpdatePasswordPolicy(policyID string, policy *PasswordPolicy) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/password-policy/%s", policyID).
+		Put(&policy)
 
 	return err
 }
 
-// DeletePasswordPolicy delete a password policy
-func (s *Client) DeletePasswordPolicy(policyId string) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/password-policy/%s", url.PathEscape(policyId)).
+// DeletePasswordPolicy delete password policy.
+func (c *SecretsManager) DeletePasswordPolicy(policyID string) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/password-policy/%s", policyID).
 		Delete()
 
 	return err
 }
 
-// MARK: Manage passwords
-// RotatePassword initiate password rotation
-func (s *Client) RotatePassword(hostId, account string) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/rotate/%s/%s", url.PathEscape(hostId), url.PathEscape(account)).
+// MARK: Manage Passwords
+// RotatePassword initiate password rotation.
+func (c *SecretsManager) RotatePassword(hostID, account string) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/rotate/%s/%s", hostID, account).
 		Post(nil)
 
 	return err
 }
 
-// MARK: Manage rotation scripts
-// ScriptTemplates lists all script templates
-func (s *Client) ScriptTemplates() (ScriptTemplateResult, error) {
-	result := ScriptTemplateResult{}
+// MARK: Manage Rotation Scripts
+// GetScriptTemplates get script templates.
+func (c *SecretsManager) GetScriptTemplates() (*response.ResultSet[ScriptTemplate], error) {
+	templates := &response.ResultSet[ScriptTemplate]{}
 
-	_, err := s.api.
+	_, err := c.api.
 		URL("/secrets-manager/api/v1/script-templates").
-		Get(&result)
+		Get(&templates)
 
-	return result, err
+	return templates, err
 }
 
-// CreateScriptTemplate create a script template
-func (s *Client) CreateScriptTemplate(t ScriptTemplate) (string, error) {
-	var object struct {
-		ID string `json:"id"`
-	}
+// CreateScriptTemplate create script template.
+func (c *SecretsManager) CreateScriptTemplate(template *ScriptTemplate) (response.Identifier, error) {
+	identifier := response.Identifier{}
 
-	_, err := s.api.
+	_, err := c.api.
 		URL("/secrets-manager/api/v1/script-template").
-		Post(&t, &object)
+		Post(&template, &identifier)
 
-	return object.ID, err
+	return identifier, err
 }
 
-// ScriptTemplate get script template by id
-func (s *Client) ScriptTemplate(templateId string) (*ScriptTemplate, error) {
+// GetScriptTemplate get script template by id.
+func (c *SecretsManager) GetScriptTemplate(templateID string) (*ScriptTemplate, error) {
 	p := &ScriptTemplate{}
 
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/script-template/%s", url.PathEscape(templateId)).
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/script-template/%s", templateID).
 		Get(&p)
 
 	return p, err
 }
 
-// UpdateScriptTemplate update existing script template
-func (s *Client) UpdateScriptTemplate(templateId string, t ScriptTemplate) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/script-template/%s", url.PathEscape(templateId)).
-		Put(t)
+// UpdateScriptTemplate update script template.
+func (c *SecretsManager) UpdateScriptTemplate(templateID string, template *ScriptTemplate) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/script-template/%s", templateID).
+		Put(&template)
 
 	return err
 }
 
-// DeleteScriptTemplate delete a script template
-func (s *Client) DeleteScriptTemplate(templateId string) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/password-policy/%s", url.PathEscape(templateId)).
+// DeleteScriptTemplate delete script template.
+func (c *SecretsManager) DeleteScriptTemplate(templateID string) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/password-policy/%s", templateID).
 		Delete()
 
 	return err
 }
 
-// CompileScript compile script with test data
-func (s *Client) CompileScript(r CompileScriptRequest) (string, error) {
-	var object struct {
-		Script string `json:"script"`
-	}
+// CompileScript compile script with test data.
+func (c *SecretsManager) CompileScript(compile CompileScript) (CompileScriptResponse, error) {
+	compiled := CompileScriptResponse{}
 
-	_, err := s.api.
+	_, err := c.api.
 		URL("/secrets-manager/api/v1/script-template/compile").
-		Post(&r, &object)
+		Post(&compile, &compiled)
 
-	return object.Script, err
+	return compiled, err
 }
 
-// MARK: Target domains
-// TargetDomains lists all target domains
-func (s *Client) TargetDomains(offset, limit int, sortkey, sortdir string) (TdResult, error) {
-	result := TdResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
+// MARK: Manage Secrets
+// GetHostSecretMetadata get host secret metadata for all accounts.
+func (c *SecretsManager) GetHostSecretMetadata(hostID string) (*PostHostSecret, error) {
+	secret := &PostHostSecret{}
+
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/host-secret/%s", hostID).
+		Get(&secret)
+
+	return secret, err
+}
+
+// CreateHostSecret create host secret.
+func (c *SecretsManager) CreateHostSecret(hostID string, secret *PostHostSecret) (*PostHostSecret, error) {
+	hostSecret := &PostHostSecret{}
+
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/host-secret/%s", hostID).
+		Post(&secret, &hostSecret)
+
+	return hostSecret, err
+}
+
+// DeleteHostSecret delete host secret.
+func (c *SecretsManager) DeleteHostSecret(hostID string) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/host-secret/%s", hostID).
+		Delete()
+
+	return err
+}
+
+// MARK: Target Domains
+// GetTargetDomains get target domains.
+func (c *SecretsManager) GetTargetDomains(opts ...filters.Option) (*response.ResultSet[TargetDomain], error) {
+	tds := &response.ResultSet[TargetDomain]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := s.api.
+	_, err := c.api.
 		URL("/secrets-manager/api/v1/targetdomains").
-		Query(&filters).
-		Get(&result)
+		Query(params).
+		Get(&tds)
 
-	return result, err
+	return tds, err
 }
 
-// CreateTargetDomain create a target domain
-func (s *Client) CreateTargetDomain(td TargetDomain) (string, error) {
-	var object struct {
-		ID string `json:"id"`
-	}
+// CreateTargetDomain create target domain.
+func (c *SecretsManager) CreateTargetDomain(td *TargetDomain) (response.Identifier, error) {
+	identifier := response.Identifier{}
 
-	_, err := s.api.
+	_, err := c.api.
 		URL("/secrets-manager/api/v1/targetdomains").
-		Post(&td, &object)
+		Post(&td, &identifier)
 
-	return object.ID, err
+	return identifier, err
 }
 
-// SearchTargetDomain search for existing target domain
-func (s *Client) SearchTargetDomain(sortkey, sortdir string, offset, limit int, searchObject TargetDomainsSearch) (TdResult, error) {
-	result := TdResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
+// SearchTargetDomain search target domains.
+func (c *SecretsManager) SearchTargetDomain(search TargetDomainsSearch, opts ...filters.Option) (*response.ResultSet[TargetDomain], error) {
+	tds := &response.ResultSet[TargetDomain]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := s.api.
+	_, err := c.api.
 		URL("/secrets-manager/api/v1/targetdomains/search").
-		Query(&filters).
-		Post(&searchObject, &result)
+		Query(params).
+		Post(&search, &tds)
 
-	return result, err
+	return tds, err
 }
 
-// TargetDomain get target domain by id
-func (s *Client) TargetDomain(tdId string) (*TargetDomain, error) {
+// GetTargetDomain get target domain by id.
+func (c *SecretsManager) GetTargetDomain(tdID string) (*TargetDomain, error) {
 	td := &TargetDomain{}
 
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s", url.PathEscape(tdId)).
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s", tdID).
 		Get(&td)
 
 	return td, err
 }
 
-// UpdateTargetDomain update existing target domain
-func (s *Client) UpdateTargetDomain(tdId string, td TargetDomain) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s", url.PathEscape(tdId)).
-		Put(td)
+// UpdateTargetDomain update target domain.
+func (c *SecretsManager) UpdateTargetDomain(tdID string, td *TargetDomain) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s", tdID).
+		Put(&td)
 
 	return err
 }
 
-// DeleteTargetDomain delete a target domain
-func (s *Client) DeleteTargetDomain(tdId string) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s", url.PathEscape(tdId)).
+// DeleteTargetDomain delete target domain.
+func (c *SecretsManager) DeleteTargetDomain(tdID string) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s", tdID).
 		Delete()
 
 	return err
 }
 
-// RefreshTargetDomain trigger target domain account scan
-func (s *Client) RefreshTargetDomain(tdId string) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/refresh", url.PathEscape(tdId)).
+// RefreshTargetDomain trigger target domain account scan.
+func (c *SecretsManager) RefreshTargetDomain(tdID string) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/refresh", tdID).
 		Post(nil)
 
 	return err
 }
 
 // MARK: Target domain accounts
-// TargetDomainAccounts lists all accounts in target domain
-func (s *Client) TargetDomainAccounts(offset, limit int, sortkey, sortdir, tdId string) (ScannedAccountResult, error) {
-	result := ScannedAccountResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
+// GetTargetDomainAccounts get accounts in target domain.
+func (c *SecretsManager) GetTargetDomainAccounts(tdID string, opts ...filters.Option) (*response.ResultSet[ScannedAccount], error) {
+	accounts := &response.ResultSet[ScannedAccount]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/accounts", url.PathEscape(tdId)).
-		Query(&filters).
-		Get(&result)
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/accounts", tdID).
+		Query(params).
+		Get(&accounts)
 
-	return result, err
+	return accounts, err
 }
 
-// SearchTargetDomainAccounts search accounts in target domain
-func (s *Client) SearchTargetDomainAccounts(sortkey, sortdir, tdId string, offset, limit int, searchObject ScannedAccountsSearch) (ScannedAccountResult, error) {
-	result := ScannedAccountResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
+// SearchTargetDomainAccounts search accounts in target domain.
+func (c *SecretsManager) SearchTargetDomainAccounts(tdID string, search ScannedAccountsSearch, opts ...filters.Option) (*response.ResultSet[ScannedAccount], error) {
+	accounts := &response.ResultSet[ScannedAccount]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/accounts/search", url.PathEscape(tdId)).
-		Query(&filters).
-		Post(&searchObject, &result)
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/accounts/search", tdID).
+		Query(params).
+		Post(&search, &accounts)
 
-	return result, err
+	return accounts, err
 }
 
-// TargetDomainAccount get target domain account
-func (s *Client) TargetDomainAccount(tdId, accountId string) (ScannedAccount, error) {
-	account := ScannedAccount{}
+// GetTargetDomainAccount get target domain account by id.
+func (c *SecretsManager) GetTargetDomainAccount(tdID, accountID string) (*ScannedAccount, error) {
+	account := &ScannedAccount{}
 
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/accounts/%s", url.PathEscape(tdId), url.PathEscape(accountId)).
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/accounts/%s", tdID, accountID).
 		Get(&account)
 
 	return account, err
 }
 
-// UpdateTargetDomainAccount update target domain account
-func (s *Client) UpdateTargetDomainAccount(tdId, accountId string, change ScannedAccountChangeSet) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/accounts/%s", url.PathEscape(tdId), url.PathEscape(accountId)).
-		Put(change)
+// UpdateTargetDomainAccount update target domain account.
+func (c *SecretsManager) UpdateTargetDomainAccount(tdID, accountID string, change ScannedAccountChangeSet) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/accounts/%s", tdID, accountID).
+		Put(&change)
 
 	return err
 }
 
-// BatchUpdateTargetDomain update target domain in batch
-func (s *Client) BatchUpdateTargetDomain(tdId string, change ScannedAccountEditBatch) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/accounts/batch/edit", url.PathEscape(tdId)).
-		Post(change)
+// BatchUpdateTargetDomain update target domain in batch.
+func (c *SecretsManager) BatchUpdateTargetDomain(tdID string, edit ScannedAccountEditBatch) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/accounts/batch/edit", tdID).
+		Post(edit)
 
 	return err
 }
 
 // MARK: Managed accounts
-// ManagedAccounts lists all managed accounts in a target domain
-func (s *Client) ManagedAccounts(offset, limit int, sortkey, sortdir, tdId string) (ManagedAccountResult, error) {
-	result := ManagedAccountResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
+// GetManagedAccounts get managed accounts in a target domain.
+func (c *SecretsManager) GetManagedAccounts(tdID string, opts ...filters.Option) (*response.ResultSet[ManagedAccount], error) {
+	accounts := &response.ResultSet[ManagedAccount]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts", url.PathEscape(tdId)).
-		Query(&filters).
-		Get(&result)
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts", tdID).
+		Query(params).
+		Get(&accounts)
 
-	return result, err
+	return accounts, err
 }
 
-// CreateManagedAccount create a managed account
-func (s *Client) CreateManagedAccount(tdId string, ma ManagedAccount) (string, error) {
-	var object struct {
-		ID string `json:"id"`
+// CreateManagedAccount create a managed account.
+func (c *SecretsManager) CreateManagedAccount(tdID string, account *ManagedAccount) (response.Identifier, error) {
+	identifier := response.Identifier{}
+
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts", tdID).
+		Post(&account, &identifier)
+
+	return identifier, err
+}
+
+// SearchManagedAccounts search managed accounts in a target domain.
+func (c *SecretsManager) SearchManagedAccounts(tdID string, search ManagedAccountsSearch, opts ...filters.Option) (*response.ResultSet[ManagedAccount], error) {
+	accounts := &response.ResultSet[ManagedAccount]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts", url.PathEscape(tdId)).
-		Post(&ma, &object)
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/search", tdID).
+		Query(params).
+		Post(&search, &accounts)
 
-	return object.ID, err
+	return accounts, err
 }
 
-// SearchManagedAccounts search managed accounts in a target domain
-func (s *Client) SearchManagedAccounts(sortkey, sortdir, tdId string, offset, limit int, searchObject ManagedAccountsSearch) (ManagedAccountResult, error) {
-	result := ManagedAccountResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
-	}
+// GetManagedAccount get managed account in target domain by id.
+func (c *SecretsManager) GetManagedAccount(tdID, maID string) (*ManagedAccount, error) {
+	account := &ManagedAccount{}
 
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/search", url.PathEscape(tdId)).
-		Query(&filters).
-		Post(&searchObject, &result)
-
-	return result, err
-}
-
-// ManagedAccount get managed account
-func (s *Client) ManagedAccount(tdId, maId string) (ManagedAccount, error) {
-	account := ManagedAccount{}
-
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/%s", url.PathEscape(tdId), url.PathEscape(maId)).
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/%s", tdID, maID).
 		Get(&account)
 
 	return account, err
 }
 
-// UpdateTargetManagedAccount update managed account
-func (s *Client) UpdateTargetManagedAccount(tdId, maId string, change ManagedAccount) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/%s", url.PathEscape(tdId), url.PathEscape(maId)).
-		Put(change)
+// UpdateTargetManagedAccount update managed account.
+func (c *SecretsManager) UpdateTargetManagedAccount(tdID, maID string, account *ManagedAccount) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/%s", tdID, maID).
+		Put(&account)
 
 	return err
 }
 
-// DeleteManagedAccount delete managed account
-func (s *Client) DeleteManagedAccount(tdId, maId string) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/%s", url.PathEscape(tdId), url.PathEscape(maId)).
+// DeleteManagedAccount delete managed account.
+func (c *SecretsManager) DeleteManagedAccount(tdID, maID string) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/%s", tdID, maID).
 		Delete()
 
 	return err
 }
 
-// RotateManagedAccountPassword trigger managed account password rotation
-func (s *Client) RotateManagedAccountPassword(tdId, maId string) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/%s/rotate", url.PathEscape(tdId), url.PathEscape(maId)).
+// RotateManagedAccountPassword trigger managed account password rotation.
+func (c *SecretsManager) RotateManagedAccountPassword(tdID, maID string) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/%s/rotate", tdID, maID).
 		Post(nil)
 
 	return err
 }
 
-// ManagedAccountPassword provide password for managed account
-func (s *Client) ManagedAccountPassword(tdId, maId, password string) error {
-	pwReq := ManagedAccountPasswordRequest{
-		Password: password,
-	}
-
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/%s/password", url.PathEscape(tdId), url.PathEscape(maId)).
-		Post(pwReq)
+// SetManagedAccountPassword set password for managed account.
+func (c *SecretsManager) SetManagedAccountPassword(tdID, maID, password ManagedAccountPasswordSet) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/%s/password", tdID, maID).
+		Post(&password)
 
 	return err
 }
 
-// BatchCreateManagedAccount create a batch of managed accounts
-func (s *Client) BatchCreateManagedAccount(tdId string, ma ManagedAccountCreateBatch) ([]string, error) {
-	var object struct {
-		IDs []string `json:"ids"`
-	}
+// BatchCreateManagedAccount create a batch of managed accounts.
+func (c *SecretsManager) BatchCreateManagedAccount(tdID string, create ManagedAccountCreateBatch) (IDList, error) {
+	ids := IDList{}
 
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/batch/create", url.PathEscape(tdId)).
-		Post(&ma, &object)
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/batch/create", tdID).
+		Post(&create, &ids)
 
-	return object.IDs, err
+	return ids, err
 }
 
-// BatchUpdateManagedAccount update a batch of managed accounts
-func (s *Client) BatchUpdateManagedAccount(tdId string, change ManagedAccountChangeSet) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/batch/edit", url.PathEscape(tdId)).
+// BatchUpdateManagedAccount update a batch of managed accounts.
+func (c *SecretsManager) BatchUpdateManagedAccount(tdID string, change *ManagedAccountEditBatch) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/batch/edit", tdID).
 		Post(&change)
 
 	return err
 }
 
-// BatchDeleteManagedAccount delete a batch of managed accounts
-func (s *Client) BatchDeleteManagedAccount(tdId string, delete ManagedAccountBatch) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/batch/delete", url.PathEscape(tdId)).
+// BatchDeleteManagedAccount delete a batch of managed accounts.
+func (c *SecretsManager) BatchDeleteManagedAccount(tdID string, delete ManagedAccountDeleteBatch) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/batch/delete", tdID).
 		Post(&delete)
 
 	return err
 }
 
-// BatchRotateManagedAccount rotate a batch of managed accounts
-func (s *Client) BatchRotateManagedAccount(tdId string, rotate ManagedAccountBatch) error {
-	_, err := s.api.
-		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/batch/rotate", url.PathEscape(tdId)).
+// BatchRotateManagedAccount rotate a batch of managed accounts.
+func (c *SecretsManager) BatchRotateManagedAccount(tdID string, rotate ManagedAccountRotateBatch) error {
+	_, err := c.api.
+		URL("/secrets-manager/api/v1/targetdomains/%s/managedaccounts/batch/rotate", tdID).
 		Post(&rotate)
 
 	return err
