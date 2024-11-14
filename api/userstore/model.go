@@ -73,8 +73,8 @@ type APIClientSearch struct {
 	Keywords string `json:"keywords"`
 	SortDir  string `json:"sortdir"`
 	SortKey  string `json:"sortkey"`
-	Limit    *int   `json:"limit"`
-	Offset   *int   `json:"offset"`
+	Limit    *int   `json:"limit,omitempty"`
+	Offset   *int   `json:"offset,omitempty"`
 }
 
 // LocalUser local user definition.

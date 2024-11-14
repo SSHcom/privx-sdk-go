@@ -2,22 +2,22 @@ package secretsmanager
 
 import "time"
 
-// PostHostSecret host secret metadata definition.
-type PostHostSecret struct {
-	Metadata HostSecret      `json:"metadata" validate:"required"`
-	Accounts []AccountSecret `json:"accounts" validate:"required"`
+// HostSecretMetadata host secret metadata definition.
+type HostSecretMetadata struct {
+	Metadata HostSecret      `json:"metadata"`
+	Accounts []AccountSecret `json:"accounts"`
 }
 
 // AccountSecret account secret definition.
 type AccountSecret struct {
 	Account           string     `json:"account"`
 	HostID            string     `json:"host_id"`
-	RotationInitiated *time.Time `json:"rotation_initiated"`
-	LastRotated       *time.Time `json:"last_rotated"`
-	LastError         *time.Time `json:"last_error"`
+	RotationInitiated *time.Time `json:"rotation_initiate,omitempty"`
+	LastRotated       *time.Time `json:"last_rotated,omitempty"`
+	LastError         *time.Time `json:"last_error,omitempty"`
 	LastErrorDetails  string     `json:"last_error_details"`
 	InitialPassword   string     `json:"initial_password,omitempty"`
-	Created           *time.Time `json:"created"`
+	Created           *time.Time `json:"created,omitempty"`
 	CreatedBy         string     `json:"created_by"`
 }
 
@@ -35,9 +35,9 @@ type HostSecret struct {
 	MainAccount                      string     `json:"main_account"`
 	PolicyID                         string     `json:"policy_id"`
 	ScriptTemplateID                 string     `json:"script_template_id"`
-	Created                          *time.Time `json:"created"`
+	Created                          *time.Time `json:"created,omitempty"`
 	CreatedBy                        string     `json:"created_by"`
-	Updated                          *time.Time `json:"updated"`
+	Updated                          *time.Time `json:"updated,omitempty"`
 	UpdatedBy                        string     `json:"updated_by"`
 }
 
@@ -59,9 +59,9 @@ type PasswordPolicy struct {
 	MaxCheckoutDuration    string     `json:"max_checkout_duration"`
 	RotateOnRelease        bool       `json:"rotate_on_release"`
 	VerifyAfterRotation    bool       `json:"verify_after_rotation"`
-	Created                *time.Time `json:"created"`
+	Created                *time.Time `json:"created,omitempty"`
 	CreatedBy              string     `json:"created_by"`
-	Updated                *time.Time `json:"updated"`
+	Updated                *time.Time `json:"updated,omitempty"`
 	UpdatedBy              string     `json:"updated_by"`
 }
 
@@ -71,9 +71,9 @@ type ScriptTemplate struct {
 	Name            string     `json:"name"`
 	OperatingSystem string     `json:"operating_system"`
 	Script          string     `json:"script"`
-	Created         *time.Time `json:"created"`
+	Created         *time.Time `json:"created,omitempty"`
 	CreatedBy       string     `json:"created_by"`
-	Updated         *time.Time `json:"updated"`
+	Updated         *time.Time `json:"updated,omitempty"`
 	UpdatedBy       string     `json:"updated_by"`
 }
 
@@ -305,10 +305,10 @@ type ManagedAccountEditBatch struct {
 
 // ManagedAccountChangeSet manage account change set request definition.
 type ManagedAccountChangeSet struct {
-	Enabled            *bool                 `json:"enabled"`
-	RotationEnabled    *bool                 `json:"rotation_enabled"`
-	ExplicitCheckout   *bool                 `json:"explicit_checkout"`
-	DisableRDPCertAuth *bool                 `json:"disable_rdp_cert_auth"`
+	Enabled            *bool                 `json:"enabled,omitempty"`
+	RotationEnabled    *bool                 `json:"rotation_enabled,omitempty"`
+	ExplicitCheckout   *bool                 `json:"explicit_checkout,omitempty"`
+	DisableRDPCertAuth *bool                 `json:"disable_rdp_cert_auth,omitempty"`
 	PasswordPolicy     *PasswordPolicyHandle `json:"password_policy,omitempty"`
 	Comment            *string               `json:"comment,omitempty"`
 }

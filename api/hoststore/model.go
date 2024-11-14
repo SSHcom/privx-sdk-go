@@ -127,14 +127,14 @@ type Principal struct {
 // Host defines PrivX target
 type Host struct {
 	ID                      string                   `json:"id"`
-	Deployable              *bool                    `json:"deployable"`
-	Tofu                    *bool                    `json:"tofu"`
+	Deployable              *bool                    `json:"deployable,omitempty"`
+	Tofu                    *bool                    `json:"tofu,omitempty"`
 	StandAloneHost          bool                     `json:"stand_alone_host"`
 	ExternalID              string                   `json:"external_id"`
 	InstanceID              string                   `json:"instance_id"`
 	SSHHostPubKeys          []HostSSHPubKeys         `json:"ssh_host_public_keys"`
 	HostCertificateRaw      string                   `json:"host_certificate_raw"`
-	HostCertificate         *HostCertificateInfo     `json:"host_certificate"`
+	HostCertificate         *HostCertificateInfo     `json:"host_certificate,omitempty"`
 	ContactAddress          string                   `json:"contact_address"`
 	PasswordRotationEnabled bool                     `json:"password_rotation_enabled"`
 	Services                []HostService            `json:"services"`
@@ -158,11 +158,11 @@ type Host struct {
 	HostClassification      string                   `json:"host_classification"`
 	Comment                 string                   `json:"comment"`
 	Addresses               []string                 `json:"addresses"`
-	AuditEnabled            *bool                    `json:"audit_enabled"`
+	AuditEnabled            *bool                    `json:"audit_enabled,omitempty"`
 	Tags                    []string                 `json:"tags"`
 	UserMessage             string                   `json:"user_message"`
 	Disabled                string                   `json:"disabled"`
-	SessionRecordingOptions *SessionRecordingOptions `json:"session_recording_options"`
+	SessionRecordingOptions *SessionRecordingOptions `json:"session_recording_options,omitempty"`
 	Deleted                 bool                     `json:"deleted,omitempty"`
 }
 
@@ -191,8 +191,8 @@ type RotationMetadata struct {
 
 type RotationStatusItem struct {
 	Account          string     `json:"principal"`
-	LastRotated      *time.Time `json:"last_rotated"`
-	LastError        *time.Time `json:"last_error"`
+	LastRotated      *time.Time `json:"last_rotated,omitempty"`
+	LastError        *time.Time `json:"last_error,omitempty"`
 	LastErrorDetails string     `json:"last_error_details"`
 }
 

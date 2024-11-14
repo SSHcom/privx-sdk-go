@@ -270,8 +270,8 @@ func (c *ConnectionManager) CreateUebaAnomalySettings(settings UebaAnomalySettin
 	return err
 }
 
-// StartAnalyzing start analyzing connections with a saved dataset.
-func (c *ConnectionManager) StartAnalyzing(datasetID string) error {
+// StartUebaAnalyzing start ueba analyzing connections with a saved dataset.
+func (c *ConnectionManager) StartUebaAnalyzing(datasetID string) error {
 	_, err := c.api.
 		URL("/connection-manager/api/v1/ueba/start-analyzing/%s", datasetID).
 		Post(nil)
@@ -279,8 +279,8 @@ func (c *ConnectionManager) StartAnalyzing(datasetID string) error {
 	return err
 }
 
-// StopAnalyzing stop analyzing connection anomalies.
-func (c *ConnectionManager) StopAnalyzing() error {
+// StopUebaAnalyzing stop ueba analyzing connection anomalies.
+func (c *ConnectionManager) StopUebaAnalyzing() error {
 	_, err := c.api.
 		URL("/connection-manager/api/v1/ueba/stop-analyzing").
 		Post(nil)
@@ -357,8 +357,8 @@ func (c *ConnectionManager) TrainUebaDataset(datasetID string, opts ...filters.O
 	return count, err
 }
 
-// GetConnectionCounts get number of connections for dataset.
-func (c *ConnectionManager) GetConnectionCounts(timeRange TimeRange) (ConnectionCount, error) {
+// GetUebaConnectionCounts get number of connections for dataset.
+func (c *ConnectionManager) GetUebaConnectionCounts(timeRange TimeRange) (ConnectionCount, error) {
 	count := ConnectionCount{}
 
 	_, err := c.api.

@@ -134,10 +134,14 @@ func (c *HostStore) DeployHost(host *Host) (HostResponse, error) {
 }
 
 // UpdateDeployStatus update host to be deployable or undeployable.
-func (c *HostStore) UpdateDeployStatus(hostID string, deployable HostDeployable) error {
+func (c *HostStore) UpdateDeployStatus(hostID string, deployable bool) error {
+	d := HostDeployable{
+		Deployable: deployable,
+	}
+
 	_, err := c.api.
 		URL("/host-store/api/v1/hosts/%s/deployable", hostID).
-		Put(&deployable)
+		Put(&d)
 
 	return err
 }
@@ -160,10 +164,14 @@ func (c *HostStore) GetHostTags(opts ...filters.Option) (*response.ResultSet[str
 }
 
 // UpdateHostStatus enable/disable host.
-func (c *HostStore) UpdateHostStatus(hostID string, disabled HostDisabled) error {
+func (c *HostStore) UpdateHostStatus(hostID string, disabled bool) error {
+	d := HostDisabled{
+		Disabled: disabled,
+	}
+
 	_, err := c.api.
 		URL("/host-store/api/v1/hosts/%s/disabled", hostID).
-		Put(disabled)
+		Put(&d)
 
 	return err
 }
@@ -217,8 +225,8 @@ func (c *HostStore) GetWhitelist(whitelistID string) (*Whitelist, error) {
 	return whitelist, err
 }
 
-// UpdateWhitelist update whitelist
-func (c *HostStore) UpdateWhitelist(whitelist Whitelist, whitelistID string) error {
+// UpdateWhitelist update whitelist.
+func (c *HostStore) UpdateWhitelist(whitelistID string, whitelist Whitelist) error {
 	_, err := c.api.
 		URL("/host-store/api/v1/whitelists/%s", whitelistID).
 		Put(&whitelist)

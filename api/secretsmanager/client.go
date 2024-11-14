@@ -157,8 +157,8 @@ func (c *SecretsManager) CompileScript(compile CompileScript) (CompileScriptResp
 
 // MARK: Manage Secrets
 // GetHostSecretMetadata get host secret metadata for all accounts.
-func (c *SecretsManager) GetHostSecretMetadata(hostID string) (*PostHostSecret, error) {
-	secret := &PostHostSecret{}
+func (c *SecretsManager) GetHostSecretMetadata(hostID string) (*HostSecretMetadata, error) {
+	secret := &HostSecretMetadata{}
 
 	_, err := c.api.
 		URL("/secrets-manager/api/v1/host-secret/%s", hostID).
@@ -168,8 +168,8 @@ func (c *SecretsManager) GetHostSecretMetadata(hostID string) (*PostHostSecret, 
 }
 
 // CreateHostSecret create host secret.
-func (c *SecretsManager) CreateHostSecret(hostID string, secret *PostHostSecret) (*PostHostSecret, error) {
-	hostSecret := &PostHostSecret{}
+func (c *SecretsManager) CreateHostSecret(hostID string, secret *HostSecretMetadata) (*HostSecretMetadata, error) {
+	hostSecret := &HostSecretMetadata{}
 
 	_, err := c.api.
 		URL("/secrets-manager/api/v1/host-secret/%s", hostID).

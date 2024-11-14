@@ -146,10 +146,10 @@ type UebaAnomalySettings struct {
 // Dataset ueba dataset definition.
 type Dataset struct {
 	ID                         string               `json:"id"`
-	LastTraining               *time.Time           `json:"last_training"`
+	LastTraining               *time.Time           `json:"last_training,omitempty"`
 	IsActive                   bool                 `json:"is_active"`
 	UseForInferenceOnceTrained bool                 `json:"use_for_inference_once_trained"`
-	TimeRangeSettings          *TimeRange           `json:"time_range_settings"`
+	TimeRangeSettings          *TimeRange           `json:"time_range_settings,omitempty"`
 	TrainingResults            []UebaTrainingResult `json:"training_results"`
 	Created                    *time.Time           `json:"created,omitempty"`
 	CreatedBy                  string               `json:"created_by,omitempty"`

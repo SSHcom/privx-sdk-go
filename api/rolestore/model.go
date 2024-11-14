@@ -12,9 +12,19 @@ import (
 	"github.com/SSHcom/privx-sdk-go/api/auth"
 )
 
+const (
+	// Enumerated values for MFA actions.
+	MFAActionEnable  MFAAction = "enable"
+	MFAActionDisable MFAAction = "disable"
+	MFAActionReset   MFAAction = "reset"
+)
+
+// MFAAction definition for possible actions related to MFA.
+type MFAAction string
+
 // AWSRoleParams aws role query parameter definition.
 type AWSRoleParams struct {
-	Refresh string `url:"refresh,omitempty"`
+	Refresh bool `url:"refresh,omitempty"`
 }
 
 // AuthorizedKeyResolve authorized key resolve request definition.
@@ -227,7 +237,7 @@ type User struct {
 	Comment                string          `json:"comment,omitempty"`
 	Tags                   []string        `json:"tags,omitempty"`
 	Roles                  []Role          `json:"roles"`
-	Attributes             []Attributes    `json:"attributes"`
+	Attributes             []UserAttribute `json:"attributes"`
 	Permissions            []string        `json:"permissions"`
 	FirstName              string          `json:"first_name,omitempty"`
 	LastName               string          `json:"last_name,omitempty"`
@@ -280,8 +290,8 @@ type MFASeed struct {
 	Seed_qr_code string `json:"seed_qr_code,omitempty"`
 }
 
-// Attributes user attributes definition.
-type Attributes struct {
+// UserAttribute user attribute definition.
+type UserAttribute struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }

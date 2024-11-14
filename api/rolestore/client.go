@@ -137,8 +137,8 @@ func (c *RoleStore) DeleteAWSRole(awsRoleID string) error {
 }
 
 // GetLinkedRoles get AWS role granting PrivX roles.
-func (c *RoleStore) GetLinkedRoles(awsRoleID string) (*response.ResultSet[AWSRole], error) {
-	roles := &response.ResultSet[AWSRole]{}
+func (c *RoleStore) GetLinkedRoles(awsRoleID string) (*response.ResultSet[LinkedPrivXRole], error) {
+	roles := &response.ResultSet[LinkedPrivXRole]{}
 
 	_, err := c.api.
 		URL("/role-store/api/v1/awsroles/%s/roles", awsRoleID).
@@ -208,7 +208,7 @@ func (c *RoleStore) UpdateUserRoles(userID string, roles []Role) error {
 }
 
 // SetMFA enable, disable or reset mfa authentication.
-func (c *RoleStore) SetMFA(userIDs []string, action string) error {
+func (c *RoleStore) SetMFA(userIDs []string, action MFAAction) error {
 	_, err := c.api.
 		URL("/role-store/api/v1/users/mfa/%s", action).
 		Post(&userIDs)
@@ -216,8 +216,8 @@ func (c *RoleStore) SetMFA(userIDs []string, action string) error {
 	return err
 }
 
-// GetCurrentUserAndSettings get current user and user settings.
-func (c *RoleStore) GetCurrentUserAndSettings() (*json.RawMessage, error) {
+// GetCurrentUserInfo get current user and user settings.
+func (c *RoleStore) GetCurrentUserInfo() (*json.RawMessage, error) {
 	current := &json.RawMessage{}
 
 	_, err := c.api.
@@ -314,8 +314,8 @@ func (c *RoleStore) GetUsersAuthorizedKeys(userID string, opts ...filters.Option
 	return keys, err
 }
 
-// CreateAuthorizedKey create authorized key for user.
-func (c *RoleStore) CreateAuthorizedKey(userID string, key *AuthorizedKey) (response.Identifier, error) {
+// CreateUserAuthorizedKey create authorized key for user.
+func (c *RoleStore) CreateUserAuthorizedKey(userID string, key *AuthorizedKey) (response.Identifier, error) {
 	identifier := response.Identifier{}
 
 	_, err := c.api.
@@ -325,8 +325,8 @@ func (c *RoleStore) CreateAuthorizedKey(userID string, key *AuthorizedKey) (resp
 	return identifier, err
 }
 
-// GetUsersAuthorizedKey get users authorized key by id.
-func (c *RoleStore) GetUsersAuthorizedKey(userID, keyID string) (*AuthorizedKey, error) {
+// GetUserAuthorizedKey get user authorized key by id.
+func (c *RoleStore) GetUserAuthorizedKey(userID, keyID string) (*AuthorizedKey, error) {
 	key := &AuthorizedKey{}
 
 	_, err := c.api.
@@ -336,8 +336,8 @@ func (c *RoleStore) GetUsersAuthorizedKey(userID, keyID string) (*AuthorizedKey,
 	return key, err
 }
 
-// UpdateUsersAuthorizedKey update users authorized key.
-func (c *RoleStore) UpdateUsersAuthorizedKey(userID, keyID string, key *AuthorizedKey) error {
+// UpdateUserAuthorizedKey update user authorized key.
+func (c *RoleStore) UpdateUserAuthorizedKey(userID, keyID string, key *AuthorizedKey) error {
 	_, err := c.api.
 		URL("/role-store/api/v1/users/%s/authorizedkeys/%s", userID, keyID).
 		Put(&key)
@@ -345,8 +345,8 @@ func (c *RoleStore) UpdateUsersAuthorizedKey(userID, keyID string, key *Authoriz
 	return err
 }
 
-// DeleteUsersAuthorizedKey delete a users authorized key.
-func (c *RoleStore) DeleteUsersAuthorizedKey(userID, keyID string) error {
+// DeleteUserAuthorizedKey delete a user authorized key.
+func (c *RoleStore) DeleteUserAuthorizedKey(userID, keyID string) error {
 	_, err := c.api.
 		URL("/role-store/api/v1/users/%s/authorizedkeys/%s", userID, keyID).
 		Delete()
@@ -354,8 +354,8 @@ func (c *RoleStore) DeleteUsersAuthorizedKey(userID, keyID string) error {
 	return err
 }
 
-// GetCurrentUsersAuthorizedKeys get current users authorized keys.
-func (c *RoleStore) GetCurrentUsersAuthorizedKeys(opts ...filters.Option) (*response.ResultSet[AuthorizedKey], error) {
+// GetCurrentUserAuthorizedKeys get current user authorized keys.
+func (c *RoleStore) GetCurrentUserAuthorizedKeys(opts ...filters.Option) (*response.ResultSet[AuthorizedKey], error) {
 	keys := &response.ResultSet[AuthorizedKey]{}
 	params := url.Values{}
 
@@ -371,8 +371,8 @@ func (c *RoleStore) GetCurrentUsersAuthorizedKeys(opts ...filters.Option) (*resp
 	return keys, err
 }
 
-// CreateAuthorizedKeyCurrentUser create authorized key for current user.
-func (c *RoleStore) CreateAuthorizedKeyCurrentUser(key *AuthorizedKey) (response.Identifier, error) {
+// CreateCurrentUserAuthorizedKey create authorized key for current user.
+func (c *RoleStore) CreateCurrentUserAuthorizedKey(key *AuthorizedKey) (response.Identifier, error) {
 	identifier := response.Identifier{}
 
 	_, err := c.api.
@@ -382,8 +382,8 @@ func (c *RoleStore) CreateAuthorizedKeyCurrentUser(key *AuthorizedKey) (response
 	return identifier, err
 }
 
-// GetCurrentUsersAuthorizedKey get current users authorized key by id.
-func (c *RoleStore) GetCurrentUsersAuthorizedKey(keyID string) (*AuthorizedKey, error) {
+// GetCurrentUserAuthorizedKey get current user authorized key by id.
+func (c *RoleStore) GetCurrentUserAuthorizedKey(keyID string) (*AuthorizedKey, error) {
 	key := &AuthorizedKey{}
 
 	_, err := c.api.
@@ -393,8 +393,8 @@ func (c *RoleStore) GetCurrentUsersAuthorizedKey(keyID string) (*AuthorizedKey, 
 	return key, err
 }
 
-// UpdateCurrentUsersAuthorizedKey update current users authorized key.
-func (c *RoleStore) UpdateCurrentUsersAuthorizedKey(keyID string, key *AuthorizedKey) error {
+// UpdateCurrentUserAuthorizedKey update current user authorized key.
+func (c *RoleStore) UpdateCurrentUserAuthorizedKey(keyID string, key *AuthorizedKey) error {
 	_, err := c.api.
 		URL("/role-store/api/v1/users/current/authorizedkeys/%s", keyID).
 		Put(&key)
@@ -402,8 +402,8 @@ func (c *RoleStore) UpdateCurrentUsersAuthorizedKey(keyID string, key *Authorize
 	return err
 }
 
-// DeleteCurrentUsersAuthorizedKey delete current a users authorized key.
-func (c *RoleStore) DeleteCurrentUsersAuthorizedKey(keyID string) error {
+// DeleteCurrentUserAuthorizedKey delete current a user authorized key.
+func (c *RoleStore) DeleteCurrentUserAuthorizedKey(keyID string) error {
 	_, err := c.api.
 		URL("/role-store/api/v1/users/current/authorizedkeys/%s", keyID).
 		Delete()
