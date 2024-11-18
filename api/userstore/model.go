@@ -8,115 +8,110 @@ package userstore
 
 import "github.com/SSHcom/privx-sdk-go/api/rolestore"
 
-// ClientType is a type of trusted clients
-type ClientType string
-
-// ClientType supported values
-const (
-	ClientExtender         = ClientType("EXTENDER")
-	ClientHostProvisioning = ClientType("HOST_PROVISIONING")
-)
-
-// Params struct for pagination queries.
-type Params struct {
-	Offset  int    `json:"offset,omitempty"`
-	Limit   int    `json:"limit,omitempty"`
-	Sortdir string `json:"sortdir,omitempty"`
-	Query   string `json:"query,omitempty"`
+// LocalUserParams local user query parameters definition.
+type LocalUserParams struct {
+	UserID   string `url:"id,omitempty"`
+	Username string `url:"username,omitempty"`
 }
 
-// FilterUser struct for local users queries.
-type FilterUser struct {
-	Params
-	UserID   string `json:"id,omitempty"`
-	Username string `json:"username,omitempty"`
-}
-
-// TrustedClient definition
+// TrustedClient trusted client definition.
 type TrustedClient struct {
-	ID                            string     `json:"id,omitempty"`
-	Secret                        string     `json:"secret,omitempty"`
-	Name                          string     `json:"name,omitempty"`
-	WebProxyAddress               string     `json:"web_proxy_address,omitempty"`
-	WebProxyPort                  string     `json:"web_proxy_port,omitempty"`
-	Registered                    bool       `json:"registered,omitempty"`
-	Enabled                       bool       `json:"enabled,omitempty"`
-	Type                          ClientType `json:"type,omitempty"`
-	Permissions                   []string   `json:"permissions,omitempty"`
-	WebProxyExtenderRoutePatterns []string   `json:"web_proxy_extender_route_patterns,omitempty"`
-	ExtenderAddress               []string   `json:"extender_address,omitempty"`
-	Subnets                       []string   `json:"subnets,omitempty"`
-	RoutingPrefix                 string     `json:"routing_prefix,omitempty"`
-	AccessGroupId                 string     `json:"access_group_id,omitempty"`
-	GroupId                       string     `json:"group_id,omitempty"`
-	OAuthClientID                 string     `json:"oauth_client_id,omitempty"`
-	OAuthClientSecret             string     `json:"oauth_client_secret,omitempty"`
-	Data                          string     `json:"data,omitempty"`
-	Created                       string     `json:"created,omitempty"`
-	Updated                       string     `json:"updated,omitempty"`
-	UpdatedBy                     string     `json:"updated_by,omitempty"`
-	Author                        string     `json:"author,omitempty"`
+	ID                            string   `json:"id"`
+	Type                          string   `json:"type"`
+	Secret                        string   `json:"secret"`
+	Name                          string   `json:"name"`
+	AccessGroupID                 string   `json:"access_group_id"`
+	Created                       string   `json:"created,omitempty"`
+	Updated                       string   `json:"updated,omitempty"`
+	UpdatedBy                     string   `json:"updated_by,omitempty"`
+	Author                        string   `json:"author,omitempty"`
+	Permissions                   []string `json:"permissions"`
+	Subnets                       []string `json:"subnets"`
+	Enabled                       bool     `json:"enabled"`
+	Registered                    bool     `json:"registered"`
+	ExtenderAddress               []string `json:"extender_address"`
+	OAuthClientID                 string   `json:"oauth_client_id,omitempty"`
+	OAuthClientSecret             string   `json:"oauth_client_secret,omitempty"`
+	GroupID                       string   `json:"group_id"`
+	WebProxyAddress               string   `json:"web_proxy_address,omitempty"`
+	WebProxyPort                  string   `json:"web_proxy_port,omitempty"`
+	WebProxyExtenderRoutePatterns []string `json:"web_proxy_extender_route_patterns,omitempty"`
+	Data                          string   `json:"data,omitempty"`
+	RoutingPrefix                 string   `json:"routing_prefix"`
 }
 
-// Extender creates new trusted client
-func Extender(name string) TrustedClient {
-	return TrustedClient{
-		Type:        ClientExtender,
-		Permissions: []string{"privx-extender"},
-		Name:        name,
-	}
+type ExtenderClient struct {
+	Type                          string   `json:"type"`
+	Name                          string   `json:"name"`
+	RoutingPrefix                 string   `json:"routing_prefix"`
+	WebProxyExtenderRoutePatterns []string `json:"web_proxy_extender_route_patterns,omitempty"`
+	WebProxyExtenderRoutes        []string `json:"web_proxy_extender_routes,omitempty"`
 }
 
-// HostProvisioning creates new trusted client
-func HostProvisioning(name string) TrustedClient {
-	return TrustedClient{
-		Type:        ClientHostProvisioning,
-		Permissions: []string{"privx-host-provisioning"},
-		Name:        name,
-	}
-}
-
-// APIClient definition
+// APIClient api client definition.
 type APIClient struct {
-	ID               string              `json:"id,omitempty"`
-	Name             string              `json:"name,omitempty"`
-	Secret           string              `json:"secret,omitempty"`
-	AuthClientID     string              `json:"oauth_client_id"`
-	AuthClientSecret string              `json:"oauth_client_secret"`
-	Roles            []rolestore.RoleRef `json:"roles,omitempty"`
-	Created          string              `json:"created,omitempty"`
-	Author           string              `json:"author,omitempty"`
+	ID                string                 `json:"id"`
+	Secret            string                 `json:"secret"`
+	Name              string                 `json:"name"`
+	Created           string                 `json:"created,omitempty"`
+	Updated           string                 `json:"updated,omitempty"`
+	UpdatedBy         string                 `json:"updated_by,omitempty"`
+	Author            string                 `json:"author,omitempty"`
+	Roles             []rolestore.RoleHandle `json:"roles"`
+	OAuthClientID     string                 `json:"oauth_client_id,omitempty"`
+	OAuthClientSecret string                 `json:"oauth_client_secret,omitempty"`
 }
 
-// LocalUser definition
+// APIClientCreate api client create request definition.
+type APIClientCreate struct {
+	Name  string                 `json:"name"`
+	Roles []rolestore.RoleHandle `json:"roles"`
+}
+
+// APIClientSearch api client search request definition.
+type APIClientSearch struct {
+	Keywords string `json:"keywords"`
+	SortDir  string `json:"sortdir"`
+	SortKey  string `json:"sortkey"`
+	Limit    *int   `json:"limit,omitempty"`
+	Offset   *int   `json:"offset,omitempty"`
+}
+
+// LocalUser local user definition.
 type LocalUser struct {
-	ID         string      `json:"id,omitempty"`
-	Created    string      `json:"created,omitempty"`
-	Updated    string      `json:"updated,omitempty"`
-	UpdatedBy  string      `json:"updated_by,omitempty"`
-	Author     string      `json:"author,omitempty"`
-	Comment    string      `json:"comment,omitempty"`
-	Tags       []string    `json:"tags,omitempty"`
-	Username   string      `json:"username,omitempty"`
-	GivenName  string      `json:"given_name,omitempty"`
-	FullName   string      `json:"full_name,omitempty"`
-	JobTitle   string      `json:"job_title,omitempty"`
-	Company    string      `json:"company,omitempty"`
-	Department string      `json:"department,omitempty"`
-	Email      string      `json:"email,omitempty"`
-	Telephone  string      `json:"telephone,omitempty"`
-	Locale     string      `json:"locale,omitempty"`
-	Password   Password    `json:"password,omitempty"`
-	Attributes []Attribute `json:"attributes,omitempty"`
+	ID                     string            `json:"id,omitempty"`
+	Created                string            `json:"created,omitempty"`
+	Updated                string            `json:"updated,omitempty"`
+	UpdatedBy              string            `json:"updated_by,omitempty"`
+	Author                 string            `json:"author,omitempty"`
+	Comment                string            `json:"comment,omitempty"`
+	Tags                   []string          `json:"tags,omitempty"`
+	Principal              string            `json:"username,omitempty"`
+	WindowsAccount         string            `json:"windows_account,omitempty"`
+	UnixAccount            string            `json:"unix_account,omitempty"`
+	FullName               string            `json:"full_name,omitempty"`
+	DisplayName            string            `json:"display_name,omitempty"`
+	FirstName              string            `json:"first_name,omitempty"`
+	LastName               string            `json:"last_name,omitempty"`
+	JobTitle               string            `json:"job_title,omitempty"`
+	Company                string            `json:"company,omitempty"`
+	Department             string            `json:"department,omitempty"`
+	Email                  string            `json:"email,omitempty"`
+	Telephone              string            `json:"telephone,omitempty"`
+	Locale                 string            `json:"locale,omitempty"`
+	Password               LocalUserPassword `json:"password"`
+	PasswordChangeRequired bool              `json:"password_change_required"`
+	Attributes             []Attributes      `json:"attributes"`
 }
 
-// User attribute
-type Attribute struct {
+// Attributes user attribute definition.
+type Attributes struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }
 
-// Password definition
-type Password struct {
+// LocalUserPassword local user password definition.
+type LocalUserPassword struct {
 	Password string `json:"password,omitempty"`
+	Created  string `json:"created,omitempty"`
 }

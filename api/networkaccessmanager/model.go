@@ -6,77 +6,74 @@
 
 package networkaccessmanager
 
-type Nat struct {
-	Addr string `json:"addr,omitempty"`
-	Port int    `json:"port,omitempty"`
-}
-type Port struct {
-	Start int `json:"start,omitempty"`
-	End   int `json:"end,omitempty"`
-}
-type Ip struct {
-	Start string `json:"start,omitempty"`
-	End   string `json:"end,omitempty"`
-}
-type Selector struct {
-	IP    Ip     `json:"ip,omitempty"`
-	Port  Port   `json:"port,omitempty"`
-	Proto string `json:"proto,omitempty"`
-}
-type Dst struct {
-	Selector Selector `json:"selector,omitempty"`
-	Nat      *Nat     `json:"nat,omitempty"`
-}
-type Role struct {
-	ID   string `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
-}
-type Item struct {
-	ID               string `json:"id,omitempty"`
-	Created          string `json:"created,omitempty"`
-	Updated          string `json:"updated,omitempty"`
-	UpdatedBy        string `json:"updated_by,omitempty"`
-	Author           string `json:"author,omitempty"`
-	Comment          string `json:"comment,omitempty"`
-	Name             string `json:"name,omitempty"`
-	UserInstructions string `json:"user_instructions,omitempty"`
-	SrcNat           bool   `json:"src_nat,omitempty"`
-	Roles            []Role `json:"roles,omitempty"`
-	Dst              []Dst  `json:"dst,omitempty"`
-	ExclusiveAccess  bool   `json:"exclusive_access,omitempty"`
-	Disabled         string `json:"disabled,omitempty"`
-}
-type ApiNwtargetsResponse struct {
-	Count int    `json:"count"`
-	Items []Item `json:"items"`
-}
-type ApiNwtargetsResponsePost struct {
-	ID string `json:"id,omitempty"`
-}
-type Params struct {
-	Offset  int    `json:"offset,omitempty"`
-	Limit   int    `json:"limit,omitempty"`
-	Sortkey string `json:"sortkey,omitempty"`
-	Sortdir string `json:"sortdir,omitempty"`
-	Name    string `json:"name,omitempty"`
-	ID      string `json:"id,omitempty"`
-	Filter  string `json:"filter,omitempty"`
+// NetworkTargetTagsParams network target tags query parameter definition.
+type NetworkTargetTagsParams struct {
+	Query int `url:"query,omitempty"`
 }
 
-type StatusDetails struct {
-	Key   string `json:"k,omitempty"`
-	Value string `json:"v,omitempty"`
+// NetworkTargetDisable network target disable request definition.
+type NetworkTargetDisable struct {
+	Disabled bool `json:"disabled"`
 }
-type ApiNAMstatus struct {
-	Version       string          `json:"version"`
-	ApiVersion    string          `json:"api_version,omitempty"`
-	Status        string          `json:"status,omitempty"`
-	StatusMessage string          `json:"status_message,omitempty"`
-	StatusDetails []StatusDetails `json:"status_details,omitempty"`
+
+// NetworkTarget network target definition.
+type NetworkTarget struct {
+	ID               string        `json:"id"`
+	Name             string        `json:"name"`
+	Dst              []Destination `json:"dst"`
+	SrcNAT           bool          `json:"src_nat,omitempty"`
+	Roles            []RoleHandle  `json:"roles"`
+	Tags             []string      `json:"tags"`
+	Comment          string        `json:"comment,omitempty"`
+	UserInstructions string        `json:"user_instructions,omitempty"`
+	ExclusiveAccess  bool          `json:"exclusive_access,omitempty"`
+	Disabled         string        `json:"disabled,omitempty"`
+	Created          string        `json:"created"`
+	Author           string        `json:"author"`
+	Updated          string        `json:"updated"`
+	UpdatedBy        string        `json:"updated_by"`
 }
-type KeywordsStruct struct {
-	Keywords string `json:"keywords,omitempty"`
+
+// RoleHandle is a handle to network target role definition.
+type RoleHandle struct {
+	ID      string `json:"id"`
+	Name    string `json:"name,omitempty"`
+	Deleted bool   `json:"deleted,omitempty"`
 }
-type DisabledStruct struct {
-	Disabled bool `json:"disabled,omitempty"`
+
+// Destination network target destination definition.
+type Destination struct {
+	Sel Selector       `json:"selector"`
+	NAT *NATParameters `json:"nat,omitempty"`
+}
+
+// Selector network target selector definition.
+type Selector struct {
+	IP       IPRange    `json:"ip"`
+	Protocol string     `json:"proto,omitempty"`
+	Port     *PortRange `json:"port,omitempty"`
+}
+
+// PortRange port range definition
+type PortRange struct {
+	Start int `json:"start"`
+	End   int `json:"end"`
+}
+
+// IPRange ip range definition.
+type IPRange struct {
+	Start string `json:"start"`
+	End   string `json:"end"`
+}
+
+// NATParameters network target parameters.
+type NATParameters struct {
+	Addr string `json:"addr"`
+	Port int    `json:"port,omitempty"`
+}
+
+// NetworkTargetSearch network target search request definition.
+type NetworkTargetSearch struct {
+	Keywords string   `json:"keywords,omitempty"`
+	Tags     []string `json:"tags,omitempty"`
 }

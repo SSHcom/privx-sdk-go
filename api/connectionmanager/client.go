@@ -7,10 +7,10 @@
 package connectionmanager
 
 import (
-	"fmt"
 	"net/url"
 
-	"github.com/SSHcom/privx-sdk-go/common"
+	"github.com/SSHcom/privx-sdk-go/api/filters"
+	"github.com/SSHcom/privx-sdk-go/api/response"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -19,403 +19,393 @@ type ConnectionManager struct {
 	api restapi.Connector
 }
 
-type connectionsResult struct {
-	Count int          `json:"count"`
-	Items []Connection `json:"items"`
-}
-
-type connectionsTagResult struct {
-	Count int      `json:"count"`
-	Items []string `json:"items"`
-}
-
-// New creates a new connection manager client instance, using the
-// argument SDK API client.
+// New connection manager client constructor.
 func New(api restapi.Connector) *ConnectionManager {
 	return &ConnectionManager{api: api}
 }
 
-// Connections get all connections
-func (store *ConnectionManager) Connections(offset, limit int, sortkey, sortdir string, fuzzycount bool) ([]Connection, error) {
-	result := connectionsResult{}
-	filters := Params{
-		Offset:     offset,
-		Limit:      limit,
-		Sortkey:    sortkey,
-		Sortdir:    sortdir,
-		FuzzyCount: fuzzycount,
+// MARK: Status
+// Status get connection manager microservice status.
+func (c *ConnectionManager) Status() (*response.ServiceStatus, error) {
+	status := &response.ServiceStatus{}
+
+	_, err := c.api.
+		URL("/connection-manager/api/v1/status").
+		Get(status)
+
+	return status, err
+}
+
+// MARK: Connections
+// GetConnections get connections.
+func (c *ConnectionManager) GetConnections(opts ...filters.Option) (*response.ResultSet[Connection], error) {
+	connections := &response.ResultSet[Connection]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/connection-manager/api/v1/connections").
-		Query(&filters).
-		Get(&result)
+		Query(params).
+		Get(&connections)
 
-	return result.Items, err
+	return connections, err
 }
 
-// ConnectionTags get connection tags
-func (store *ConnectionManager) ConnectionTags(offset, limit int, sortdir string, query string) (connectionsTagResult, error) {
-	result := connectionsTagResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortdir: sortdir,
-		Query:   query,
+// SearchConnections search for connections.
+func (c *ConnectionManager) SearchConnections(search *ConnectionSearch, opts ...filters.Option) (*response.ResultSet[Connection], error) {
+	connections := &response.ResultSet[Connection]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := store.api.
-		URL("/connection-manager/api/v1/connections/tags").
-		Query(&filters).
-		Get(&result)
-
-	return result, err
-}
-
-// UpdateConnectionTags update connection tags
-func (store *ConnectionManager) UpdateConnectionTags(connectionTags []string, connectionID string) error {
-	_, err := store.api.
-		URL("/connection-manager/api/v1/connections/%s/tags", connectionID).
-		Put(&connectionTags)
-
-	return err
-}
-
-// SearchConnections search for connections
-func (store *ConnectionManager) SearchConnections(offset, limit int, sortdir, sortkey string, fuzzycount bool, searchObject ConnectionSearch) ([]Connection, error) {
-	result := connectionsResult{}
-	filters := Params{
-		Offset:     offset,
-		Limit:      limit,
-		Sortdir:    sortdir,
-		Sortkey:    sortkey,
-		FuzzyCount: fuzzycount,
-	}
-
-	_, err := store.api.
+	_, err := c.api.
 		URL("/connection-manager/api/v1/connections/search").
-		Query(&filters).
-		Post(&searchObject, &result)
+		Query(params).
+		Post(&search, &connections)
 
-	return result.Items, err
+	return connections, err
 }
 
-// Connection get a single connection
-func (store *ConnectionManager) Connection(connID string) (*Connection, error) {
-	conn := &Connection{}
+// GetConnection get connection by id.
+func (c *ConnectionManager) GetConnection(connID string) (*Connection, error) {
+	connection := &Connection{}
 
-	_, err := store.api.
-		URL("/connection-manager/api/v1/connections/%s", url.PathEscape(connID)).
-		Get(conn)
+	_, err := c.api.
+		URL("/connection-manager/api/v1/connections/%s", connID).
+		Get(&connection)
 
-	return conn, err
+	return connection, err
 }
 
-// CreateSessionIDFileDownload create session ID for trail stored file download
-func (store *ConnectionManager) CreateSessionIDFileDownload(connID, chanID, fileID string) (string, error) {
-	var object struct {
-		SessionID string `json:"session_id"`
-	}
+// CreateSessionForFileDownload create session id for trail stored file download.
+func (c *ConnectionManager) CreateSessionForFileDownload(connID, chanID, fileID string) (DownloadSessionID, error) {
+	sessionID := DownloadSessionID{}
 
-	_, err := store.api.
-		URL("/connection-manager/api/v1/connections/%s/channel/%s/file/%s",
-			url.PathEscape(connID), url.PathEscape(chanID), url.PathEscape(fileID)).
-		Post(nil, &object)
+	_, err := c.api.
+		URL("/connection-manager/api/v1/connections/%s/channel/%s/file/%s", connID, chanID, fileID).
+		Post(nil, &sessionID)
 
-	return object.SessionID, err
+	return sessionID, err
 }
 
-// DownloadStoredFile download trail stored file transferred within audited connection channel
-func (store *ConnectionManager) DownloadStoredFile(connID, chanID, fileID, sessionID, filename string) error {
-	err := store.api.
+// DownloadTrailStoredFile download trail stored file transferred within audited connection channel,
+func (c *ConnectionManager) DownloadTrailStoredFile(connID, chanID, fileID, sessionID, filename string) error {
+	err := c.api.
 		URL("/connection-manager/api/v1/connections/%s/channel/%s/file/%s/%s",
-			url.PathEscape(connID), url.PathEscape(chanID), url.PathEscape(fileID), url.PathEscape(sessionID)).
+			connID, chanID, fileID, sessionID).
 		Download(filename)
 
 	return err
 }
 
-// CreateSessionIDTrailLog create session ID for trail log download
-func (store *ConnectionManager) CreateSessionIDTrailLog(connID, chanID string) (string, error) {
-	var object struct {
-		SessionID string `json:"session_id"`
-	}
+// CreateSessionForTrailLogDownload create session id for trail log download.
+func (c *ConnectionManager) CreateSessionForTrailLogDownload(connID, chanID string) (DownloadSessionID, error) {
+	sessionID := DownloadSessionID{}
 
-	_, err := store.api.
-		URL("/connection-manager/api/v1/connections/%s/channel/%s/log",
-			url.PathEscape(connID), url.PathEscape(chanID)).
-		Post(nil, &object)
+	_, err := c.api.
+		URL("/connection-manager/api/v1/connections/%s/channel/%s/log", connID, chanID).
+		Post(nil, &sessionID)
 
-	return object.SessionID, err
+	return sessionID, err
 }
 
-// DownloadTrailLog download trail log of audited connection channel
-func (store *ConnectionManager) DownloadTrailLog(connID, chanID, sessionID, format, filter, filename string) error {
-	filters := Params{
-		Format: format,
-		Filter: filter,
+// DownloadTrailLog download trail log of audited connection channel.
+func (c *ConnectionManager) DownloadTrailLog(connID, chanID, sessionID, filename string, opts ...filters.Option) error {
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	err := store.api.
-		URL("/connection-manager/api/v1/connections/%s/channel/%s/log/%s",
-			url.PathEscape(connID), url.PathEscape(chanID), url.PathEscape(sessionID)).
-		Query(&filters).
+	err := c.api.
+		URL("/connection-manager/api/v1/connections/%s/channel/%s/log/%s", connID, chanID, sessionID).
+		Query(params).
 		Download(filename)
 
 	return err
 }
 
-// AccessRoles get saved access roles for a connection
-func (store *ConnectionManager) AccessRoles(connID string) ([]AccessRoles, error) {
-	var result []AccessRoles
+// GetAccessRoles get access roles for connection by id.
+// Note, the v1 endpoint doesn't return the count as part of the response body,
+// this will change with v2. Until then, we will handle it internally within the SDK.
+func (c *ConnectionManager) GetAccessRoles(connID string) (*response.ResultSet[ConnectionPermission], error) {
+	p := []ConnectionPermission{}
 
-	_, err := store.api.
-		URL("/connection-manager/api/v1/connections/%s/access_roles", url.PathEscape(connID)).
-		Get(&result)
+	_, err := c.api.
+		URL("/connection-manager/api/v1/connections/%s/access_roles", connID).
+		Get(&p)
 
-	return result, err
+	// v1 endpoint does not return count,
+	// return count internally in sdk until v2 is introduced
+	perms := &response.ResultSet[ConnectionPermission]{
+		Count: len(p),
+		Items: p,
+	}
+
+	return perms, err
 }
 
-// GrantAccessRoleToConnection grant a role permission for a connection
-func (store *ConnectionManager) GrantAccessRoleToConnection(connID, roleID string) error {
-	_, err := store.api.
-		URL("/connection-manager/api/v1/connections/%s/access_roles/%s",
-			url.PathEscape(connID), url.PathEscape(roleID)).
+// GrantAccessRole grant a role permission for a connection.
+func (c *ConnectionManager) GrantAccessRole(connID, roleID string) error {
+	_, err := c.api.
+		URL("/connection-manager/api/v1/connections/%s/access_roles/%s", connID, roleID).
 		Post(nil)
 
 	return err
 }
 
-// RevokeAccessRoleFromConnection revoke a permission for a role from a connection
-func (store *ConnectionManager) RevokeAccessRoleFromConnection(connID, roleID string) error {
-	_, err := store.api.
-		URL("/connection-manager/api/v1/connections/%s/access_roles/%s",
-			url.PathEscape(connID), url.PathEscape(roleID)).
+// RevokeAccessRole revoke a permission for a role from a connection.
+func (c *ConnectionManager) RevokeAccessRole(connID, roleID string) error {
+	_, err := c.api.
+		URL("/connection-manager/api/v1/connections/%s/access_roles/%s", connID, roleID).
 		Delete()
 
 	return err
 }
 
-// RevokeAccessRoleFromAllConnections revoke permissions for a role from connections
-func (store *ConnectionManager) RevokeAccessRoleFromAllConnections(roleID string) error {
-	_, err := store.api.
-		URL("/connection-manager/api/v1/connections/access_roles/%s",
-			url.PathEscape(roleID)).
+// RevokeAccessRoleFromAllConnections revoke permissions for a role from all connections.
+func (c *ConnectionManager) RevokeAccessRoleFromAllConnections(roleID string) error {
+	_, err := c.api.
+		URL("/connection-manager/api/v1/connections/access_roles/%s", roleID).
 		Delete()
 
 	return err
 }
 
-// TerminateConnection terminate connection by ID.
-func (store *ConnectionManager) TerminateConnection(connID string) error {
-	_, err := store.api.
-		URL("/connection-manager/api/v1/terminate/connection/%s", url.PathEscape(connID)).
+// GetConnectionTags get connection tags.
+func (c *ConnectionManager) GetConnectionTags(opts ...filters.Option) (*response.ResultSet[string], error) {
+	tags := &response.ResultSet[string]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/connection-manager/api/v1/connections/tags").
+		Query(params).
+		Get(&tags)
+
+	return tags, err
+}
+
+// UpdateConnectionTags update connection tags.
+func (c *ConnectionManager) UpdateConnectionTags(tags []string, connectionID string) error {
+	_, err := c.api.
+		URL("/connection-manager/api/v1/connections/%s/tags", connectionID).
+		Put(&tags)
+
+	return err
+}
+
+// TerminateConnection terminate connection by id.
+func (c *ConnectionManager) TerminateConnection(connID string) error {
+	_, err := c.api.
+		URL("/connection-manager/api/v1/terminate/connection/%s", connID).
 		Post(nil)
 
 	return err
 }
 
-// TerminateConnectionsByTargetHost terminate connection(s) from host
-func (store *ConnectionManager) TerminateConnectionsByTargetHost(hostID string) error {
-	_, err := store.api.
-		URL("/connection-manager/api/v1/terminate/host/%s", url.PathEscape(hostID)).
+// MARK: Terminate
+// TerminateConnectionsByHost terminate connections from host.
+func (c *ConnectionManager) TerminateConnectionsByHost(hostID string) error {
+	_, err := c.api.
+		URL("/connection-manager/api/v1/terminate/host/%s", hostID).
 		Post(nil)
 
 	return err
 }
 
 // TerminateConnectionsByUser terminate connection(s) of a user
-func (store *ConnectionManager) TerminateConnectionsByUser(userID string) error {
-	_, err := store.api.
-		URL("/connection-manager/api/v1/terminate/user/%s", url.PathEscape(userID)).
+func (c *ConnectionManager) TerminateConnectionsByUser(userID string) error {
+	_, err := c.api.
+		URL("/connection-manager/api/v1/terminate/user/%s", userID).
 		Post(nil)
 
 	return err
 }
 
-// UEBA
-
-// UebaConfigurations get ueba configurations
-func (store *ConnectionManager) UebaConfigurations() (UebaConfigurations, error) {
-	configurations := UebaConfigurations{}
-	_, err := store.api.
+// MARK: UEBA Management
+// GetUebaConfigurations get ueba configurations.
+func (c *ConnectionManager) GetUebaConfigurations() (*UebaConfigurations, error) {
+	configurations := &UebaConfigurations{}
+	_, err := c.api.
 		URL("/connection-manager/api/v1/ueba/configure").
 		Get(&configurations)
 
 	return configurations, err
 }
 
-// SetUebaConfigurations set ueba configurations
-func (store *ConnectionManager) SetUebaConfigurations(configurations *UebaConfigurations) error {
-	_, err := store.api.
+// SetUebaConfigurations set ueba configurations.
+func (c *ConnectionManager) SetUebaConfigurations(configurations *UebaConfigurations) error {
+	_, err := c.api.
 		URL("/connection-manager/api/v1/ueba/configure").
 		Post(&configurations)
 
 	return err
 }
 
-// UebaAnomalySettings get ueba anomaly settings
-func (store *ConnectionManager) UebaAnomalySettings() (UebaAnomalySettings, error) {
+// GetUebaAnomalySettings get ueba anomaly settings.
+func (c *ConnectionManager) GetUebaAnomalySettings() (UebaAnomalySettings, error) {
 	settings := UebaAnomalySettings{}
-	_, err := store.api.
+	_, err := c.api.
 		URL("/connection-manager/api/v1/ueba/anomaly-settings").
 		Get(&settings)
 
 	return settings, err
 }
 
-// CreateAnomalySettings create Ueba anomaly settings
-func (store *ConnectionManager) CreateAnomalySettings(settings UebaAnomalySettings) error {
-
-	_, err := store.api.
+// CreateUebaAnomalySettings create Ueba anomaly settings.
+func (c *ConnectionManager) CreateUebaAnomalySettings(settings UebaAnomalySettings) error {
+	_, err := c.api.
 		URL("/connection-manager/api/v1/ueba/anomaly-settings").
 		Post(&settings)
 
 	return err
 }
 
-// StartAnalyzing start ueba analysis
-func (store *ConnectionManager) StartAnalyzing(datasetID string) error {
-	_, err := store.api.
-		URL("/connection-manager/api/v1/ueba/start-analyzing/%s", url.PathEscape(datasetID)).
+// StartUebaAnalyzing start ueba analyzing connections with a saved dataset.
+func (c *ConnectionManager) StartUebaAnalyzing(datasetID string) error {
+	_, err := c.api.
+		URL("/connection-manager/api/v1/ueba/start-analyzing/%s", datasetID).
 		Post(nil)
 
 	return err
 }
 
-// StopAnalyzing stop ueba analysis
-func (store *ConnectionManager) StopAnalyzing() error {
-	_, err := store.api.
+// StopUebaAnalyzing stop ueba analyzing connection anomalies.
+func (c *ConnectionManager) StopUebaAnalyzing() error {
+	_, err := c.api.
 		URL("/connection-manager/api/v1/ueba/stop-analyzing").
 		Post(nil)
 
 	return err
 }
 
-// CreateIdForUebaScript create session ID for Ueba setup script
-func (store *ConnectionManager) CreateIdForUebaScript() (IDstruct, error) {
-	sessionId := IDstruct{}
-	_, err := store.api.
-		URL("/connection-manager/api/v1/ueba/setup-script").
-		Post(nil, &sessionId)
+// MARK: UEBA Train
+// GetUebaDatasets get dataset list for ueba.
+func (c *ConnectionManager) GetUebaDatasets() (*response.ResultSet[Dataset], error) {
+	datasets := &response.ResultSet[Dataset]{}
 
-	return sessionId, err
-}
-
-// DownloadUebaScript download ueba setup script.
-func (store *ConnectionManager) DownloadUebaScript(sessionID string) error {
-	filename := fmt.Sprintf("ueba-%s-startup.sh", sessionID)
-	err := store.api.
-		URL("/connection-manager/api/v1/ueba/setup-script/%s", url.PathEscape(sessionID)).
-		Download(filename)
-	return err
-}
-
-// UebaDatasets get dataset object list for ueba.
-func (store *ConnectionManager) UebaDatasets(logs bool, bin_count int) (uebaDatasetsResult, error) {
-	result := uebaDatasetsResult{}
-	filters := UebaDatasetQueryParams{
-		Logs:     logs,
-		BinCount: bin_count,
-	}
-
-	_, err := store.api.
+	_, err := c.api.
 		URL("/connection-manager/api/v1/ueba/datasets").
-		Query(&filters).
-		Get(&result)
+		Get(&datasets)
 
-	return result, err
+	return datasets, err
 }
 
-// CreateUebaDataset Save new dataset definition.
-func (store *ConnectionManager) CreateUebaDataset(uebaDatasetParam DatasetBodyParam) (IDstruct, error) {
-	datasetID := IDstruct{}
+// CreateUebaDataset create a new dataset.
+func (c *ConnectionManager) CreateUebaDataset(dataset *Dataset) (response.Identifier, error) {
+	identifier := response.Identifier{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/connection-manager/api/v1/ueba/datasets").
-		Post(&uebaDatasetParam, &datasetID)
+		Post(&dataset, &identifier)
 
-	return datasetID, err
+	return identifier, err
 }
 
-// UebaDataset Get dataset by id, possibility to filter training history.
-func (store *ConnectionManager) UebaDataset(logs bool, bin_count int, datasetID string) (Dataset, error) {
-	result := Dataset{}
-	filters := UebaDatasetQueryParams{
-		Logs:     logs,
-		BinCount: bin_count,
-	}
+// GetUebaDataset get ueba dataset by id.
+func (c *ConnectionManager) GetUebaDataset(datasetID string) (*Dataset, error) {
+	dataset := &Dataset{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/connection-manager/api/v1/ueba/datasets/%s", datasetID).
-		Query(&filters).
-		Get(&result)
+		Get(&dataset)
 
-	return result, err
+	return dataset, err
 }
 
-// UpdateUebaDataset Update dataset.
-func (store *ConnectionManager) UpdateUebaDataset(uebaDatasetParam DatasetBodyParam, datasetID string) error {
-
-	_, err := store.api.
+// UpdateUebaDataset update ueba dataset.
+func (c *ConnectionManager) UpdateUebaDataset(dataset *Dataset, datasetID string) error {
+	_, err := c.api.
 		URL("/connection-manager/api/v1/ueba/datasets/%s", datasetID).
-		Put(&uebaDatasetParam)
+		Put(&dataset)
 
 	return err
 }
 
-// DeleteUebaDataset Delete dataset.
-func (store *ConnectionManager) DeleteUebaDataset(datasetID string) error {
-	_, err := store.api.
+// DeleteUebaDataset delete ueba dataset.
+func (c *ConnectionManager) DeleteUebaDataset(datasetID string) error {
+	_, err := c.api.
 		URL("/connection-manager/api/v1/ueba/datasets/%s", datasetID).
 		Delete()
 
 	return err
 }
 
-// TrainUebaDataset Train or retrain saved dataset.
-func (store *ConnectionManager) TrainUebaDataset(datasetID string, set_active_after_training bool) (ConnectionCount, error) {
+// TrainUebaDataset train or retrain ueba dataset.
+func (c *ConnectionManager) TrainUebaDataset(datasetID string, opts ...filters.Option) (ConnectionCount, error) {
 	count := ConnectionCount{}
-	filters := trainingQueryParams{
-		SetActiveAfterTraining: set_active_after_training,
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := store.api.
-		URL("/connection-manager/api/v1/ueba/train/%s", url.PathEscape(datasetID)).
-		Query(&filters).
+	_, err := c.api.
+		URL("/connection-manager/api/v1/ueba/train/%s", datasetID).
+		Query(params).
 		Post(nil, &count)
 
 	return count, err
 }
 
-// ConnectionCounts Get number of connections for dataset with given parameters.
-// All connections, if json empty in body.
-func (store *ConnectionManager) ConnectionCounts(timerange TimeRange) (ConnectionCount, error) {
+// GetUebaConnectionCounts get number of connections for dataset.
+func (c *ConnectionManager) GetUebaConnectionCounts(timeRange TimeRange) (ConnectionCount, error) {
 	count := ConnectionCount{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/connection-manager/api/v1/ueba/query-connection-count").
-		Post(&timerange, &count)
+		Post(&timeRange, &count)
 
 	return count, err
 }
 
-// UebaStatus Get Ueba service status
-func (store *ConnectionManager) UebaStatus() (*common.ServiceStatus, error) {
-	uebaStatus := &common.ServiceStatus{}
+// MARK: UEBA Setup
+// CreateSessionForUebaScriptDownload create session id for ueba setup script download.
+func (c *ConnectionManager) CreateSessionForUebaScriptDownload() (response.Identifier, error) {
+	identifier := response.Identifier{}
 
-	_, err := store.api.
-		URL("/connection-manager/api/v1/ueba/status").
-		Get(uebaStatus)
+	_, err := c.api.
+		URL("/connection-manager/api/v1/ueba/setup-script").
+		Post(nil, &identifier)
 
-	return uebaStatus, err
+	return identifier, err
 }
 
-// UebaInternalStatus Get Ueba microservice internal status
-func (store *ConnectionManager) UebaInternalStatus() (UebaInternalStatus, error) {
+// DownloadUebaScript download ueba setup script.
+func (c *ConnectionManager) DownloadUebaScript(sessionID, filename string) error {
+	err := c.api.
+		URL("/connection-manager/api/v1/ueba/setup-script/%s", sessionID).
+		Download(filename)
+
+	return err
+}
+
+// MARK: UEBA Status
+// GetUebaStatus get ueba service status.
+func (c *ConnectionManager) GetUebaStatus() (*response.ServiceStatus, error) {
+	status := &response.ServiceStatus{}
+
+	_, err := c.api.
+		URL("/connection-manager/api/v1/ueba/status").
+		Get(&status)
+
+	return status, err
+}
+
+// GetUebaInternalStatus get ueba internal status.
+func (c *ConnectionManager) GetUebaInternalStatus() (UebaInternalStatus, error) {
 	uebaInternalStatus := UebaInternalStatus{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/connection-manager/api/v1/ueba/status/internal").
 		Get(&uebaInternalStatus)
 

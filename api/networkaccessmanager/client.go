@@ -9,6 +9,8 @@ package networkaccessmanager
 import (
 	"net/url"
 
+	"github.com/SSHcom/privx-sdk-go/api/filters"
+	"github.com/SSHcom/privx-sdk-go/api/response"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -17,114 +19,120 @@ type NetworkAccessManager struct {
 	api restapi.Connector
 }
 
-// New creates a new network access manager client instance, using the
-// argument SDK API client.
+// New network access manager client constructor.
 func New(api restapi.Connector) *NetworkAccessManager {
 	return &NetworkAccessManager{api: api}
 }
 
-// nwtargets Get network targets
-func (nam *NetworkAccessManager) GetNetworkTargets(offset, limit int, sortkey, sortdir, name, id string) (ApiNwtargetsResponse, error) {
-	result := ApiNwtargetsResponse{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
-		Name:    name,
-		ID:      id,
-	}
+// MARK: Status
+// Status get network access manager microservice status.
+func (c *NetworkAccessManager) Status() (*response.ServiceStatus, error) {
+	status := &response.ServiceStatus{}
 
-	_, err := nam.api.
-		URL("/network-access-manager/api/v1/nwtargets").
-		Query(&filters).
-		Get(&result)
-
-	return result, err
-}
-
-// nwtargets Create network target
-func (nam *NetworkAccessManager) CreateNetworkTargets(network Item) (ApiNwtargetsResponsePost, error) {
-	result := ApiNwtargetsResponsePost{}
-
-	_, err := nam.api.
-		URL("/network-access-manager/api/v1/nwtargets").
-		Post(&network, &result)
-
-	return result, err
-}
-
-// nwtargets Search network target
-func (nam *NetworkAccessManager) SearchNetworkTargets(offset, limit int, sortkey, sortdir, filter, keywords string) (ApiNwtargetsResponse, error) {
-	result := ApiNwtargetsResponse{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
-		Filter:  filter,
-	}
-	body := KeywordsStruct{
-		Keywords: keywords,
-	}
-	_, err := nam.api.
-		URL("/network-access-manager/api/v1/nwtargets/search").
-		Query(&filters).
-		Post(body, &result)
-
-	return result, err
-}
-
-// Get microservice status
-func (nam *NetworkAccessManager) NetworkAccessManagerStatus() (ApiNAMstatus, error) {
-	result := ApiNAMstatus{}
-
-	_, err := nam.api.
+	_, err := c.api.
 		URL("/network-access-manager/api/v1/status").
-		Get(&result)
+		Get(status)
 
-	return result, err
+	return status, err
 }
 
-// nwtarget Get network targets by ID
-func (nam *NetworkAccessManager) GetNetworkTargetByID(NetworkTargetID string) (Item, error) {
-	result := Item{}
+// MARK: Network Targets
+// GetNetworkTargets get network targets.
+func (c *NetworkAccessManager) GetNetworkTargets(opts ...filters.Option) (*response.ResultSet[NetworkTarget], error) {
+	targets := &response.ResultSet[NetworkTarget]{}
+	params := url.Values{}
 
-	_, err := nam.api.
-		URL("/network-access-manager/api/v1/nwtargets/%s", url.PathEscape(NetworkTargetID)).
-		Get(&result)
+	for _, opt := range opts {
+		opt(&params)
+	}
 
-	return result, err
+	_, err := c.api.
+		URL("/network-access-manager/api/v1/nwtargets").
+		Query(params).
+		Get(&targets)
+
+	return targets, err
 }
 
-//nwtarget Update a network target
-func (nam *NetworkAccessManager) UpdateNetworkTarget(networkTarget *Item, NetworkTargetID string) error {
+// CreateNetworkTarget create network target.
+func (c *NetworkAccessManager) CreateNetworkTarget(target *NetworkTarget) (response.Identifier, error) {
+	identifier := response.Identifier{}
 
-	_, err := nam.api.
-		URL("/network-access-manager/api/v1/nwtargets/%s", url.PathEscape(NetworkTargetID)).
-		Put(networkTarget)
+	_, err := c.api.
+		URL("/network-access-manager/api/v1/nwtargets").
+		Post(&target, &identifier)
+
+	return identifier, err
+}
+
+// SearchNetworkTargets search network target.
+func (c *NetworkAccessManager) SearchNetworkTargets(search NetworkTargetSearch, opts ...filters.Option) (*response.ResultSet[NetworkTarget], error) {
+	targets := &response.ResultSet[NetworkTarget]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/network-access-manager/api/v1/nwtargets/search").
+		Query(params).
+		Post(&search, &targets)
+
+	return targets, err
+}
+
+// GetNetworkTargetTags get network target tags.
+func (c *NetworkAccessManager) GetNetworkTargetTags(opts ...filters.Option) (*response.ResultSet[string], error) {
+	tags := &response.ResultSet[string]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/network-access-manager/api/v1/nwtargets/tags").
+		Query(params).
+		Get(&tags)
+
+	return tags, err
+}
+
+// GetNetworkTarget get network target by id.
+func (c *NetworkAccessManager) GetNetworkTarget(targetID string) (*NetworkTarget, error) {
+	target := &NetworkTarget{}
+
+	_, err := c.api.
+		URL("/network-access-manager/api/v1/nwtargets/%s", targetID).
+		Get(&target)
+
+	return target, err
+}
+
+// UpdateNetworkTarget update network target.
+func (c *NetworkAccessManager) UpdateNetworkTarget(targetID string, target *NetworkTarget) error {
+	_, err := c.api.
+		URL("/network-access-manager/api/v1/nwtargets/%s", targetID).
+		Put(&target)
 
 	return err
 }
 
-// nwtarget Delete network target by ID
-func (nam *NetworkAccessManager) DeleteNetworkTargetByID(NetworkTargetID string) error {
-
-	_, err := nam.api.
-		URL("/network-access-manager/api/v1/nwtargets/%s", url.PathEscape(NetworkTargetID)).
+// DeleteNetworkTarget delete network target by id.
+func (c *NetworkAccessManager) DeleteNetworkTarget(targetID string) error {
+	_, err := c.api.
+		URL("/network-access-manager/api/v1/nwtargets/%s", targetID).
 		Delete()
 
 	return err
 }
 
-//nwtarget disable a network target
-func (nam *NetworkAccessManager) DisableNetworkTargetByID(DisabledVal bool, NetworkTargetID string) error {
-	dis := DisabledStruct{}
-	dis.Disabled = DisabledVal
-
-	_, err := nam.api.
-		URL("/network-access-manager/api/v1/nwtargets/%s/disabled", url.PathEscape(NetworkTargetID)).
-		Put(dis)
+// DisableNetworkTarget disable network target by id.
+func (c *NetworkAccessManager) DisableNetworkTarget(targetID string, disable NetworkTargetDisable) error {
+	_, err := c.api.
+		URL("/network-access-manager/api/v1/nwtargets/%s/disabled", targetID).
+		Put(&disable)
 
 	return err
 }

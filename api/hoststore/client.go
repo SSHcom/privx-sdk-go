@@ -9,172 +9,263 @@ package hoststore
 import (
 	"net/url"
 
+	"github.com/SSHcom/privx-sdk-go/api/filters"
+	"github.com/SSHcom/privx-sdk-go/api/response"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-// HostStore is a role-store client instance.
+// HostStore is a host store client instance.
 type HostStore struct {
 	api restapi.Connector
 }
 
-type hostResult struct {
-	Count int    `json:"count"`
-	Items []Host `json:"items"`
-}
-
-type tagsResult struct {
-	Count int      `json:"count"`
-	Items []string `json:"items"`
-}
-
-// New creates a new host-store client instance
-// See http://apispecs.ssh.com/#swagger-ui-4 for details about api
+// New host store client constructor.
 func New(api restapi.Connector) *HostStore {
 	return &HostStore{api: api}
 }
 
-// SearchHost search for existing hosts
-func (store *HostStore) SearchHost(sortkey, sortdir, filter string, offset, limit int, searchObject *HostSearchObject) ([]Host, error) {
-	result := hostResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
-		Filter:  filter,
+// MARK: Status
+// Status get host store microservice status.
+func (c *HostStore) Status() (*response.ServiceStatus, error) {
+	status := &response.ServiceStatus{}
+
+	_, err := c.api.
+		URL("/host-store/api/v1/status").
+		Get(status)
+
+	return status, err
+}
+
+// MARK: Hosts
+// SearchHosts search hosts.
+func (c *HostStore) SearchHosts(search *HostSearch, opts ...filters.Option) (*response.ResultSet[Host], error) {
+	hosts := &response.ResultSet[Host]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/host-store/api/v1/hosts/search").
-		Query(&filters).
-		Post(&searchObject, &result)
+		Query(params).
+		Post(&search, &hosts)
 
-	return result.Items, err
+	return hosts, err
 }
 
-// Hosts returns existing hosts
-func (store *HostStore) Hosts(offset, limit int, sortkey, sortdir, filter string) ([]Host, error) {
-	result := hostResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
-		Filter:  filter,
+// GetHosts get hosts.
+func (c *HostStore) GetHosts(opts ...filters.Option) (*response.ResultSet[Host], error) {
+	hosts := &response.ResultSet[Host]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/host-store/api/v1/hosts").
-		Query(&filters).
-		Get(&result)
+		Query(params).
+		Get(&hosts)
 
-	return result.Items, err
+	return hosts, err
 }
 
-// CreateHost create a host to host store
-func (store *HostStore) CreateHost(host Host) (string, error) {
-	var object struct {
-		ID string `json:"id"`
-	}
+// CreateHost create a host.
+func (c *HostStore) CreateHost(host *Host) (response.Identifier, error) {
+	identifier := response.Identifier{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/host-store/api/v1/hosts").
-		Post(&host, &object)
+		Post(&host, &identifier)
 
-	return object.ID, err
+	return identifier, err
 }
 
-// ResolveHost resolve service and address to a single host in host store
-func (store *HostStore) ResolveHost(service Service) (*Host, error) {
+// ResolveHost resolve service to a single host.
+func (c *HostStore) ResolveHost(resolve HostResolve) (*Host, error) {
 	host := &Host{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/host-store/api/v1/hosts/resolve").
-		Post(&service, &host)
+		Post(&resolve, &host)
 
 	return host, err
 }
 
-// Host returns existing single host
-func (store *HostStore) Host(hostID string) (*Host, error) {
+// GetHost get host by id.
+func (c *HostStore) GetHost(hostID string) (*Host, error) {
 	host := &Host{}
 
-	_, err := store.api.
-		URL("/host-store/api/v1/hosts/%s", url.PathEscape(hostID)).
+	_, err := c.api.
+		URL("/host-store/api/v1/hosts/%s", hostID).
 		Get(&host)
 
 	return host, err
 }
 
-// UpdateHost update existing host
-func (store *HostStore) UpdateHost(hostID string, host *Host) error {
-	_, err := store.api.
-		URL("/host-store/api/v1/hosts/%s", url.PathEscape(hostID)).
-		Put(host)
+// UpdateHost update host.
+func (c *HostStore) UpdateHost(hostID string, host *Host) error {
+	_, err := c.api.
+		URL("/host-store/api/v1/hosts/%s", hostID).
+		Put(&host)
 
 	return err
 }
 
-// DeleteHost delete a host
-func (store *HostStore) DeleteHost(hostID string) error {
-	_, err := store.api.
+// DeleteHost delete host.
+func (c *HostStore) DeleteHost(hostID string) error {
+	_, err := c.api.
 		URL("/host-store/api/v1/hosts/%s", hostID).
 		Delete()
 
 	return err
 }
 
-// UpdateDeployStatus update host to be deployable or undeployable
-func (store *HostStore) UpdateDeployStatus(hostID string, status bool) error {
-	deployStatus := Host{
-		Deployable: status,
+// DeployHost deploy host.
+func (c *HostStore) DeployHost(host *Host) (HostResponse, error) {
+	response := HostResponse{}
+
+	_, err := c.api.
+		URL("/host-store/api/v1/hosts/deploy").
+		Post(&host, &response)
+
+	return response, err
+}
+
+// UpdateDeployStatus update host to be deployable or undeployable.
+func (c *HostStore) UpdateDeployStatus(hostID string, deployable bool) error {
+	d := HostDeployable{
+		Deployable: deployable,
 	}
 
-	_, err := store.api.
-		URL("/host-store/api/v1/hosts/%s/deployable", url.PathEscape(hostID)).
-		Put(deployStatus)
+	_, err := c.api.
+		URL("/host-store/api/v1/hosts/%s/deployable", hostID).
+		Put(&d)
 
 	return err
 }
 
-// HostTags returns host tags
-func (store *HostStore) HostTags(offset, limit int, sortdir, query string) ([]string, error) {
-	result := tagsResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortdir: sortdir,
-		Query:   query,
+// GetHostTags get host tags.
+func (c *HostStore) GetHostTags(opts ...filters.Option) (*response.ResultSet[string], error) {
+	tags := &response.ResultSet[string]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/host-store/api/v1/hosts/tags").
-		Query(&filters).
-		Get(&result)
+		Query(params).
+		Get(&tags)
 
-	return result.Items, err
+	return tags, err
 }
 
-// UpdateDisabledHostStatus enable/disable host
-func (store *HostStore) UpdateDisabledHostStatus(hostID string, status bool) error {
-	disabledStatus := HostDisabledRequest{
-		Disabled: status,
+// UpdateHostStatus enable/disable host.
+func (c *HostStore) UpdateHostStatus(hostID string, disabled bool) error {
+	d := HostDisabled{
+		Disabled: disabled,
 	}
 
-	_, err := store.api.
-		URL("/host-store/api/v1/hosts/%s/disabled", url.PathEscape(hostID)).
-		Put(disabledStatus)
+	_, err := c.api.
+		URL("/host-store/api/v1/hosts/%s/disabled", hostID).
+		Put(&d)
 
 	return err
 }
 
-// ServiceOptions returns default service options
-func (store *HostStore) ServiceOptions() (*DefaultServiceOptions, error) {
-	options := &DefaultServiceOptions{}
+// MARK: Settings
+// GetServiceOptions get default service options.
+func (c *HostStore) GetServiceOptions() (*HostServiceOptions, error) {
+	options := &HostServiceOptions{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/host-store/api/v1/settings/default_service_options").
 		Get(&options)
 
 	return options, err
+}
+
+// MARK: WhiteLists
+// GetWhitelists get whitelists.
+func (c *HostStore) GetWhitelists(opts ...filters.Option) (*response.ResultSet[Whitelist], error) {
+	result := &response.ResultSet[Whitelist]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+	_, err := c.api.
+		URL("/host-store/api/v1/whitelists").
+		Query(params).
+		Get(&result)
+
+	return result, err
+}
+
+// CreateWhitelist create whitelist.
+func (c *HostStore) CreateWhitelist(whitelist *Whitelist) (response.Identifier, error) {
+	identifier := response.Identifier{}
+	_, err := c.api.
+		URL("/host-store/api/v1/whitelists").
+		Post(&whitelist, &identifier)
+
+	return identifier, err
+}
+
+// GetWhitelist get whitelist by id.
+func (c *HostStore) GetWhitelist(whitelistID string) (*Whitelist, error) {
+	whitelist := &Whitelist{}
+	_, err := c.api.
+		URL("/host-store/api/v1/whitelists/%s", whitelistID).
+		Get(&whitelist)
+
+	return whitelist, err
+}
+
+// UpdateWhitelist update whitelist.
+func (c *HostStore) UpdateWhitelist(whitelistID string, whitelist Whitelist) error {
+	_, err := c.api.
+		URL("/host-store/api/v1/whitelists/%s", whitelistID).
+		Put(&whitelist)
+
+	return err
+}
+
+// DeleteWhitelist delete whitelist.
+func (c *HostStore) DeleteWhitelist(whitelistID string) error {
+	_, err := c.api.
+		URL("/host-store/api/v1/whitelists/%s", whitelistID).
+		Delete()
+
+	return err
+}
+
+// SearchWhitelists search whitelists.
+func (c *HostStore) SearchWhitelists(search WhitelistSearch, opts ...filters.Option) (*response.ResultSet[Whitelist], error) {
+	whitelists := &response.ResultSet[Whitelist]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/host-store/api/v1/whitelists/search").
+		Query(params).
+		Post(&search, &whitelists)
+
+	return whitelists, err
+}
+
+// EvaluateWhitelist evaluate commands against whitelist patterns.
+func (c *HostStore) EvaluateWhitelist(evaluate *WhitelistEvaluate) (*WhitelistEvaluateResponse, error) {
+	result := &WhitelistEvaluateResponse{}
+	_, err := c.api.
+		URL("/host-store/api/v1/whitelists/evaluate").
+		Post(&evaluate, &result)
+
+	return result, err
 }

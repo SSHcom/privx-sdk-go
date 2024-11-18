@@ -9,8 +9,9 @@ package rolestore
 import (
 	"encoding/json"
 	"net/url"
-	"strings"
 
+	"github.com/SSHcom/privx-sdk-go/api/filters"
+	"github.com/SSHcom/privx-sdk-go/api/response"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -19,734 +20,732 @@ type RoleStore struct {
 	api restapi.Connector
 }
 
-type usersResult struct {
-	Count int    `json:"count"`
-	Items []User `json:"items"`
-}
-
-type rolesResult struct {
-	Count int    `json:"count"`
-	Items []Role `json:"items"`
-}
-
-type sourcesResult struct {
-	Count int      `json:"count"`
-	Items []Source `json:"items"`
-}
-
-type awsrolesResult struct {
-	Count int           `json:"count"`
-	Items []AWSRoleLink `json:"items"`
-}
-
-type awsTokenResult struct {
-	Count int        `json:"count"`
-	Items []AWSToken `json:"items"`
-}
-
-type principalkeysResult struct {
-	Count int            `json:"count"`
-	Items []PrincipalKey `json:"items"`
-}
-
-type authorizedkeysResult struct {
-	Count int             `json:"count"`
-	Items []AuthorizedKey `json:"items"`
-}
-
-type collectorsResult struct {
-	Count int                `json:"count"`
-	Items []LogconfCollector `json:"items"`
-}
-
-// New creates a new role-store client instance, using the
-// argument SDK API client.
+// New role store client constructor.
 func New(api restapi.Connector) *RoleStore {
 	return &RoleStore{api: api}
 }
 
-// Sources get all sources.
-func (store *RoleStore) Sources() ([]Source, error) {
-	result := sourcesResult{}
+// MARK: Status
+// Status get role store microservice status.
+func (c *RoleStore) Status() (*response.ServiceStatus, error) {
+	status := &response.ServiceStatus{}
 
-	_, err := store.api.
-		URL("/role-store/api/v1/sources").
-		Get(&result)
+	_, err := c.api.
+		URL("/role-store/api/v1/status").
+		Get(status)
 
-	return result.Items, err
+	return status, err
 }
 
-// CreateSource create a new source
-func (store *RoleStore) CreateSource(source Source) (string, error) {
-	var object struct {
-		ID string `json:"id"`
-	}
+// MARK: Sources
+// GetSources get sources.
+func (c *RoleStore) GetSources() (*response.ResultSet[Source], error) {
+	sources := &response.ResultSet[Source]{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/role-store/api/v1/sources").
-		Post(&source, &object)
+		Get(&sources)
 
-	return object.ID, err
+	return sources, err
 }
 
-// Source returns a source
-func (store *RoleStore) Source(sourceID string) (*Source, error) {
+// CreateSource create source.
+func (c *RoleStore) CreateSource(source *Source) (response.Identifier, error) {
+	identifier := response.Identifier{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/sources").
+		Post(&source, &identifier)
+
+	return identifier, err
+}
+
+// GetSource get source by id.
+func (c *RoleStore) GetSource(sourceID string) (*Source, error) {
 	source := &Source{}
 
-	_, err := store.api.
-		URL("/role-store/api/v1/sources/%s", url.PathEscape(sourceID)).
-		Get(source)
+	_, err := c.api.
+		URL("/role-store/api/v1/sources/%s", sourceID).
+		Get(&source)
 
 	return source, err
 }
 
-// DeleteSource delete a source
-func (store *RoleStore) DeleteSource(sourceID string) error {
-	_, err := store.api.
+// UpdateSource update source.
+func (c *RoleStore) UpdateSource(sourceID string, source *Source) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/sources/%s", sourceID).
+		Put(&source)
+
+	return err
+}
+
+// DeleteSource delete source.
+func (c *RoleStore) DeleteSource(sourceID string) error {
+	_, err := c.api.
 		URL("/role-store/api/v1/sources/%s", sourceID).
 		Delete()
 
 	return err
 }
 
-// UpdateSource update existing source
-func (store *RoleStore) UpdateSource(sourceID string, source *Source) error {
-	_, err := store.api.
-		URL("/role-store/api/v1/sources/%s", url.PathEscape(sourceID)).
-		Put(source)
-
-	return err
-}
-
-// RefreshSources refresh all host and user sources
-func (store *RoleStore) RefreshSources(sourceIDs []string) error {
-	_, err := store.api.
+// RefreshSources refresh sources.
+func (c *RoleStore) RefreshSources(sourceIDs []string) error {
+	_, err := c.api.
 		URL("/role-store/api/v1/sources/refresh").
 		Post(&sourceIDs)
 
 	return err
 }
 
-// AWSRoleLinks returns all aws roles.
-func (store *RoleStore) AWSRoleLinks(refresh bool) ([]AWSRoleLink, error) {
-	result := awsrolesResult{}
-	filters := Params{
-		Refresh: refresh,
+// MARK: AWS Roles
+// GetAWSRoles get AWS roles.
+func (c *RoleStore) GetAWSRoles(opts ...filters.Option) (*response.ResultSet[AWSRole], error) {
+	roles := &response.ResultSet[AWSRole]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/role-store/api/v1/awsroles").
-		Query(&filters).
-		Get(&result)
+		Query(params).
+		Get(&roles)
 
-	return result.Items, err
+	return roles, err
 }
 
-// AWSRoleLink returns existing single aws role
-func (store *RoleStore) AWSRoleLink(awsroleID string) (*AWSRoleLink, error) {
-	role := &AWSRoleLink{}
+// GetAWSRole get AWS role by id.
+func (c *RoleStore) GetAWSRole(awsRoleID string) (*AWSRole, error) {
+	role := &AWSRole{}
 
-	_, err := store.api.
-		URL("/role-store/api/v1/awsroles/%s", url.PathEscape(awsroleID)).
+	_, err := c.api.
+		URL("/role-store/api/v1/awsroles/%s", awsRoleID).
 		Get(role)
 
 	return role, err
 }
 
-// DeleteAWSRoleLInk delete a aws role
-func (store *RoleStore) DeleteAWSRoleLInk(awsroleID string) error {
-	_, err := store.api.
-		URL("/role-store/api/v1/awsroles/%s", awsroleID).
+// DeleteAWSRole delete AWS role.
+func (c *RoleStore) DeleteAWSRole(awsRoleID string) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/awsroles/%s", awsRoleID).
 		Delete()
 
 	return err
 }
 
-// UpdateAWSRoleLink update existing aws role
-func (store *RoleStore) UpdateAWSRoleLink(awsRoleID string, roles []RoleRef) error {
-	_, err := store.api.
-		URL("/role-store/api/v1/awsroles/%s/roles", url.PathEscape(awsRoleID)).
+// GetLinkedRoles get AWS role granting PrivX roles.
+func (c *RoleStore) GetLinkedRoles(awsRoleID string) (*response.ResultSet[LinkedPrivXRole], error) {
+	roles := &response.ResultSet[LinkedPrivXRole]{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/awsroles/%s/roles", awsRoleID).
+		Get(&roles)
+
+	return roles, err
+}
+
+// UpdateAWSRole update AWS role granting PrivX roles.
+func (c *RoleStore) UpdateAWSRole(awsRoleID string, roles []LinkedPrivXRole) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/awsroles/%s/roles", awsRoleID).
 		Put(&roles)
 
 	return err
 }
 
-// LinkedRoles return AWS role granting PrivX roles
-func (store *RoleStore) LinkedRoles(awsroleID string) ([]AWSRoleLink, error) {
-	result := awsrolesResult{}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/awsroles/%s/roles", url.PathEscape(awsroleID)).
-		Get(&result)
-
-	return result.Items, err
-}
-
-// Roles gets all configured roles.
-func (store *RoleStore) Roles(offset, limit int, sortkey, sortdir string) ([]Role, error) {
-	result := rolesResult{}
-
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
-	}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/roles").Query(filters).Get(&result)
-
-	return result.Items, err
-}
-
-// CreateRole creates new role
-func (store *RoleStore) CreateRole(role Role) (string, error) {
-	var object struct {
-		ID string `json:"id"`
-	}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/roles").
-		Post(&role, &object)
-
-	return object.ID, err
-}
-
-// ResolveRoles searches give role name and returns corresponding ids
-func (store *RoleStore) ResolveRoles(names []string) ([]RoleRef, error) {
-	var result struct {
-		Count int       `json:"count"`
-		Items []RoleRef `json:"items"`
-	}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/roles/resolve").
-		Post(&names, &result)
-
-	return result.Items, err
-}
-
-// EvaluateRole evaluate a new role definition
-func (store *RoleStore) EvaluateRole(role *Role) ([]User, error) {
-	var result struct {
-		Count int    `json:"count"`
-		Items []User `json:"items"`
-	}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/roles/evaluate").
-		Post(role, &result)
-
-	return result.Items, err
-}
-
-// Role gets information about the argument role ID.
-func (store *RoleStore) Role(roleID string) (*Role, error) {
-	role := &Role{}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/roles/%s", url.PathEscape(roleID)).
-		Get(role)
-
-	return role, err
-}
-
-// DeleteRole delete a role
-func (store *RoleStore) DeleteRole(roleID string) error {
-	_, err := store.api.
-		URL("/role-store/api/v1/roles/%s", roleID).
-		Delete()
-
-	return err
-}
-
-// UpdateRole update existing role
-func (store *RoleStore) UpdateRole(roleID string, role *Role) error {
-	_, err := store.api.
-		URL("/role-store/api/v1/roles/%s", url.PathEscape(roleID)).
-		Put(role)
-
-	return err
-}
-
-// GetRoleMembers gets all members (users) of the argument role ID.
-func (store *RoleStore) GetRoleMembers(roleID string, offset, limit int, sortkey, sortdir string) ([]User, error) {
-	result := usersResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
-	}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/roles/%s/members", url.PathEscape(roleID)).
-		Query(&filters).
-		Get(&result)
-
-	return result.Items, err
-}
-
-// AWSToken returns AWS token for a specified role
-func (store *RoleStore) AWSToken(roleID, tokencode string, ttl int) ([]AWSToken, error) {
-	result := awsTokenResult{}
-	filters := Params{
-		Tokencode: tokencode,
-		TTL:       ttl,
-	}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/roles/%s/awstoken", url.PathEscape(roleID)).
-		Query(&filters).
-		Get(&result)
-
-	return result.Items, err
-}
-
-// PrincipalKeys returns all principal keys
-func (store *RoleStore) PrincipalKeys(roleID string) ([]PrincipalKey, error) {
-	result := principalkeysResult{}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/roles/%s/principalkeys", url.PathEscape(roleID)).
-		Get(&result)
-
-	return result.Items, err
-}
-
-// GeneratePrincipalKey generate new principal key for existing role
-func (store *RoleStore) GeneratePrincipalKey(roleID string) (string, error) {
-	var object struct {
-		ID string `json:"id"`
-	}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/roles/%s/principalkeys/generate", url.PathEscape(roleID)).
-		Post(nil, &object)
-
-	return object.ID, err
-}
-
-// ImportPrincipalKey import new principal key for existing role
-func (store *RoleStore) ImportPrincipalKey(key PrivateKey, roleID string) (string, error) {
-	var object struct {
-		ID string `json:"id"`
-	}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/roles/%s/principalkeys/import", url.PathEscape(roleID)).
-		Post(&key, &object)
-
-	return object.ID, err
-}
-
-// PrincipalKey returns a role's principal key object.
-func (store *RoleStore) PrincipalKey(roleID, keyID string) (*PrincipalKey, error) {
-	key := &PrincipalKey{}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/roles/%s/principalkeys/%s", url.PathEscape(roleID), url.PathEscape(keyID)).
-		Get(key)
-
-	return key, err
-}
-
-// DeletePrincipalKey delete a role's principal key
-func (store *RoleStore) DeletePrincipalKey(roleID, keyID string) error {
-	_, err := store.api.
-		URL("/role-store/api/v1/roles/%s/principalkeys/%s", roleID, keyID).
-		Delete()
-
-	return err
-}
-
-// User gets information about the argument user ID.
-func (store *RoleStore) User(userID string) (*User, error) {
+// MARK: Users
+// GetUser get user by id.
+func (c *RoleStore) GetUser(userID string) (*User, error) {
 	user := &User{}
 
-	_, err := store.api.
-		URL("/role-store/api/v1/users/%s", url.PathEscape(userID)).
+	_, err := c.api.
+		URL("/role-store/api/v1/users/%s", userID).
 		Get(user)
 
 	return user, err
 }
 
-// UserSettings get specific user settings
-func (store *RoleStore) UserSettings(userID string) (*json.RawMessage, error) {
+// GetUserSettings get user settings.
+func (c *RoleStore) GetUserSettings(userID string) (*json.RawMessage, error) {
 	settings := &json.RawMessage{}
 
-	_, err := store.api.
-		URL("/role-store/api/v1/users/%s/settings", url.PathEscape(userID)).
+	_, err := c.api.
+		URL("/role-store/api/v1/users/%s/settings", userID).
 		Get(&settings)
 
 	return settings, err
 }
 
 // UpdateUserSettings update specific user's settings
-func (store *RoleStore) UpdateUserSettings(settings *json.RawMessage, userID string) error {
-	_, err := store.api.
-		URL("/role-store/api/v1/users/%s/settings", url.PathEscape(userID)).
-		Put(settings)
+func (c *RoleStore) UpdateUserSettings(userID string, settings *UserSettings) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/users/%s/settings", userID).
+		Put(&settings)
 
 	return err
 }
 
-// UserRoles gets the roles of the argument user ID.
-func (store *RoleStore) UserRoles(userID string) ([]Role, error) {
-	result := rolesResult{}
-	_, err := store.api.
-		URL("/role-store/api/v1/users/%s/roles", url.PathEscape(userID)).
-		Get(&result)
+// GetUserRoles get roles of user by id.
+func (c *RoleStore) GetUserRoles(userID string) (*response.ResultSet[Role], error) {
+	roles := &response.ResultSet[Role]{}
+	_, err := c.api.
+		URL("/role-store/api/v1/users/%s/roles", userID).
+		Get(&roles)
 
-	return result.Items, err
+	return roles, err
 }
 
-// GrantUserRole adds the specified role for the user. If the user
-// already has the role, this function does nothing.
-func (store *RoleStore) GrantUserRole(userID, roleID string) error {
-	// Get user's current roles.
-	roles, err := store.UserRoles(userID)
-	if err != nil {
-		return err
-	}
-	// Does user already have the specified role?
-	for _, role := range roles {
-		if role.ID == roleID {
-			// Already granted.
-			return nil
-		}
-	}
-
-	// Get new role.
-	role, err := store.Role(roleID)
-	if err != nil {
-		return err
-	}
-
-	// Add an explicit role grant request.
-	roles = append(roles, Role{
-		ID:       role.ID,
-		Explicit: true,
-	})
-
-	return store.setUserRoles(userID, roles)
-}
-
-// RevokeUserRole removes the specified role from the user. If the
-// user does not have the role, this function does nothing.
-func (store *RoleStore) RevokeUserRole(userID, roleID string) error {
-	// Get user's current roles.
-	roles, err := store.UserRoles(userID)
-	if err != nil {
-		return err
-	}
-	// Remove role from user's roles.
-	var newRoles []Role
-	for _, role := range roles {
-		if role.ID != roleID {
-			newRoles = append(newRoles, role)
-		}
-	}
-	if len(newRoles) == len(roles) {
-		// User did not have the specified role.
-		return nil
-	}
-
-	// Set new roles.
-	return store.setUserRoles(userID, newRoles)
-}
-
-func (store *RoleStore) setUserRoles(userID string, roles []Role) error {
-	_, err := store.api.
-		URL("/role-store/api/v1/users/%s/roles", url.PathEscape(userID)).
+// UpdateUserRoles update user roles by id.
+func (c *RoleStore) UpdateUserRoles(userID string, roles []Role) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/users/%s/roles", userID).
 		Put(roles)
 
 	return err
 }
 
-// EnableMFA enable multifactor authentication
-func (store *RoleStore) EnableMFA(userIDs []string) error {
-	_, err := store.api.
-		URL("/role-store/api/v1/users/mfa/enable").
+// SetMFA enable, disable or reset mfa authentication.
+func (c *RoleStore) SetMFA(userIDs []string, action MFAAction) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/users/mfa/%s", action).
 		Post(&userIDs)
 
 	return err
 }
 
-// DisableMFA disable multifactor authentication
-func (store *RoleStore) DisableMFA(userIDs []string) error {
-	_, err := store.api.
-		URL("/role-store/api/v1/users/mfa/disable").
-		Post(&userIDs)
+// GetCurrentUserInfo get current user and user settings.
+func (c *RoleStore) GetCurrentUserInfo() (*json.RawMessage, error) {
+	current := &json.RawMessage{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/users/current").
+		Get(&current)
+
+	return current, err
+}
+
+// GetCurrentUserSettings get current user AWS roles.
+func (c *RoleStore) GetCurrentAWSRoles() (*response.ResultSet[AWSRole], error) {
+	roles := &response.ResultSet[AWSRole]{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/users/current/awsroles").
+		Get(&roles)
+
+	return roles, err
+}
+
+// GetCurrentUserAndSettings get current user settings.
+func (c *RoleStore) GetCurrentUserSettings() (*json.RawMessage, error) {
+	settings := &json.RawMessage{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/users/current/settings").
+		Get(&settings)
+
+	return settings, err
+}
+
+// UpdateCurrentUserSettings update current user settings.
+func (c *RoleStore) UpdateCurrentUserSettings(settings *UserSettings) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/users/current/settings").
+		Put(&settings)
 
 	return err
 }
 
-// ResetMFA reset multifactor authentication
-func (store *RoleStore) ResetMFA(userIDs []string) error {
-	_, err := store.api.
-		URL("/role-store/api/v1/users/mfa/reset").
-		Post(&userIDs)
-
-	return err
-}
-
-// ResolveUser resolve users role
-func (store *RoleStore) ResolveUser(userID string) (*User, error) {
+// ResolveUserRoles resolve user roles.
+func (c *RoleStore) ResolveUserRoles(userID string) (*User, error) {
 	user := &User{}
 
-	_, err := store.api.
-		URL("/role-store/api/v1/users/%s/resolve", url.PathEscape(userID)).
-		Get(user)
+	_, err := c.api.
+		URL("/role-store/api/v1/users/%s/resolve", userID).
+		Get(&user)
 
 	return user, err
 }
 
-// SearchUsers searches for users, matching the keywords and source
-// criteria.
-func (store *RoleStore) SearchUsers(offset, limit int, sortkey, sortdir string, searchBody UserSearchObject) ([]User, error) {
-	result := usersResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
+// SearchUsers search users.
+func (c *RoleStore) SearchUsers(search UserSearch, opts ...filters.Option) (*response.ResultSet[User], error) {
+	users := &response.ResultSet[User]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
-	_, err := store.api.
+
+	_, err := c.api.
 		URL("/role-store/api/v1/users/search").
-		Query(&filters).
-		Post(searchBody, &result)
+		Query(params).
+		Post(&search, &users)
 
-	return result.Items, err
+	return users, err
 }
 
-// SearchUsersExternal searches users with user search parameters.
-func (store *RoleStore) SearchUsersExternal(keywords, sourceID string) ([]User, error) {
-	result := usersResult{}
-	_, err := store.api.
+// SearchExternalUsers search external users.
+func (c *RoleStore) SearchExternalUsers(search UserSearch) (*response.ResultSet[User], error) {
+	users := &response.ResultSet[User]{}
+
+	_, err := c.api.
 		URL("/role-store/api/v1/users/search/external").
-		Post(map[string]string{
-			"keywords": keywords,
-			"source":   sourceID,
-		}, &result)
+		Post(&search, &users)
 
-	return result.Items, err
+	return users, err
 }
 
-// AuthorizedKeys return user's authorized keys
-func (store *RoleStore) AuthorizedKeys(userID string) ([]AuthorizedKey, error) {
-	result := authorizedkeysResult{}
+// GetUsersAuthorizedKeys get users authorized keys.
+func (c *RoleStore) GetUsersAuthorizedKeys(userID string, opts ...filters.Option) (*response.ResultSet[AuthorizedKey], error) {
+	keys := &response.ResultSet[AuthorizedKey]{}
+	params := url.Values{}
 
-	_, err := store.api.
-		URL("/role-store/api/v1/users/%s/authorizedkeys", url.PathEscape(userID)).
-		Get(&result)
-
-	return result.Items, err
-}
-
-// CreateAuthorizedKey register an authorized key for user
-func (store *RoleStore) CreateAuthorizedKey(key AuthorizedKey, userID string) (string, error) {
-	var object struct {
-		ID string `json:"id"`
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := store.api.
-		URL("/role-store/api/v1/users/%s/authorizedkeys", url.PathEscape(userID)).
-		Post(&key, &object)
+	_, err := c.api.
+		URL("/role-store/api/v1/users/%s/authorizedkeys", userID).
+		Query(params).
+		Get(&keys)
 
-	return object.ID, err
+	return keys, err
 }
 
-// AuthorizedKey return user's authorized key
-func (store *RoleStore) AuthorizedKey(userID, keyID string) (*AuthorizedKey, error) {
+// CreateUserAuthorizedKey create authorized key for user.
+func (c *RoleStore) CreateUserAuthorizedKey(userID string, key *AuthorizedKey) (response.Identifier, error) {
+	identifier := response.Identifier{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/users/%s/authorizedkeys", userID).
+		Post(&key, &identifier)
+
+	return identifier, err
+}
+
+// GetUserAuthorizedKey get user authorized key by id.
+func (c *RoleStore) GetUserAuthorizedKey(userID, keyID string) (*AuthorizedKey, error) {
 	key := &AuthorizedKey{}
 
-	_, err := store.api.
-		URL("/role-store/api/v1/users/%s/authorizedkeys/%s", url.PathEscape(userID), url.PathEscape(keyID)).
-		Get(key)
+	_, err := c.api.
+		URL("/role-store/api/v1/users/%s/authorizedkeys/%s", userID, keyID).
+		Get(&key)
 
 	return key, err
 }
 
-// UpdateAuthorizedKey update authorized key for user
-func (store *RoleStore) UpdateAuthorizedKey(key *AuthorizedKey, userID, keyID string) error {
-	_, err := store.api.
-		URL("/role-store/api/v1/users/%s/authorizedkeys/%s", url.PathEscape(userID), url.PathEscape(keyID)).
-		Put(key)
+// UpdateUserAuthorizedKey update user authorized key.
+func (c *RoleStore) UpdateUserAuthorizedKey(userID, keyID string, key *AuthorizedKey) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/users/%s/authorizedkeys/%s", userID, keyID).
+		Put(&key)
 
 	return err
 }
 
-// DeleteAuthorizedKey delete a user's authorized key
-func (store *RoleStore) DeleteAuthorizedKey(userID, keyID string) error {
-	_, err := store.api.
+// DeleteUserAuthorizedKey delete a user authorized key.
+func (c *RoleStore) DeleteUserAuthorizedKey(userID, keyID string) error {
+	_, err := c.api.
 		URL("/role-store/api/v1/users/%s/authorizedkeys/%s", userID, keyID).
 		Delete()
 
 	return err
 }
 
-// LogconfCollectors returns all logconf collectors
-func (store *RoleStore) LogconfCollectors() ([]LogconfCollector, error) {
-	result := collectorsResult{}
+// GetCurrentUserAuthorizedKeys get current user authorized keys.
+func (c *RoleStore) GetCurrentUserAuthorizedKeys(opts ...filters.Option) (*response.ResultSet[AuthorizedKey], error) {
+	keys := &response.ResultSet[AuthorizedKey]{}
+	params := url.Values{}
 
-	_, err := store.api.
-		URL("/role-store/api/v1/logconf/collectors").
-		Get(&result)
-
-	return result.Items, err
-}
-
-// CreateLogconfCollector create a logconf collector
-func (store *RoleStore) CreateLogconfCollector(conf LogconfCollector) (string, error) {
-	var object struct {
-		ID string `json:"id"`
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := store.api.
-		URL("/role-store/api/v1/logconf/collectors").
-		Post(&conf, &object)
+	_, err := c.api.
+		URL("/role-store/api/v1/users/current/authorizedkeys").
+		Query(params).
+		Get(&keys)
 
-	return object.ID, err
+	return keys, err
 }
 
-// LogconfCollector returns existing single logconf collector
-func (store *RoleStore) LogconfCollector(collectorID string) (*LogconfCollector, error) {
-	conf := &LogconfCollector{}
+// CreateCurrentUserAuthorizedKey create authorized key for current user.
+func (c *RoleStore) CreateCurrentUserAuthorizedKey(key *AuthorizedKey) (response.Identifier, error) {
+	identifier := response.Identifier{}
 
-	_, err := store.api.
-		URL("/role-store/api/v1/logconf/collectors/%s", url.PathEscape(collectorID)).
-		Get(conf)
+	_, err := c.api.
+		URL("/role-store/api/v1/users/current/authorizedkeys").
+		Post(&key, &identifier)
 
-	return conf, err
+	return identifier, err
 }
 
-// UpdateLogconfCollector update existing logconf collector
-func (store *RoleStore) UpdateLogconfCollector(collectorID string, conf *LogconfCollector) error {
-	_, err := store.api.
-		URL("/role-store/api/v1/logconf/collectors/%s", url.PathEscape(collectorID)).
-		Put(conf)
+// GetCurrentUserAuthorizedKey get current user authorized key by id.
+func (c *RoleStore) GetCurrentUserAuthorizedKey(keyID string) (*AuthorizedKey, error) {
+	key := &AuthorizedKey{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/users/current/authorizedkeys/%s", keyID).
+		Get(&key)
+
+	return key, err
+}
+
+// UpdateCurrentUserAuthorizedKey update current user authorized key.
+func (c *RoleStore) UpdateCurrentUserAuthorizedKey(keyID string, key *AuthorizedKey) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/users/current/authorizedkeys/%s", keyID).
+		Put(&key)
 
 	return err
 }
 
-// DeleteLogconfCollector delete a logconf collector
-func (store *RoleStore) DeleteLogconfCollector(collectorID string) error {
-	_, err := store.api.
+// DeleteCurrentUserAuthorizedKey delete current a user authorized key.
+func (c *RoleStore) DeleteCurrentUserAuthorizedKey(keyID string) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/users/current/authorizedkeys/%s", keyID).
+		Delete()
+
+	return err
+}
+
+// GetRoles get roles.
+func (c *RoleStore) GetRoles(opts ...filters.Option) (*response.ResultSet[Role], error) {
+	roles := &response.ResultSet[Role]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/roles").
+		Query(params).
+		Get(&roles)
+
+	return roles, err
+}
+
+// CreateRole creates role.
+func (c *RoleStore) CreateRole(role *Role) (response.Identifier, error) {
+	identifier := response.Identifier{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/roles").
+		Post(&role, &identifier)
+
+	return identifier, err
+}
+
+// ResolveRoles resolve role names to role.
+func (c *RoleStore) ResolveRoles(names []string) (*response.ResultSet[Role], error) {
+	roles := &response.ResultSet[Role]{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/roles/resolve").
+		Post(&names, &roles)
+
+	return roles, err
+}
+
+// SearchRoles search roles.
+func (c *RoleStore) SearchRoles(search RoleSearch, opts ...filters.Option) (*response.ResultSet[Role], error) {
+	roles := &response.ResultSet[Role]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/roles/search").
+		Query(params).
+		Post(&search, &roles)
+
+	return roles, err
+}
+
+// EvaluateRole evaluate role definition.
+func (c *RoleStore) EvaluateRole(role *Role) (*response.ResultSet[User], error) {
+	users := &response.ResultSet[User]{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/roles/evaluate").
+		Post(role, &users)
+
+	return users, err
+}
+
+// GetRole get role by id.
+func (c *RoleStore) GetRole(roleID string) (*Role, error) {
+	role := &Role{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/roles/%s", roleID).
+		Get(&role)
+
+	return role, err
+}
+
+// UpdateRole update role.
+func (c *RoleStore) UpdateRole(roleID string, role *Role) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/roles/%s", roleID).
+		Put(&role)
+
+	return err
+}
+
+// DeleteRole delete role.
+func (c *RoleStore) DeleteRole(roleID string) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/roles/%s", roleID).
+		Delete()
+
+	return err
+}
+
+// GetRoleMembers gets users of the role.
+func (c *RoleStore) GetRoleMembers(roleID string, opts ...filters.Option) (*response.ResultSet[User], error) {
+	users := &response.ResultSet[User]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/roles/%s/members", roleID).
+		Query(params).
+		Get(&users)
+
+	return users, err
+}
+
+// GetAWSToken get AWS token for role.
+func (c *RoleStore) GetAWSToken(roleID string, opts ...filters.Option) (*json.RawMessage, error) {
+	token := &json.RawMessage{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/roles/%s/awstoken", roleID).
+		Query(params).
+		Get(&token)
+
+	return token, err
+}
+
+// GetPrincipalKeys get roles principal keys.
+func (c *RoleStore) GetPrincipalKeys(roleID string) (*response.ResultSet[RolePrincipalKey], error) {
+	keys := &response.ResultSet[RolePrincipalKey]{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/roles/%s/principalkeys", roleID).
+		Get(&keys)
+
+	return keys, err
+}
+
+// CreatePrincipalKey create principal key for role.
+func (c *RoleStore) CreatePrincipalKey(roleID string) (response.Identifier, error) {
+	identifier := response.Identifier{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/roles/%s/principalkeys/generate", roleID).
+		Post(nil, &identifier)
+
+	return identifier, err
+}
+
+// ImportPrincipalKey import principal key for role.
+func (c *RoleStore) ImportPrincipalKey(roleID string, key RolePrincipalKeyImport) (response.Identifier, error) {
+	identifier := response.Identifier{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/roles/%s/principalkeys/import", roleID).
+		Post(&key, &identifier)
+
+	return identifier, err
+}
+
+// GetPrincipalKey get roles principal key.
+func (c *RoleStore) GetPrincipalKey(roleID, keyID string) (RolePrincipalKey, error) {
+	key := RolePrincipalKey{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/roles/%s/principalkeys/%s", roleID, keyID).
+		Get(&key)
+
+	return key, err
+}
+
+// DeletePrincipalKey delete roles principal key.
+func (c *RoleStore) DeletePrincipalKey(roleID, keyID string) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/roles/%s/principalkeys/%s", roleID, keyID).
+		Delete()
+
+	return err
+}
+
+// MARK: Identity Providers
+// GetIdentityProviders get identity providers.
+func (c *RoleStore) GetIdentityProviders(opts ...filters.Option) (*response.ResultSet[IdentityProvider], error) {
+	providers := &response.ResultSet[IdentityProvider]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/identity-providers").
+		Query(params).
+		Get(&providers)
+
+	return providers, err
+}
+
+// CreateIdentityProvider create a identity provider.
+func (c *RoleStore) CreateIdentityProvider(provider *IdentityProvider) (response.Identifier, error) {
+	identifier := response.Identifier{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/identity-providers").
+		Post(&provider, &identifier)
+
+	return identifier, err
+}
+
+// GetIdentityProvider get identity provider by id.
+func (c *RoleStore) GetIdentityProvider(providerID string) (*IdentityProvider, error) {
+	provider := &IdentityProvider{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/identity-providers/%s", providerID).
+		Get(&provider)
+
+	return provider, err
+}
+
+// UpdateIdentityProvider update identity provider.
+func (c *RoleStore) UpdateIdentityProvider(providerID string, provider *IdentityProvider) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/identity-providers/%s", providerID).
+		Put(&provider)
+
+	return err
+}
+
+// DeleteIdentityProvider delete identity provider by id.
+func (c *RoleStore) DeleteIdentityProvider(providerID string) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/identity-providers/%s", providerID).
+		Delete()
+
+	return err
+}
+
+// SearchIdentityProviders search identity providers.
+func (c *RoleStore) SearchIdentityProviders(search IdentityProviderSearch, opts ...filters.Option) (*response.ResultSet[IdentityProvider], error) {
+	providers := &response.ResultSet[IdentityProvider]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/identity-providers/search").
+		Query(params).
+		Post(&search, &providers)
+
+	return providers, err
+}
+
+// MARK: Authorized Keys
+// GetAuthorizedKeys get authorized keys.
+func (c *RoleStore) GetAuthorizedKeys(opts ...filters.Option) (*response.ResultSet[AuthorizedKey], error) {
+	keys := &response.ResultSet[AuthorizedKey]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/authorizedkeys").
+		Query(params).
+		Get(&keys)
+
+	return keys, err
+}
+
+// ResolveAuthorizedKey resolve authorized key.
+func (c *RoleStore) ResolveAuthorizedKey(resolve AuthorizedKeyResolve) (*AuthorizedKey, error) {
+	key := &AuthorizedKey{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/authorizedkeys/resolve").
+		Post(&resolve, &key)
+
+	return key, err
+}
+
+// MARK: Logconf
+// GetLogConfCollectors get logconf collectors.
+func (c *RoleStore) GetLogConfCollectors() (*response.ResultSet[LogConfCollector], error) {
+	collectors := &response.ResultSet[LogConfCollector]{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/logconf/collectors").
+		Get(&collectors)
+
+	return collectors, err
+}
+
+// CreateLogConfCollector create logconf collector.
+func (c *RoleStore) CreateLogConfCollector(collector *LogConfCollector) (response.Identifier, error) {
+	identifier := response.Identifier{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/logconf/collectors").
+		Post(&collector, &identifier)
+
+	return identifier, err
+}
+
+// GetLogConfCollector get logconf collector by id.
+func (c *RoleStore) GetLogConfCollector(collectorID string) (*LogConfCollector, error) {
+	collector := &LogConfCollector{}
+
+	_, err := c.api.
+		URL("/role-store/api/v1/logconf/collectors/%s", collectorID).
+		Get(&collector)
+
+	return collector, err
+}
+
+// UpdateLogConfCollector update logconf collector.
+func (c *RoleStore) UpdateLogConfCollector(collectorID string, collector *LogConfCollector) error {
+	_, err := c.api.
+		URL("/role-store/api/v1/logconf/collectors/%s", collectorID).
+		Put(&collector)
+
+	return err
+}
+
+// DeleteLogConfCollector delete logconf collector.
+func (c *RoleStore) DeleteLogConfCollector(collectorID string) error {
+	_, err := c.api.
 		URL("/role-store/api/v1/logconf/collectors/%s", collectorID).
 		Delete()
 
 	return err
-}
-
-// AllAuthorizedKeys returns all authorized keys
-func (store *RoleStore) AllAuthorizedKeys(offset, limit int, sortdir, sortkey string) ([]AuthorizedKey, error) {
-	result := authorizedkeysResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortdir: sortdir,
-		Sortkey: sortkey,
-	}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/authorizedkeys").
-		Query(&filters).
-		Get(&result)
-
-	return result.Items, err
-}
-
-// ResolveAuthorizedKey resolve authorized keys
-func (store *RoleStore) ResolveAuthorizedKey(resolve ResolveAuthorizedKey) ([]AuthorizedKey, error) {
-	result := authorizedkeysResult{}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/authorizedkeys/resolve").
-		Post(&resolve, &result)
-
-	return result.Items, err
-}
-
-/////////////////////////////
-//// Identity providers ////
-///////////////////////////
-
-// List all identity providers.
-func (store *RoleStore) GetAllIdentityProviders(offset, limit int) (IdentityProviderResponse, error) {
-	result := IdentityProviderResponse{}
-
-	filters := Params{
-		Offset: offset,
-		Limit:  limit,
-	}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/identity-providers").
-		Query(&filters).
-		Get(&result)
-	return result, err
-}
-
-// Create a new Identity Provider.
-func (store *RoleStore) CreateIdentityProvider(newIP IdentityProvider) (IdentityProviderCreateResponse, error) {
-	result := IdentityProviderCreateResponse{}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/identity-providers").
-		Post(newIP, &result)
-
-	return result, err
-}
-
-// Get Identity Provider by ID.
-func (store *RoleStore) GetIdentityProviderByID(ID string) (IdentityProvider, error) {
-	result := IdentityProvider{}
-
-	_, err := store.api.
-		URL("/role-store/api/v1/identity-providers/%s", url.PathEscape(ID)).
-		Get(&result)
-
-	return result, err
-}
-
-// Delete Identity Provider by ID.
-func (store *RoleStore) DeleteIdentityProviderByID(ID string) error {
-
-	_, err := store.api.
-		URL("/role-store/api/v1/identity-providers/%s", url.PathEscape(ID)).
-		Delete()
-
-	return err
-}
-
-// Update a Identity Provider.
-func (store *RoleStore) UpdateIdentityProvider(UpdatedIP IdentityProvider, ID string) error {
-
-	_, err := store.api.
-		URL("/role-store/api/v1/identity-providers/%s", url.PathEscape(ID)).
-		Put(UpdatedIP)
-
-	return err
-}
-
-// Search Identity Providers.
-func (store *RoleStore) SearchIdentityProviders(offset, limit int, sortkey, sortdir, keywords string) (IdentityProviderResponse, error) {
-	result := IdentityProviderResponse{}
-
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: strings.ToUpper(sortdir),
-	}
-	body := IdentityProviderSearch{
-		Keywords: keywords,
-	}
-	_, err := store.api.
-		URL("/role-store/api/v1/identity-providers/search").
-		Query(filters).
-		Post(body, &result)
-
-	return result, err
 }
