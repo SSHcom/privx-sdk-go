@@ -9,6 +9,8 @@ package trailindex
 import (
 	"net/url"
 
+	"github.com/SSHcom/privx-sdk-go/api/filters"
+	"github.com/SSHcom/privx-sdk-go/api/response"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -17,63 +19,70 @@ type TrailIndex struct {
 	api restapi.Connector
 }
 
-type trailIndexResult struct {
-	Count int             `json:"count"`
-	Items []IndexResponse `json:"items"`
-}
-
-// New creates a new trail index client instance, using the
-// argument SDK API client.
+// New trail index client constructor.
 func New(api restapi.Connector) *TrailIndex {
 	return &TrailIndex{api: api}
 }
 
-// IndexingStatus get indexing status of the connection
-func (store *TrailIndex) IndexingStatus(connectionID string) (*Connection, error) {
-	status := &Connection{}
+// MARK: Status
+// Status get trail index microservice status.
+func (c *TrailIndex) Status() (*response.ServiceStatus, error) {
+	status := &response.ServiceStatus{}
 
-	_, err := store.api.
-		URL("/trail-index/api/v1/index/%s/status", url.PathEscape(connectionID)).
+	_, err := c.api.
+		URL("/trail-index/api/v1/status").
 		Get(status)
 
 	return status, err
 }
 
-// IndexingStatuses gets the statuses of the specified connections
-func (store *TrailIndex) IndexingStatuses(connectionIDs []string) ([]Connection, error) {
-	var connections []Connection
+// MARK: Index
+// GetIndexingStatus get indexing status.
+func (c *TrailIndex) GetIndexingStatus(connectionID string) (ConnectionTranscriptStatus, error) {
+	status := ConnectionTranscriptStatus{}
 
-	_, err := store.api.
+	_, err := c.api.
+		URL("/trail-index/api/v1/index/%s/status", connectionID).
+		Get(&status)
+
+	return status, err
+}
+
+// GetIndexingStatuses gets the statuses of the specified connections.
+func (c *TrailIndex) GetIndexingStatuses(connectionIDs []string) ([]ConnectionTranscriptStatus, error) {
+	statuses := []ConnectionTranscriptStatus{}
+
+	_, err := c.api.
 		URL("/trail-index/api/v1/index/status").
-		Post(connectionIDs, &connections)
+		Post(connectionIDs, &statuses)
 
-	return connections, err
+	return statuses, err
 }
 
-// StartIndexing starts indexing of the specified connections
-func (store *TrailIndex) StartIndexing(connectionIDs []string) ([]Connection, error) {
-	var connections []Connection
+// StartIndexing starts indexing of the specified connections.
+func (c *TrailIndex) StartIndexing(connectionIDs []string) ([]ConnectionTranscriptStatus, error) {
+	statuses := []ConnectionTranscriptStatus{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/trail-index/api/v1/index/start").
-		Post(connectionIDs, &connections)
+		Post(connectionIDs, &statuses)
 
-	return connections, err
+	return statuses, err
 }
 
-// SearchContent search for the content based on the search parameters defined
-func (store *TrailIndex) SearchContent(offset, limit int, sortdir string, searchObject SearchRequestObject) ([]IndexResponse, error) {
-	result := trailIndexResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortdir: sortdir,
+// SearchIndexes search for the content based on the search parameters defined.
+func (c *TrailIndex) SearchIndexes(search *TranscriptSearch, opts ...filters.Option) (*response.ResultSet[TrailIndexResponse], error) {
+	indexes := &response.ResultSet[TrailIndexResponse]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/trail-index/api/v1/index/search").
-		Query(&filters).
-		Post(&searchObject, &result)
+		Query(params).
+		Post(&search, &indexes)
 
-	return result.Items, err
+	return indexes, err
 }

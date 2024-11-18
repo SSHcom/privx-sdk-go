@@ -9,203 +9,204 @@ package workflow
 import (
 	"net/url"
 
+	"github.com/SSHcom/privx-sdk-go/api/filters"
+	"github.com/SSHcom/privx-sdk-go/api/response"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
-// Engine is a workflow client instance.
-type Engine struct {
+// WorkflowEngine is a workflow client instance.
+type WorkflowEngine struct {
 	api restapi.Connector
 }
 
-type workflowsResult struct {
-	Count int        `json:"count"`
-	Items []Workflow `json:"items"`
+// New workflow engine client constructor.
+func New(api restapi.Connector) *WorkflowEngine {
+	return &WorkflowEngine{api: api}
 }
 
-type requestsResult struct {
-	Count int       `json:"count"`
-	Items []Request `json:"items"`
+// MARK: Status
+// Status get workflow engine microservice status.
+func (c *WorkflowEngine) Status() (*response.ServiceStatus, error) {
+	status := &response.ServiceStatus{}
+
+	_, err := c.api.
+		URL("/workflow-engine/api/v1/status").
+		Get(status)
+
+	return status, err
 }
 
-// New creates a new workflow client instance, using the
-// argument SDK API client.
-func New(api restapi.Connector) *Engine {
-	return &Engine{api: api}
-}
+// MARK: Workflows
+// GetWorkflows get workflows.
+func (c *WorkflowEngine) GetWorkflows(opts ...filters.Option) (*response.ResultSet[Workflow], error) {
+	workflows := &response.ResultSet[Workflow]{}
+	params := url.Values{}
 
-// Workflows get all workflows
-func (store *Engine) Workflows(offset, limit int) ([]Workflow, error) {
-	result := workflowsResult{}
-	filters := Params{
-		Offset: offset,
-		Limit:  limit,
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/workflow-engine/api/v1/workflows").
-		Query(&filters).
-		Get(&result)
+		Query(params).
+		Get(&workflows)
 
-	return result.Items, err
+	return workflows, err
 }
 
-// CreateWorkflow create a new workflow
-func (store *Engine) CreateWorkflow(workflow *Workflow) (string, error) {
-	var object struct {
-		ID string `json:"id"`
-	}
+// CreateWorkflow create workflow.
+func (c *WorkflowEngine) CreateWorkflow(workflow *Workflow) (response.Identifier, error) {
+	identifier := response.Identifier{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/workflow-engine/api/v1/workflows").
-		Post(&workflow, &object)
+		Post(&workflow, &identifier)
 
-	return object.ID, err
+	return identifier, err
 }
 
-// Workflow return workflow object by ID
-func (store *Engine) Workflow(workflowID string) (*Workflow, error) {
+// GetWorkflow get workflow by id.
+func (c *WorkflowEngine) GetWorkflow(workflowID string) (*Workflow, error) {
 	workflow := &Workflow{}
 
-	_, err := store.api.
-		URL("/workflow-engine/api/v1/workflows/%s", url.PathEscape(workflowID)).
-		Get(workflow)
+	_, err := c.api.
+		URL("/workflow-engine/api/v1/workflows/%s", workflowID).
+		Get(&workflow)
 
 	return workflow, err
 }
 
-// DeleteWorkflow delete a workflow by ID
-func (store *Engine) DeleteWorkflow(workflowID string) error {
-	_, err := store.api.
+// UpdateWorkflow update workflow.
+func (c *WorkflowEngine) UpdateWorkflow(workflowID string, workflow *Workflow) error {
+	_, err := c.api.
+		URL("/workflow-engine/api/v1/workflows/%s", workflowID).
+		Put(&workflow)
+
+	return err
+}
+
+// DeleteWorkflow delete a workflow.
+func (c *WorkflowEngine) DeleteWorkflow(workflowID string) error {
+	_, err := c.api.
 		URL("/workflow-engine/api/v1/workflows/%s", workflowID).
 		Delete()
 
 	return err
 }
 
-// UpdateWorkflow update  a workflow
-func (store *Engine) UpdateWorkflow(workflowID string, workflow *Workflow) error {
-	_, err := store.api.
-		URL("/workflow-engine/api/v1/workflows/%s", url.PathEscape(workflowID)).
-		Put(workflow)
+// MARK: Requests
+// GetRequests get the request queue for the user
+func (c *WorkflowEngine) GetRequests(opts ...filters.Option) (*response.ResultSet[AccessRequest], error) {
+	requests := &response.ResultSet[AccessRequest]{}
+	params := url.Values{}
 
-	return err
-}
-
-// Requests get the request queue for the user
-func (store *Engine) Requests(offset, limit int, filter string) ([]Request, error) {
-	result := requestsResult{}
-	filters := Params{
-		Offset: offset,
-		Limit:  limit,
-		Filter: filter,
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/workflow-engine/api/v1/requests").
-		Query(&filters).
-		Get(&result)
+		Query(params).
+		Get(&requests)
 
-	return result.Items, err
+	return requests, err
 }
 
-// CreateRequest add a workflow to the request queue.
-func (store *Engine) CreateRequest(request *Request) (string, error) {
-	var object struct {
-		ID string `json:"id"`
-	}
+// CreateRequest create request.
+func (c *WorkflowEngine) CreateRequest(request *AccessRequest) (response.Identifier, error) {
+	identifier := response.Identifier{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/workflow-engine/api/v1/requests").
-		Post(&request, &object)
+		Post(&request, &identifier)
 
-	return object.ID, err
+	return identifier, err
 }
 
-// Request return a request object by ID.
-func (store *Engine) Request(requestID string) (*Request, error) {
-	request := &Request{}
+// GetRequest get request by id.
+func (c *WorkflowEngine) GetRequest(requestID string) (*AccessRequest, error) {
+	request := &AccessRequest{}
 
-	_, err := store.api.
-		URL("/workflow-engine/api/v1/requests/%s", url.PathEscape(requestID)).
+	_, err := c.api.
+		URL("/workflow-engine/api/v1/requests/%s", requestID).
 		Get(request)
 
 	return request, err
 }
 
-//RevokeTargetRole Revokes the target role in a request from target user
-func (store *Engine) RevokeTargetRole(requestID string) error {
-	_, err := store.api.
-		URL("/workflow-engine/api/v1/requests/%s/role/revoke", url.PathEscape(requestID)).
-		Post(nil)
-
-	return err
-}
-
-// DeleteRequest delete request item by ID.
-func (store *Engine) DeleteRequest(requestID string) error {
-	_, err := store.api.
+// DeleteRequest delete request.
+func (c *WorkflowEngine) DeleteRequest(requestID string) error {
+	_, err := c.api.
 		URL("/workflow-engine/api/v1/requests/%s", requestID).
 		Delete()
 
 	return err
 }
 
-// MakeDecisionOnRequest update a request in queue
-func (store *Engine) MakeDecisionOnRequest(requestID string, request Decision) error {
-	_, err := store.api.
-		URL("/workflow-engine/api/v1/requests/%s/decision", url.PathEscape(requestID)).
+// UpdateDecisionOnRequest update a request decision in queue.
+func (c *WorkflowEngine) UpdateDecisionOnRequest(requestID string, request Decision) error {
+	_, err := c.api.
+		URL("/workflow-engine/api/v1/requests/%s/decision", requestID).
 		Post(&request)
 
 	return err
 }
 
-// SearchRequests search access requests
-func (store *Engine) SearchRequests(
-	offset, limit int, sortdir, sortkey, filter string, searchObject *Search) ([]Request, error) {
-	result := requestsResult{}
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
-		Filter:  filter,
-	}
+// RevokeTargetRole revoke target role in request from target user.
+func (c *WorkflowEngine) RevokeTargetRole(requestID string) error {
+	_, err := c.api.
+		URL("/workflow-engine/api/v1/requests/%s/role/revoke", requestID).
+		Post(nil)
 
-	_, err := store.api.
-		URL("/workflow-engine/api/v1/requests/search").
-		Query(&filters).
-		Post(&searchObject, &result)
-
-	return result.Items, err
+	return err
 }
 
-// Settings get settings for the microservice
-func (store *Engine) Settings() (*Settings, error) {
-	settings := &Settings{}
+// SearchRequests search access requests
+func (c *WorkflowEngine) SearchRequests(search *AccessRequestSearch, opts ...filters.Option) (*response.ResultSet[AccessRequest], error) {
+	requests := &response.ResultSet[AccessRequest]{}
+	params := url.Values{}
 
-	_, err := store.api.
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/workflow-engine/api/v1/requests/search").
+		Query(params).
+		Post(&search, &requests)
+
+	return requests, err
+}
+
+// MARK: Settings
+// GetSettings get settings for workflow engine.
+func (c *WorkflowEngine) GetSettings() (*WorkflowSettings, error) {
+	settings := &WorkflowSettings{}
+
+	_, err := c.api.
 		URL("/workflow-engine/api/v1/settings").
 		Get(&settings)
 
 	return settings, err
 }
 
-// UpdateSettings store microservice settings
-func (store *Engine) UpdateSettings(settings *Settings) error {
-	_, err := store.api.
+// UpdateSettings update settings for workflow engine.
+func (c *WorkflowEngine) UpdateSettings(settings *WorkflowSettings) error {
+	_, err := c.api.
 		URL("/workflow-engine/api/v1/settings").
-		Put(settings)
+		Put(&settings)
 
 	return err
 }
 
-// TestEmailNotification test the email settings
-func (store *Engine) TestEmailNotification(settings *Settings) (SMTPResponse, error) {
-	var result SMTPResponse
+// MARK: Test SMTP
+// TestSMTP test SMTP settings.
+func (c *WorkflowEngine) TestSMTP(settings *WorkflowSettings) (SMTPResponse, error) {
+	testResponse := SMTPResponse{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/workflow-engine/api/v1/testsmtp").
-		Post(&settings, &result)
+		Post(&settings, &testResponse)
 
-	return result, err
+	return testResponse, err
 }

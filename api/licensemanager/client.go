@@ -7,6 +7,7 @@
 package licensemanager
 
 import (
+	"github.com/SSHcom/privx-sdk-go/api/response"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -15,90 +16,110 @@ type LicenseManager struct {
 	api restapi.Connector
 }
 
-// New creates a new license manager client instance, using the
-// argument SDK API client.
+// New license manager client constructor.
 func New(api restapi.Connector) *LicenseManager {
 	return &LicenseManager{api: api}
 }
 
-// RefreshLicense refresh the license info
-func (store *LicenseManager) RefreshLicense() (*License, error) {
-	license := &License{}
+// MARK: Status
+// Status get license manager microservice status.
+func (c *LicenseManager) Status() (*response.ServiceStatus, error) {
+	status := &response.ServiceStatus{}
 
-	_, err := store.api.
-		URL("/license-manager/api/v1/license/refresh").
-		Post(nil, license)
+	_, err := c.api.
+		URL("/license-manager/api/v1/status").
+		Get(status)
+
+	return status, err
+}
+
+// MARK: License
+// GetLicense get license.
+func (c *LicenseManager) GetLicense() (map[string]interface{}, error) {
+	license := map[string]interface{}{}
+
+	_, err := c.api.
+		URL("/license-manager/api/v1/license").
+		Get(&license)
 
 	return license, err
 }
 
-// DeactivateLicense deactivate license
-func (store *LicenseManager) DeactivateLicense() error {
-	_, err := store.api.
-		URL("/license-manager/api/v1/license/deactivate").
-		Post(nil)
-
-	return err
-}
-
-// SetLicenseStatistics settings for SSH license statistics
-func (store *LicenseManager) SetLicenseStatistics(optin bool) error {
-	statistics := License{
-		Optin: optin,
-	}
-
-	_, err := store.api.
-		URL("/license-manager/api/v1/license/optin").
-		Post(&statistics)
-
-	return err
-}
-
-// SetLicense post a new license to server
-func (store *LicenseManager) SetLicense(licenseCode string) error {
-	_, err := store.api.
+// SetLicense set new license.
+func (c *LicenseManager) SetLicense(licenseCode string) error {
+	_, err := c.api.
 		URL("/license-manager/api/v1/license").
 		Post(licenseCode)
 
 	return err
 }
 
-// License return privx license
-func (store *LicenseManager) License() (*License, error) {
-	license := &License{}
+// RefreshLicense refresh license info.
+func (c *LicenseManager) RefreshLicense() (map[string]interface{}, error) {
+	license := map[string]interface{}{}
 
-	_, err := store.api.
-		URL("/license-manager/api/v1/license").
-		Get(license)
+	_, err := c.api.
+		URL("/license-manager/api/v1/license/refresh").
+		Post(nil, license)
 
 	return license, err
 }
 
-// Register PrivX instance to mobilegw
-func (store *LicenseManager) RegisterToMobileGW() error {
-	_, err := store.api.
+// SetLicenseStatistics set settings for SSH license statistics.
+func (c *LicenseManager) SetLicenseStatistics(optin LicenseStatistics) error {
+	_, err := c.api.
+		URL("/license-manager/api/v1/license/optin").
+		Post(&optin)
+
+	return err
+}
+
+// DeactivateLicense deactivate license.
+func (c *LicenseManager) DeactivateLicense() error {
+	_, err := c.api.
+		URL("/license-manager/api/v1/license/deactivate").
+		Post(nil)
+
+	return err
+}
+
+// GetLicenseJSSnippet get PrivX license javascript snippet.
+func (c *LicenseManager) GetLicenseJSSnippet() (string, error) {
+	snippet := ""
+
+	_, err := c.api.
+		URL("/license-manager/api/v1/license.js").
+		Get(&snippet)
+
+	return snippet, err
+}
+
+// MARK: Mobile Gateway
+// Get PrivX registration status to mobile gateway.
+func (c *LicenseManager) GetMobileGwRegistration() (*RegistrationStatus, error) {
+	status := &RegistrationStatus{}
+
+	_, err := c.api.
+		URL("/license-manager/api/v1/mobilegw/status").
+		Get(status)
+
+	return status, err
+}
+
+// RegisterToMobileGw register PrivX instance to mobile gateway.
+func (c *LicenseManager) RegisterToMobileGw() error {
+	_, err := c.api.
 		URL("/license-manager/api/v1/mobilegw/register").
 		Post(nil)
 
 	return err
 }
 
-// Unregister PrivX instance from mobilegw
-func (store *LicenseManager) UnregisterToMobileGW() error {
-	_, err := store.api.
+// UnregisterFromMobileGw unregister PrivX instance from mobile gateway.
+func (c *LicenseManager) UnregisterFromMobileGw() error {
+	_, err := c.api.
 		URL("/license-manager/api/v1/mobilegw/unregister").
 		Delete(nil)
 
 	return err
-}
-
-// Get PrivX registration status to mobilegw
-func (store *LicenseManager) GetMobileGwRegistration() (*RegistrationStatus, error) {
-	status := &RegistrationStatus{}
-
-	_, err := store.api.
-		URL("/license-manager/api/v1/mobilegw/status").
-		Get(status)
-
-	return status, err
 }

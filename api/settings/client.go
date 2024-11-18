@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"net/url"
 
+	"github.com/SSHcom/privx-sdk-go/api/filters"
+	"github.com/SSHcom/privx-sdk-go/api/response"
 	"github.com/SSHcom/privx-sdk-go/restapi"
 )
 
@@ -18,82 +20,98 @@ type Settings struct {
 	api restapi.Connector
 }
 
-// New creates a new settings client instance, using the
-// argument SDK API client.
+// New settings client constructor.
 func New(api restapi.Connector) *Settings {
 	return &Settings{api: api}
 }
 
-// ScopeSettings get settings for the scope
-func (store *Settings) ScopeSettings(scope, merge string) (*json.RawMessage, error) {
-	settings := &json.RawMessage{}
-	filter := Params{
-		Merge: merge,
-	}
+// MARK: Status
+// Status get settings microservice status.
+func (c *Settings) Status() (*response.ServiceStatus, error) {
+	status := &response.ServiceStatus{}
 
-	_, err := store.api.
-		URL("/settings/api/v1/settings/%s", url.PathEscape(scope)).
-		Query(&filter).
+	_, err := c.api.
+		URL("/settings/api/v1/status").
+		Get(status)
+
+	return status, err
+}
+
+// MARK: Schema
+// GetScopeSchema get schema for the scope.
+func (c *Settings) GetScopeSchema(scope string) (*json.RawMessage, error) {
+	schema := &json.RawMessage{}
+	_, err := c.api.
+		URL("/settings/api/v1/schema/%s", scope).
+		Get(&schema)
+
+	return schema, err
+}
+
+// GetSectionSchema get schema for the section
+func (c *Settings) GetSectionSchema(scope, section string) (*json.RawMessage, error) {
+	schema := &json.RawMessage{}
+	_, err := c.api.
+		URL("/settings/api/v1/schema/%s/%s", scope, section).
+		Get(&schema)
+
+	return schema, err
+}
+
+// MARK: Settings
+// GetScopeSettings get settings for the scope
+func (c *Settings) GetScopeSettings(scope string, opts ...filters.Option) (*json.RawMessage, error) {
+	settings := &json.RawMessage{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+	_, err := c.api.
+		URL("/settings/api/v1/settings/%s", scope).
+		Query(params).
 		Get(&settings)
 
 	return settings, err
 }
 
 // UpdateScopeSettings update settings for a scope.
-func (store *Settings) UpdateScopeSettings(settings *json.RawMessage, scope string) error {
-	_, err := store.api.
-		URL("/settings/api/v1/settings/%s", url.PathEscape(scope)).
-		Put(settings)
+func (c *Settings) UpdateScopeSettings(settings map[string]interface{}, scope string) error {
+	_, err := c.api.
+		URL("/settings/api/v1/settings/%s", scope).
+		Put(&settings)
 
 	return err
 }
 
-// ScopeSectionSettings get settings for the scope
-func (store *Settings) ScopeSectionSettings(scope, section string) (*json.RawMessage, error) {
+// GetSectionSettings get settings for the section.
+func (c *Settings) GetSectionSettings(scope, section string) (*json.RawMessage, error) {
 	settings := &json.RawMessage{}
-	_, err := store.api.
-		URL("/settings/api/v1/settings/%s/%s", url.PathEscape(scope), url.PathEscape(section)).
+
+	_, err := c.api.
+		URL("/settings/api/v1/settings/%s/%s", scope, section).
 		Get(&settings)
 
 	return settings, err
 }
 
-// UpdateScopeSectionSettings update settings for a scope and section combination
-func (store *Settings) UpdateScopeSectionSettings(settings *json.RawMessage, scope, section string) error {
-	_, err := store.api.
-		URL("/settings/api/v1/settings/%s/%s", url.PathEscape(scope), url.PathEscape(section)).
-		Put(settings)
+// UpdateSectionSettings update settings for a scope and section combination.
+func (c *Settings) UpdateSectionSettings(scope, section string, settings map[string]interface{}) error {
+	_, err := c.api.
+		URL("/settings/api/v1/settings/%s/%s", scope, section).
+		Put(&settings)
 
 	return err
 }
 
-// ScopeSchema get schema for the scope
-func (store *Settings) ScopeSchema(scope string) (*json.RawMessage, error) {
-	schema := &json.RawMessage{}
-	_, err := store.api.
-		URL("/settings/api/v1/schema/%s", url.PathEscape(scope)).
-		Get(&schema)
+// MARK: Restart Required
+// VerifyRestartRequired verify if restart is required for given settings scope.
+func (c *Settings) VerifyRestartRequired(scope string, settings map[string]interface{}) (*map[string]interface{}, error) {
+	verification := &map[string]interface{}{}
 
-	return schema, err
-}
+	_, err := c.api.
+		URL("/settings/api/v1/restart_required/%s", scope).
+		Post(&settings, &verification)
 
-// SectionSchema get schema for the section
-func (store *Settings) SectionSchema(scope, section string) (*json.RawMessage, error) {
-	schema := &json.RawMessage{}
-	_, err := store.api.
-		URL("/settings/api/v1/schema/%s/%s", url.PathEscape(scope), url.PathEscape(section)).
-		Get(&schema)
-
-	return schema, err
-}
-
-// RestartRequired get restart required information for given settings and scope
-func (store *Settings) RestartRequired(settings *json.RawMessage, scope string) (*json.RawMessage, error) {
-	isRestartRequiredResponse := &json.RawMessage{}
-
-	_, err := store.api.
-		URL("/settings/api/v1/restart_required/%s", url.PathEscape(scope)).
-		Post(settings, isRestartRequiredResponse)
-
-	return isRestartRequiredResponse, err
+	return verification, err
 }

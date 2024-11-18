@@ -6,26 +6,33 @@
 
 package trailindex
 
-// Params struct for pagination queries.
-type Params struct {
-	Offset  int    `json:"offset,omitempty"`
-	Limit   int    `json:"limit,omitempty"`
-	Sortdir string `json:"sortdir,omitempty"`
+// TrailIndexResponse trail index response definition.
+type TrailIndexResponse struct {
+	ConnID      string          `json:"connection_id"`
+	ChanID      string          `json:"channel_id"`
+	Protocol    string          `json:"protocol"`
+	ChannelType string          `json:"type"`
+	Extra       TrailIndexExtra `json:"extra,omitempty"`
+	TimeStamp   string          `json:"timestamp"`
+	Position    int             `json:"position"`
+	Content     string          `json:"content"`
 }
 
-// IndexResponse trail index response definition
-type IndexResponse struct {
-	ConnID      string `json:"connection_id,omitempty"`
-	ChanID      string `json:"channel_id,omitempty"`
-	Protocol    string `json:"protocol,omitempty"`
-	ChannelType string `json:"type,omitempty"`
-	TimeStamp   string `json:"timestamp,omitempty"`
-	Content     string `json:"content,omitempty"`
-	Position    int    `json:"position,omitempty"`
+// TrailIndexExtra trail index extra definition.
+type TrailIndexExtra struct {
+	Command           string `json:"command,omitempty"`
+	SubsystemName     string `json:"subsystem_name,omitempty"`
+	OriginatorAddress string `json:"originator_address,omitempty"`
+	OriginatorPort    uint32 `json:"originator_port,omitempty"`
+	ListenerAddress   string `json:"listener_address,omitempty"`
+	ListenerPort      uint32 `json:"listener_port,omitempty"`
+	DstAddress        string `json:"dst_address,omitempty"`
+	DstPort           uint32 `json:"dst_port,omitempty"`
+	PTY               bool   `json:"pty,omitempty"`
 }
 
-// SearchRequestObject search request object definition
-type SearchRequestObject struct {
+// TranscriptSearch transcript search request object definition.
+type TranscriptSearch struct {
 	ConnID    string `json:"connection_id"`
 	ChanID    string `json:"channel_id"`
 	Protocol  string `json:"protocol"`
@@ -36,8 +43,8 @@ type SearchRequestObject struct {
 	EndPos    int    `json:"end_position"`
 }
 
-// Connection connection definition
-type Connection struct {
-	ConnID string `json:"connection_id,omitempty"`
-	Status string `json:"status,omitempty"`
+// ConnectionTranscriptStatus connection transcript status definition.
+type ConnectionTranscriptStatus struct {
+	ConnectionID string `json:"connection_id"`
+	Status       string `json:"status"`
 }
