@@ -42,7 +42,13 @@ func (c *ConnectionManager) GetConnections(opts ...filters.Option) (*response.Re
 	connections := &response.ResultSet[Connection]{}
 	params := url.Values{}
 
-	for _, opt := range opts {
+	// Set default options, which will be overwritten by opts if defined.
+	options := append([]filters.Option{
+		filters.Paging(0, 50),
+		filters.Sort("id", "ASC"),
+	}, opts...)
+
+	for _, opt := range options {
 		opt(&params)
 	}
 
@@ -59,7 +65,13 @@ func (c *ConnectionManager) SearchConnections(search *ConnectionSearch, opts ...
 	connections := &response.ResultSet[Connection]{}
 	params := url.Values{}
 
-	for _, opt := range opts {
+	// Set default options, which will be overwritten by opts if defined.
+	options := append([]filters.Option{
+		filters.Paging(0, 50),
+		filters.Sort("id", "ASC"),
+	}, opts...)
+
+	for _, opt := range options {
 		opt(&params)
 	}
 

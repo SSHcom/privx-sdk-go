@@ -88,7 +88,7 @@ type RequestStepApprover struct {
 	Role         WorkflowRole  `json:"role"`
 	Decision     string        `json:"decision"`
 	User         *WorkflowUser `json:"user,omitempty"`
-	DecisionTime *string       `json:"decision_time"`
+	DecisionTime *string       `json:"decision_time,omitempty"`
 	Comment      string        `json:"comment"`
 }
 
