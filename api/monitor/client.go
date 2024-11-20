@@ -53,8 +53,9 @@ func (c *Monitor) SearchAuditEvents(search *AuditEventSearch, opts ...filters.Op
 
 	// Set default options, which will be overwritten by opts if defined.
 	options := append([]filters.Option{
-		filters.Paging(0, 50),
-		filters.Sort("created", "ASC"),
+		filters.Paging(0, 25),
+		filters.Sort("created", "DESC"),
+		filters.FuzzyCount(true),
 	}, opts...)
 
 	for _, opt := range options {
@@ -76,8 +77,9 @@ func (c *Monitor) GetAuditEvents(opts ...filters.Option) (*response.ResultSet[Au
 
 	// Set default options, which will be overwritten by opts if defined.
 	options := append([]filters.Option{
-		filters.Paging(0, 50),
-		filters.Sort("created", "ASC"),
+		filters.Paging(0, 25),
+		filters.Sort("created", "DESC"),
+		filters.FuzzyCount(true),
 	}, opts...)
 
 	for _, opt := range options {
