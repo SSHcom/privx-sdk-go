@@ -8,7 +8,6 @@ package connectionmanager
 
 import (
 	"net/url"
-	"time"
 
 	"github.com/SSHcom/privx-sdk-go/api/filters"
 	"github.com/SSHcom/privx-sdk-go/api/response"
@@ -66,15 +65,6 @@ func (c *ConnectionManager) GetConnections(opts ...filters.Option) (*response.Re
 func (c *ConnectionManager) SearchConnections(search *ConnectionSearch, opts ...filters.Option) (*response.ResultSet[Connection], error) {
 	connections := &response.ResultSet[Connection]{}
 	params := url.Values{}
-
-	// Define default connected start time if empty (similar on how UI is handling start time).
-	if search != nil && search.Connected == nil {
-		search = &ConnectionSearch{
-			Connected: &TimestampSearch{
-				Start: time.Now().UTC().AddDate(0, 0, -8).Format("2006-01-02T15:04:05.000Z"),
-			},
-		}
-	}
 
 	// Set default options, which will be overwritten by opts if defined.
 	options := append([]filters.Option{

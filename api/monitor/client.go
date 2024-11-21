@@ -9,7 +9,6 @@ package monitor
 import (
 	"encoding/json"
 	"net/url"
-	"time"
 
 	"github.com/SSHcom/privx-sdk-go/api/filters"
 	"github.com/SSHcom/privx-sdk-go/api/response"
@@ -43,13 +42,6 @@ func (c *Monitor) Status() (*response.ServiceStatus, error) {
 func (c *Monitor) SearchAuditEvents(search *AuditEventSearch, opts ...filters.Option) (*response.ResultSet[AuditEvent], error) {
 	events := &response.ResultSet[AuditEvent]{}
 	params := url.Values{}
-
-	// Define default start time if empty (similar on how UI is handling start time).
-	if search != nil && search.StartTime == "" {
-		search = &AuditEventSearch{
-			StartTime: time.Now().UTC().AddDate(0, 0, -8).Format("2006-01-02T15:04:05.000Z"),
-		}
-	}
 
 	// Set default options, which will be overwritten by opts if defined.
 	options := append([]filters.Option{
