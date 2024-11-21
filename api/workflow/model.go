@@ -6,150 +6,130 @@
 
 package workflow
 
-// Params struct for pagination queries
-type Params struct {
-	Offset  int    `json:"offset,omitempty"`
-	Limit   int    `json:"limit,omitempty"`
-	Sortkey string `json:"sortkey,omitempty"`
-	Sortdir string `json:"sortdir,omitempty"`
-	Filter  string `json:"filter,omitempty"`
-}
-
-// SMTPResponse smtp server test response definition
+// SMTPResponse smtp server test response definition.
 type SMTPResponse struct {
-	Status  string      `json:"status,omitempty"`
-	Details interface{} `json:"details,omitempty"`
+	Status  string      `json:"status"`
+	Details interface{} `json:"details"`
 }
 
-// Settings workflow settings definition
-type Settings struct {
-	BackendAddress string `json:"privx_backend_address,omitempty"`
-	Address        string `json:"smtp_sender_address,omitempty"`
-	Server         string `json:"smtp_server,omitempty"`
-	Password       string `json:"smtp_server_password,omitempty"`
-	Protocol       string `json:"smtp_server_protocol,omitempty"`
-	Username       string `json:"smtp_server_username,omitempty"`
-	Approvers      int    `json:"request_role_max_approvers,omitempty"`
-	Attempts       int    `json:"smtp_retry_attempts,omitempty"`
-	Port           int    `json:"smtp_server_port,omitempty"`
-	Enabled        bool   `json:"smtp_server_enabled,omitempty"`
-	InsecureVerify bool   `json:"smtp_server_insecure_verify,omitempty"`
+// WorkflowSettings workflow settings definition.
+type WorkflowSettings struct {
+	Host               string `json:"smtp_server"`
+	Port               int    `json:"smtp_server_port"`
+	MaxApprovers       int    `json:"request_role_max_approvers"`
+	Enabled            bool   `json:"smtp_server_enabled"`
+	BackendAddress     string `json:"privx_backend_address"`
+	Username           string `json:"smtp_server_username"`
+	Password           string `json:"smtp_server_password"`
+	Protocol           string `json:"smtp_server_protocol"`
+	SenderAddress      string `json:"smtp_sender_address"`
+	EmailRetryAttempts int    `json:"smtp_retry_attempts"`
+	InsecureVerify     bool   `json:"smtp_server_insecure_verify"`
 }
 
-// StepApprover workflow step approver defintion
-type StepApprover struct {
-	ID   string `json:"id,omitempty"`
-	Role Role   `json:"role,omitempty"`
+// WorkflowStepApprover workflow step approver definition.
+type WorkflowStepApprover struct {
+	ID   string       `json:"id,omitempty"`
+	Role WorkflowRole `json:"role,omitempty"`
 }
 
-// Step workflow step definition
-type Step struct {
-	ID        string         `json:"id,omitempty"`
-	Name      string         `json:"name,omitempty"`
-	Match     string         `json:"match,omitempty"`
-	Approvers []StepApprover `json:"approvers,omitempty"`
+// WorkflowStep workflow step definition.
+type WorkflowStep struct {
+	ID        string                 `json:"id,omitempty"`
+	Name      string                 `json:"name,omitempty"`
+	Match     string                 `json:"match,omitempty"`
+	Approvers []WorkflowStepApprover `json:"approvers,omitempty"`
 }
 
-// Role workflow frole definition
-type Role struct {
-	ID      string `json:"id,omitempty"`
-	Name    string `json:"name,omitempty"`
+// WorkflowRole workflow role definition.
+type WorkflowRole struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
 	Deleted bool   `json:"deleted,omitempty"`
 }
 
-// User workflow user definition
-type User struct {
+// WorkflowUser workflow user definition.
+type WorkflowUser struct {
 	ID          string `json:"id,omitempty"`
 	DisplayName string `json:"display_name,omitempty"`
+	Deleted     bool   `json:"deleted"`
 }
 
 // Workflow workflow definition
 type Workflow struct {
-	ID                        string   `json:"id,omitempty"`
-	Author                    string   `json:"author,omitempty"`
-	Created                   string   `json:"created,omitempty"`
-	Updated                   string   `json:"updated,omitempty"`
-	UpdatedBy                 string   `json:"updated_by,omitempty"`
-	Name                      string   `json:"name,omitempty"`
-	Requester                 User     `json:"requester"`
-	RequestedRole             Role     `json:"requested_role"`
-	RequestJustification      string   `json:"request_justification,omitempty"`
-	GrantTypes                []string `json:"grant_types,omitempty"`
-	GrantStart                string   `json:"grant_start,omitempty"`
-	GrantEnd                  string   `json:"grant_end,omitempty"`
-	FloatingLength            int64    `json:"floating_length,omitempty"`
-	MaxTimeRestrictedDuration int64    `json:"max_time_restricted_duration,omitempty"`
-	MaxFloatingDuration       int64    `json:"max_floating_duration,omitempty"`
-	MaxActiveRequests         *int64   `json:"max_active_requests,omitempty"`
-	TargetUser                User     `json:"target_user,omitempty"`
-	TargetRoles               []Role   `json:"target_roles,omitempty"`
-	RequestorRoles            []Role   `json:"requester_roles,omitempty"`
-	Action                    string   `json:"action,omitempty"`
-	CanBypassRevokeWF         bool     `json:"can_bypass_revoke_workflow"`
-	Status                    string   `json:"status,omitempty"`
-	Comment                   string   `json:"comment,omitempty"`
-	Steps                     []Step   `json:"steps,omitempty"`
+	ID                        string         `json:"id"`
+	Author                    string         `json:"author"`
+	Created                   string         `json:"created"`
+	Updated                   string         `json:"updated"`
+	UpdatedBy                 string         `json:"updated_by"`
+	Name                      string         `json:"name"`
+	GrantTypes                []string       `json:"grant_types,omitempty"`
+	MaxTimeRestrictedDuration int64          `json:"max_time_restricted_duration,omitempty"`
+	MaxFloatingDuration       int64          `json:"max_floating_duration,omitempty"`
+	MaxActiveRequests         int64          `json:"max_active_requests"`
+	TargetRoles               []WorkflowRole `json:"target_roles,omitempty"`
+	RequestorRoles            []WorkflowRole `json:"requester_roles,omitempty"`
+	Action                    string         `json:"action,omitempty"`
+	CanBypassRevokeWF         bool           `json:"can_bypass_revoke_workflow"`
+	Comment                   string         `json:"comment,omitempty"`
+	Steps                     []WorkflowStep `json:"steps,omitempty"`
 }
 
-// Search request search definition
-type Search struct {
-	Keywords  string `json:"keywords,omitempty"`
-	StartTime string `json:"start_time,omitempty"`
-	EndTime   string `json:"end_time,omitempty"`
-}
-
-// Decision request decision definition
+// Decision request decision definition.
 type Decision struct {
 	Step     int    `json:"step"`
 	Decision string `json:"decision"`
 	Comment  string `json:"comment,omitempty"`
 }
 
-// RequestStepApprover request step approver definition
+// RequestStepApprover request step approver definition.
 type RequestStepApprover struct {
-	ID           string `json:"id,omitempty"`
-	Decision     string `json:"decision,omitempty"`
-	DecisionTime string `json:"decision_time,omitempty"`
-	Comment      string `json:"comment,omitempty"`
-	User         User   `json:"user,omitempty"`
-	Role         Role   `json:"role,omitempty"`
+	ID           string        `json:"id"`
+	Role         WorkflowRole  `json:"role"`
+	Decision     string        `json:"decision"`
+	User         *WorkflowUser `json:"user,omitempty"`
+	DecisionTime *string       `json:"decision_time,omitempty"`
+	Comment      string        `json:"comment"`
 }
 
-// RequestStep request step definition
+// RequestStep request step definition.
 type RequestStep struct {
-	ID        string                `json:"id,omitempty"`
-	Name      string                `json:"name,omitempty"`
-	Match     string                `json:"match,omitempty"`
-	Approvers []RequestStepApprover `json:"approvers,omitempty"`
+	ID        string                `json:"id"`
+	Name      string                `json:"name"`
+	Match     string                `json:"match"`
+	Approvers []RequestStepApprover `json:"approvers"`
 }
 
-// Request access request definition
-type Request struct {
-	ID                        string        `json:"id,omitempty"`
-	Author                    string        `json:"author,omitempty"`
-	Created                   string        `json:"created,omitempty"`
-	Updated                   string        `json:"updated,omitempty"`
-	UpdatedBy                 string        `json:"updated_by,omitempty"`
-	Name                      string        `json:"name,omitempty"`
-	Requester                 User          `json:"requester,omitempty"`
-	RequestedRole             Role          `json:"requested_role,omitempty"`
-	RequestJustification      string        `json:"request_justification,omitempty"`
-	GrantType                 string        `json:"grant_type,omitempty"`
-	GrantStart                string        `json:"grant_start,omitempty"`
-	GrantEnd                  string        `json:"grant_end,omitempty"`
-	FloatingLength            int64         `json:"floating_length,omitempty"`
-	MaxTimeRestrictedDuration int64         `json:"max_time_restricted_duration,omitempty"`
-	MaxFloatingDuration       int64         `json:"max_floating_duration,omitempty"`
-	TargetUser                User          `json:"target_user,omitempty"`
-	TargetRoles               []Role        `json:"target_roles,omitempty"`
-	RequestorRoles            []Role        `json:"requester_roles,omitempty"`
-	Action                    string        `json:"action,omitempty"`
-	CanBypassRevokeWF         bool          `json:"can_bypass_revoke_workflow"`
-	Status                    string        `json:"status,omitempty"`
-	Comment                   string        `json:"comment,omitempty"`
-	Steps                     []RequestStep `json:"steps,omitempty"`
-	ApproverCanRevoke         bool          `json:"approver_can_revoke"`
-	TargetRoleRevoked         bool          `json:"target_role_revoked"`
-	TargetRoleRevokeTime      *string       `json:"target_role_revocation_time,omitempty"`
-	TargetRoleRevokedBy       User          `json:"target_role_revoked_by,omitempty"`
+// AccessRequest access request definition.
+type AccessRequest struct {
+	ID                   string        `json:"id"`
+	Author               string        `json:"author"`
+	Created              string        `json:"created"`
+	Updated              string        `json:"updated"`
+	UpdatedBy            string        `json:"updated_by"`
+	Name                 string        `json:"name"`
+	Requester            *WorkflowUser `json:"requester,omitempty"`
+	RequestedRole        *WorkflowRole `json:"requested_role,omitempty"`
+	RequestJustification string        `json:"request_justification"`
+	GrantType            string        `json:"grant_type,omitempty"`
+	GrantStart           string        `json:"grant_start,omitempty"`
+	GrantEnd             string        `json:"grant_end,omitempty"`
+	FloatingLength       int64         `json:"floating_length,omitempty"`
+	TargetUser           *WorkflowUser `json:"target_user,omitempty"`
+	Action               string        `json:"action,omitempty"`
+	Status               string        `json:"status,omitempty"`
+	Comment              string        `json:"comment,omitempty"`
+	Steps                []RequestStep `json:"steps,omitempty"`
+	ApproverCanRevoke    bool          `json:"approver_can_revoke"`
+	TargetRoleRevoked    bool          `json:"target_role_revoked"`
+	TargetRoleRevokeTime *string       `json:"target_role_revocation_time,omitempty"`
+	TargetRoleRevokedBy  *WorkflowUser `json:"target_role_revoked_by,omitempty"`
+}
+
+// AccessRequestSearch access request search definition.
+type AccessRequestSearch struct {
+	Keywords  string `json:"keywords,omitempty"`
+	StartTime string `json:"start_time,omitempty"`
+	EndTime   string `json:"end_time,omitempty"`
+	Filter    string `json:"filter,omitempty"`
 }
