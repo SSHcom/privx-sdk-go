@@ -280,3 +280,13 @@ type ManagedAccountResult struct {
 	Count int              `json:"count"`
 	Items []ManagedAccount `json:"items"`
 }
+
+type TargetDomainsResolveResponse struct {
+	Count int                    `json:"count"`
+	Items []TargetDomainsResolve `json:"items"`
+}
+
+type TargetDomainsResolve struct {
+	ID               string `json:"id"`
+	TargetDomainName string `json:"target_domain_name"`
+}
