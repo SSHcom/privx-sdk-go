@@ -8,10 +8,15 @@ PrivX is a lean and modern privileged access management solution to automate you
 [![Coverage Status](https://coveralls.io/repos/github/SSHcom/privx-sdk-go/badge.svg?branch=master)](https://coveralls.io/github/SSHcom/privx-sdk-go?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/SSHcom/privx-sdk-go)](https://goreportcard.com/report/github.com/SSHcom/privx-sdk-go)
 
-
-\
 **Jump To**:
 [PrivX REST API Reference](https://privx.docs.ssh.com/reference)
+
+# Important Notice: Final Major Release of SDK Version 1
+
+Version 1.37.0 will be the last major release of SDK Version 1.
+
+Starting with the next release, we will intorudce Version 2 of the SDK, which will include significant changes, including breaking changes to backward compatibility.
+We will continue to provide critical bug fixes for Version 1, there will be no new features or support for PrivX versions greater than 37 in this version.
 
 
 ## Getting Started
@@ -37,6 +42,8 @@ func authorize() restapi.Authorizer {
 		/* the options can be referred from SDK Configuration providers section below*/
 		restapi.UseConfigFile("config.toml"),
 		restapi.UseEnvironment(),
+		// Fallback method, in case base url is not defined in config or env
+		restapi.BaseURL(url),
 	)
 
 	return oauth.With(
@@ -55,6 +62,10 @@ func authorize() restapi.Authorizer {
 func curl() restapi.Connector {
 	return restapi.New(
 		restapi.Auth(authorize())
+		restapi.UseConfigFile(config),
+		restapi.UseEnvironment(),
+		// Fallback method, in case base url is not defined in config or env
+		restapi.BaseURL(url),
 	)
 }
 
@@ -165,15 +176,16 @@ If you experience any issues with the library, please let us know via [GitHub is
 * **Reveal** the steps you took to reproduce the problem, include code snippet or links to your project.
 
 
-## How To Contribute
+## How To Contribute to SDK Version 1
 
 The project is [Apache 2.0](LICENSE) licensed and accepts contributions via GitHub pull requests:
 
 1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+2. Select the Appropriate Branch (`git switch v1`)
+3. Create your feature branch (`git switch -c my-new-feature`)
+4. Commit your changes (`git commit -am 'Added some feature'`)
+5. Push to the branch (`git push origin my-new-feature`)
+6. Create new Pull Request
 
 
 ## License
