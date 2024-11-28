@@ -293,3 +293,11 @@ type Secrets struct {
 	Secret  string    `json:"secret"`
 	Created time.Time `json:"created"`
 }
+
+type ComponentCaConfig struct {
+	Name        string    `json:"name"`
+	CAID        string    `json:"ca_id"`
+	PrimaryCAID string    `json:"primary_ca_id"`
+	Updated     time.Time `json:"updated"`
+	UpdatedBy   string    `json:"updated_by,omitempty"`
+}

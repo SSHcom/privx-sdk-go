@@ -72,6 +72,26 @@ func (c *Authorizer) DownloadCACertificate(caID, filename string) error {
 	return err
 }
 
+// CAConfig get authorizers root certificate config by ca type.
+func (c *Authorizer) CAConfig(caType string) (ComponentCaConfig, error) {
+	caConf := ComponentCaConfig{}
+
+	_, err := c.api.
+		URL("/authorizer/api/v1/%s/cas/config", caType).
+		Get(&caConf)
+
+	return caConf, err
+}
+
+// UpdateCAConfig update authorizers root certificate config by ca type.
+func (c *Authorizer) UpdateCAConfig(caType string, caConf ComponentCaConfig) error {
+	_, err := c.api.
+		URL("/authorizer/api/v1/%s/cas/config", caType).
+		Put(&caConf)
+
+	return err
+}
+
 // DownloadCertificateRevocationList fetch authorizer CA certificate revocation list as a download object.
 func (c *Authorizer) DownloadCertificateRevocationList(caID, filename string) error {
 	err := c.api.

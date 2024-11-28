@@ -271,6 +271,17 @@ func (c *SecretsManager) RefreshTargetDomain(tdID string) error {
 	return err
 }
 
+// ResolveTargetDomains resolve target domain names to target domain IDs.
+func (s *SecretsManager) ResolveTargetDomains(tdNames []string) (TargetDomainsResolveResponse, error) {
+	resolve := TargetDomainsResolveResponse{}
+
+	_, err := s.api.
+		URL("/secrets-manager/api/v1/targetdomains/resolve").
+		Post(tdNames, &resolve)
+
+	return resolve, err
+}
+
 // MARK: Target domain accounts
 // GetTargetDomainAccounts get accounts in target domain.
 func (c *SecretsManager) GetTargetDomainAccounts(tdID string, opts ...filters.Option) (*response.ResultSet[ScannedAccount], error) {
