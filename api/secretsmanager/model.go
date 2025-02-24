@@ -333,3 +333,13 @@ type TargetDomainsResolve struct {
 	ID               string `json:"id"`
 	TargetDomainName string `json:"target_domain_name"`
 }
+
+type TargetDomainsResolveResponse struct {
+	Count int                    `json:"count"`
+	Items []TargetDomainsResolve `json:"items"`
+}
+
+type TargetDomainsResolve struct {
+	ID               string `json:"id"`
+	TargetDomainName string `json:"target_domain_name"`
+}
