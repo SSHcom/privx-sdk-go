@@ -7,7 +7,7 @@
 package licensemanager
 
 import (
-	"github.com/SSHcom/privx-sdk-go/api/rolestore"
+	"github.com/SSHcom/privx-sdk-go/v2/api/rolestore"
 )
 
 // LicenseStatistics license statistics request definition.

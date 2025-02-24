@@ -7,8 +7,8 @@
 package licensemanager
 
 import (
-	"github.com/SSHcom/privx-sdk-go/api/response"
-	"github.com/SSHcom/privx-sdk-go/restapi"
+	"github.com/SSHcom/privx-sdk-go/v2/api/response"
+	"github.com/SSHcom/privx-sdk-go/v2/restapi"
 )
 
 // LicenseManager is a license manager client instance.

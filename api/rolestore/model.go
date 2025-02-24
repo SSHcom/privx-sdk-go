@@ -9,7 +9,7 @@ package rolestore
 import (
 	"encoding/json"
 
-	"github.com/SSHcom/privx-sdk-go/api/auth"
+	"github.com/SSHcom/privx-sdk-go/v2/api/auth"
 )
 
 const (

@@ -9,9 +9,9 @@ package hoststore
 import (
 	"net/url"
 
-	"github.com/SSHcom/privx-sdk-go/api/filters"
-	"github.com/SSHcom/privx-sdk-go/api/response"
-	"github.com/SSHcom/privx-sdk-go/restapi"
+	"github.com/SSHcom/privx-sdk-go/v2/api/filters"
+	"github.com/SSHcom/privx-sdk-go/v2/api/response"
+	"github.com/SSHcom/privx-sdk-go/v2/restapi"
 )
 
 // HostStore is a host store client instance.

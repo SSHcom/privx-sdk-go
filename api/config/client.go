@@ -7,7 +7,7 @@
 package config
 
 import (
-	"github.com/SSHcom/privx-sdk-go/restapi"
+	"github.com/SSHcom/privx-sdk-go/v2/restapi"
 )
 
 // ConfFileStore is a role-store client instance.

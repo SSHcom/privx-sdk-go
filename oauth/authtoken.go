@@ -6,7 +6,7 @@
 
 package oauth
 
-import "github.com/SSHcom/privx-sdk-go/restapi"
+import "github.com/SSHcom/privx-sdk-go/v2/restapi"
 
 type tAuthExplicit struct{ string }
 
