@@ -9,7 +9,7 @@ package authorizer
 import (
 	"time"
 
-	"github.com/SSHcom/privx-sdk-go/api/secretsmanager"
+	"github.com/SSHcom/privx-sdk-go/v2/api/secretsmanager"
 )
 
 // CAparams ca query parameter definition.

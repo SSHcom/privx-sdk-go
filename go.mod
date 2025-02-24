@@ -1,4 +1,4 @@
-module github.com/SSHcom/privx-sdk-go
+module github.com/SSHcom/privx-sdk-go/v2
 
 go 1.21
 

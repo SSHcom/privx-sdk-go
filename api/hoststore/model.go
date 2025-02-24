@@ -9,8 +9,8 @@ package hoststore
 import (
 	"time"
 
-	"github.com/SSHcom/privx-sdk-go/api/rolestore"
-	"github.com/SSHcom/privx-sdk-go/api/secretsmanager"
+	"github.com/SSHcom/privx-sdk-go/v2/api/rolestore"
+	"github.com/SSHcom/privx-sdk-go/v2/api/secretsmanager"
 )
 
 // HostSearch host search request definition.

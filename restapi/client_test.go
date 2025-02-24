@@ -14,7 +14,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SSHcom/privx-sdk-go/restapi"
+	"github.com/SSHcom/privx-sdk-go/v2/restapi"
 )
 
 func TestGet(t *testing.T) {
@@ -106,7 +106,6 @@ func TestRecvNoIdP(t *testing.T) {
 	}
 }
 
-//
 func mock() *httptest.Server {
 	return httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +121,6 @@ func mock() *httptest.Server {
 	)
 }
 
-//
 func mockStatus() *httptest.Server {
 	return httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/SSHcom/privx-sdk-go/restapi"
+	"github.com/SSHcom/privx-sdk-go/v2/restapi"
 )
 
 type tAuthPassword struct{ *tAuth }

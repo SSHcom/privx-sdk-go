@@ -6,7 +6,7 @@
 
 package userstore
 
-import "github.com/SSHcom/privx-sdk-go/api/rolestore"
+import "github.com/SSHcom/privx-sdk-go/v2/api/rolestore"
 
 // LocalUserParams local user query parameters definition.
 type LocalUserParams struct {

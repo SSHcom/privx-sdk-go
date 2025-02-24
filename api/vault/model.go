@@ -9,7 +9,7 @@ package vault
 import (
 	"time"
 
-	"github.com/SSHcom/privx-sdk-go/api/rolestore"
+	"github.com/SSHcom/privx-sdk-go/v2/api/rolestore"
 )
 
 // Secret secret definition.
