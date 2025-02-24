@@ -302,12 +302,3 @@ type ComponentCaConfig struct {
 	Updated     time.Time `json:"updated"`
 	UpdatedBy   string    `json:"updated_by,omitempty"`
 }
-
-// ComponentCaConfig component ca config response definition.
-type ComponentCaConfig struct {
-	Name        string    `json:"name"`
-	CAID        string    `json:"ca_id"`
-	PrimaryCAID string    `json:"primary_ca_id"`
-	Updated     time.Time `json:"updated"`
-	UpdatedBy   string    `json:"updated_by,omitempty"`
-}
