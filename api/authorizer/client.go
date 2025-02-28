@@ -9,48 +9,74 @@ package authorizer
 import (
 	"net/url"
 
-	"github.com/SSHcom/privx-sdk-go/restapi"
+	"github.com/SSHcom/privx-sdk-go/v2/api/filters"
+	"github.com/SSHcom/privx-sdk-go/v2/api/response"
+	"github.com/SSHcom/privx-sdk-go/v2/restapi"
 )
 
-// Client is a authorizer client instance.
-type Client struct {
+// Authorizer is a authorizer client instance.
+type Authorizer struct {
 	api restapi.Connector
 }
 
-// New creates a new authorizer client instance
-func New(api restapi.Connector) *Client {
-	return &Client{api: api}
+// New authorizer client constructor.
+func New(api restapi.Connector) *Authorizer {
+	return &Authorizer{api: api}
 }
 
-// CACertificates gets authorizer's root certificates
-func (auth *Client) CACertificates(accessGroupID string) ([]CA, error) {
-	ca := []CA{}
-	filters := Params{
-		AccessGroupID: accessGroupID,
+// MARK: Status
+// Status get authorizer microservice status.
+func (c *Authorizer) Status() (*response.ServiceStatus, error) {
+	status := &response.ServiceStatus{}
+
+	_, err := c.api.
+		URL("/authorizer/api/v1/status").
+		Get(status)
+
+	return status, err
+}
+
+// MARK: CAS
+// GetCACertificates get authorizers root certificates.
+// Note, the v1 endpoint doesn't return the count as part of the response body,
+// this will change with v2. Until then, we will handle it internally within the SDK.
+func (c *Authorizer) GetCACertificates(opts ...filters.Option) (*response.ResultSet[CA], error) {
+	cas := []CA{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/cas").
-		Query(&filters).
-		Get(&ca)
+		Query(params).
+		Get(&cas)
 
-	return ca, err
+	// v1 endpoint does not return count,
+	// return count internally in sdk until v2 is introduced
+	certs := &response.ResultSet[CA]{
+		Items: cas,
+		Count: len(cas),
+	}
+
+	return certs, err
 }
 
-// CACertificate gets authorizer's root certificate
-func (auth *Client) CACertificate(caID, filename string) error {
-	err := auth.api.
-		URL("/authorizer/api/v1/cas/%s", url.PathEscape(caID)).
+// DownloadCACertificate fetch authorizers root certificate as a download object.
+func (c *Authorizer) DownloadCACertificate(caID, filename string) error {
+	err := c.api.
+		URL("/authorizer/api/v1/cas/%s", caID).
 		Download(filename)
 
 	return err
 }
 
 // CAConfig get authorizers root certificate config by ca type.
-func (auth *Client) CAConfig(caType string) (ComponentCaConfig, error) {
+func (c *Authorizer) CAConfig(caType string) (ComponentCaConfig, error) {
 	caConf := ComponentCaConfig{}
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/%s/cas/config", caType).
 		Get(&caConf)
 
@@ -58,401 +84,440 @@ func (auth *Client) CAConfig(caType string) (ComponentCaConfig, error) {
 }
 
 // UpdateCAConfig update authorizers root certificate config by ca type.
-func (auth *Client) UpdateCAConfig(caType string, caConf ComponentCaConfig) error {
-	_, err := auth.api.
+func (c *Authorizer) UpdateCAConfig(caType string, caConf ComponentCaConfig) error {
+	_, err := c.api.
 		URL("/authorizer/api/v1/%s/cas/config", caType).
 		Put(&caConf)
 
 	return err
 }
 
-// CertificateRevocationList gets authorizer CA's certificate revocation list.
-func (auth *Client) CertificateRevocationList(caID, filename string) error {
-	err := auth.api.
-		URL("/authorizer/api/v1/cas/%s/crl", url.PathEscape(caID)).
+// DownloadCertificateRevocationList fetch authorizer CA certificate revocation list as a download object.
+func (c *Authorizer) DownloadCertificateRevocationList(caID, filename string) error {
+	err := c.api.
+		URL("/authorizer/api/v1/cas/%s/crl", caID).
 		Download(filename)
 
 	return err
 }
 
-// TargetHostCredentials get target host credentials for the user
-func (auth *Client) TargetHostCredentials(authorizer *AuthorizationRequest) (*ApiIdentitiesResponse, error) {
+// GetTargetHostCredentials get target host credentials for the user.
+func (c *Authorizer) GetTargetHostCredentials(request *ApiIdentities) (*ApiIdentitiesResponse, error) {
 	principal := &ApiIdentitiesResponse{}
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/ca/authorize").
-		Post(&authorizer, &principal)
+		Post(&request, &principal)
 
 	return principal, err
 }
 
-// Principals gets defined principals from the authorizer
-func (auth *Client) Principals() ([]Principal, error) {
-	principals := []Principal{}
+// MARK: Principals
+// GetPrincipals get defined principals.
+// Note, the v1 endpoint doesn't return the count as part of the response body,
+// this will change with v2. Until then, we will handle it internally within the SDK.
+func (c *Authorizer) GetPrincipals() (*response.ResultSet[Principal], error) {
+	p := []Principal{}
 
-	_, err := auth.api.
-		URL("/authorizer/api/v1/cas").
-		Get(&principals)
+	_, err := c.api.
+		URL("/authorizer/api/v1/principals").
+		Get(&p)
+
+	// v1 endpoint does not return count,
+	// return count internally in sdk until v2 is introduced
+	principals := &response.ResultSet[Principal]{
+		Count: len(p),
+		Items: p,
+	}
 
 	return principals, err
 }
 
-// Principal gets the principal key by its group ID
-func (auth *Client) Principal(groupID, keyID, filter string) (*Principal, error) {
+// GetPrincipal get principal by its group id.
+func (c *Authorizer) GetPrincipal(groupID string, opts ...filters.Option) (*Principal, error) {
 	principal := &Principal{}
-	filters := Params{
-		KeyID:  keyID,
-		Filter: filter,
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := auth.api.
-		URL("/authorizer/api/v1/principals/%s", url.PathEscape(groupID)).
-		Query(&filters).
+	_, err := c.api.
+		URL("/authorizer/api/v1/principals/%s", groupID).
+		Query(params).
 		Get(&principal)
 
 	return principal, err
 }
 
-// DeletePrincipalKey delete the principal key by its group ID
-func (auth *Client) DeletePrincipalKey(groupID, keyID string) error {
-	filters := Params{
-		KeyID: keyID,
+// DeletePrincipalKey delete the principal key by its group id.
+func (c *Authorizer) DeletePrincipalKey(groupID string, opts ...filters.Option) error {
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := auth.api.
-		URL("/authorizer/api/v1/principals/%s", url.PathEscape(groupID)).
-		Query(filters).
+	_, err := c.api.
+		URL("/authorizer/api/v1/principals/%s", groupID).
+		Query(params).
 		Delete()
 
 	return err
 }
 
-// CreatePrincipalKey create a principal key pair
-func (auth *Client) CreatePrincipalKey(groupID string) (*Principal, error) {
+// CreatePrincipalKey create a principal key pair.
+func (c *Authorizer) CreatePrincipalKey(groupID string) (*Principal, error) {
 	principal := &Principal{}
 
-	_, err := auth.api.
-		URL("/authorizer/api/v1/principals/%s/create", url.PathEscape(groupID)).
+	_, err := c.api.
+		URL("/authorizer/api/v1/principals/%s/create", groupID).
 		Post(nil, &principal)
 
 	return principal, err
 }
 
-// ImportPrincipalKey mport a principal key pair
-func (auth *Client) ImportPrincipalKey(groupID string, key *PrincipalKeyImportRequest) (*Principal, error) {
+// ImportPrincipalKey import a principal key pair.
+func (c *Authorizer) ImportPrincipalKey(groupID string, key *PrincipalKeyImport) (*Principal, error) {
 	principal := &Principal{}
 
-	_, err := auth.api.
-		URL("/authorizer/api/v1/principals/%s/import", url.PathEscape(groupID)).
+	_, err := c.api.
+		URL("/authorizer/api/v1/principals/%s/import", groupID).
 		Post(&key, &principal)
 
 	return principal, err
 }
 
-// SignPrincipalKey sign a principal key and get a signature
-func (auth *Client) SignPrincipalKey(groupID, keyID string, credential *Credential) (*Signature, error) {
+// SignPrincipalKey get a principal key signature.
+func (c *Authorizer) SignPrincipalKey(groupID string, sign *PrincipalKeySign, opts ...filters.Option) (*Signature, error) {
 	signature := &Signature{}
-	filters := Params{
-		KeyID: keyID,
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := auth.api.
-		URL("/authorizer/api/v1/principals/%s/sign", url.PathEscape(groupID)).
-		Query(&filters).
-		Post(&credential, &signature)
+	_, err := c.api.
+		URL("/authorizer/api/v1/principals/%s/sign", groupID).
+		Query(params).
+		Post(&sign, &signature)
 
 	return signature, err
 }
 
-// ExtenderCACertificates gets authorizer's extender CA certificates
-func (auth *Client) ExtenderCACertificates(accessGroupID string) ([]CA, error) {
-	certificates := []CA{}
-	filters := Params{
-		AccessGroupID: accessGroupID,
+// MARK: Extender
+// GetExtenderCACertificates gets authorizers extender CA certificates.
+// Note, the v1 endpoint doesn't return the count as part of the response body,
+// this will change with v2. Until then, we will handle it internally within the SDK.
+func (c *Authorizer) GetExtenderCACertificates(opts ...filters.Option) (*response.ResultSet[CA], error) {
+	cs := []CA{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/extender/cas").
-		Query(&filters).
-		Get(&certificates)
+		Query(params).
+		Get(&cs)
+
+	// v1 endpoint does not return count,
+	// return count internally in sdk until v2 is introduced
+	certificates := &response.ResultSet[CA]{
+		Count: len(cs),
+		Items: cs,
+	}
 
 	return certificates, err
 }
 
-// ExtenderCACertificate gets authorizer's extender CA certificate
-func (auth *Client) ExtenderCACertificate(id string) (*CA, error) {
-	certificate := &CA{}
-
-	_, err := auth.api.
-		URL("/authorizer/api/v1/extender/cas/%s", url.PathEscape(id)).
-		Get(&certificate)
-
-	return certificate, err
-}
-
-// DownloadExtenderCertificateCRL gets authorizer CA's certificate revocation list
-func (auth *Client) DownloadExtenderCertificateCRL(filename, id string) error {
-	err := auth.api.
-		URL("/authorizer/api/v1/extender/cas/%s/crl", url.PathEscape(id)).
+// DownloadExtenderCACertificate fetch authorizers extender CA certificate by id as a download object.
+func (c *Authorizer) DownloadExtenderCACertificate(filename, id string) error {
+	err := c.api.
+		URL("/authorizer/api/v1/extender/cas/%s", id).
 		Download(filename)
 
 	return err
 }
 
-// ExtenderConfigDownloadHandle get a session id
-func (auth *Client) ExtenderConfigDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
-	sessionID := &DownloadHandle{}
-
-	_, err := auth.api.
-		URL("/authorizer/api/v1/extender/conf/%s", url.PathEscape(trustedClientID)).
-		Post(nil, &sessionID)
-
-	return sessionID, err
-}
-
-// DownloadExtenderConfig gets a pre-configured extender config
-func (auth *Client) DownloadExtenderConfig(trustedClientID, sessionID, filename string) error {
-	err := auth.api.
-		URL("/authorizer/api/v1/extender/conf/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
+// DownloadExtenderCertificateCRL fetch authorizer CA certificate revocation list as a download object.
+func (c *Authorizer) DownloadExtenderCertificateCRL(filename, id string) error {
+	err := c.api.
+		URL("/authorizer/api/v1/extender/cas/%s/crl", id).
 		Download(filename)
 
 	return err
 }
 
-// DeployScriptDownloadHandle get a session id for a deployment script
-func (auth *Client) DeployScriptDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
-	sessionID := &DownloadHandle{}
+// GetExtenderConfigSessions get extenders config session ids.
+func (c *Authorizer) GetExtenderConfigSessions(trustedClientID string) (*SessionIDResponse, error) {
+	sessionIDs := &SessionIDResponse{}
 
-	_, err := auth.api.
-		URL("/authorizer/api/v1/deploy/%s", url.PathEscape(trustedClientID)).
-		Post(nil, &sessionID)
+	_, err := c.api.
+		URL("/authorizer/api/v1/extender/conf/%s", trustedClientID).
+		Post(nil, &sessionIDs)
 
-	return sessionID, err
+	return sessionIDs, err
 }
 
-// DownloadDeployScript gets a pre-configured deployment script
-func (auth *Client) DownloadDeployScript(trustedClientID, sessionID, filename string) error {
-	err := auth.api.
-		URL("/authorizer/api/v1/deploy/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
+// DownloadExtenderConfig fetch a pre-configured extender config as a download object.
+func (c *Authorizer) DownloadExtenderConfig(trustedClientID, sessionID, filename string) error {
+	err := c.api.
+		URL("/authorizer/api/v1/extender/conf/%s/%s", trustedClientID, sessionID).
 		Download(filename)
 
 	return err
 }
 
-// DownloadPrincipalCommandScript gets the principals_command.sh script
-func (auth *Client) DownloadPrincipalCommandScript(filename string) error {
-	err := auth.api.
+// MARK: Deploy
+// GetDeployScriptSessions get deploy script session ids.
+func (c *Authorizer) GetDeployScriptSessions(trustedClientID string) (*SessionIDResponse, error) {
+	sessionIDs := &SessionIDResponse{}
+
+	_, err := c.api.
+		URL("/authorizer/api/v1/deploy/%s", trustedClientID).
+		Post(nil, &sessionIDs)
+
+	return sessionIDs, err
+}
+
+// DownloadDeployScript fetch a pre-configured deployment script.
+func (c *Authorizer) DownloadDeployScript(trustedClientID, sessionID, filename string) error {
+	err := c.api.
+		URL("/authorizer/api/v1/deploy/%s/%s", trustedClientID, sessionID).
+		Download(filename)
+
+	return err
+}
+
+// DownloadPrincipalCommandScript fetch the principals_command.sh script.
+func (c *Authorizer) DownloadPrincipalCommandScript(filename string) error {
+	err := c.api.
 		URL("/authorizer/api/v1/deploy/principals_command.sh").
 		Download(filename)
 
 	return err
 }
 
-// CarrierConfigDownloadHandle get a session id for a carrier config
-func (auth *Client) CarrierConfigDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
-	sessionID := &DownloadHandle{}
+// MARK: Carrier
+// // GetCarrierConfigSessions get carrier config session ids.
+func (c *Authorizer) GetCarrierConfigSessions(trustedClientID string) (*SessionIDResponse, error) {
+	sessionIDs := &SessionIDResponse{}
 
-	_, err := auth.api.
-		URL("/authorizer/api/v1/carrier/conf/%s", url.PathEscape(trustedClientID)).
-		Post(nil, &sessionID)
+	_, err := c.api.
+		URL("/authorizer/api/v1/carrier/conf/%s", trustedClientID).
+		Post(nil, &sessionIDs)
 
-	return sessionID, err
+	return sessionIDs, err
 }
 
-// DownloadCarrierConfig gets a pre-configured carrier config
-func (auth *Client) DownloadCarrierConfig(trustedClientID, sessionID, filename string) error {
-	err := auth.api.
-		URL("/authorizer/api/v1/carrier/conf/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
+// DownloadCarrierConfig fetch a pre-configured carrier config.
+func (c *Authorizer) DownloadCarrierConfig(trustedClientID, sessionID, filename string) error {
+	err := c.api.
+		URL("/authorizer/api/v1/carrier/conf/%s/%s", trustedClientID, sessionID).
 		Download(filename)
 
 	return err
 }
 
-// WebProxyCACertificates gets authorizer's web proxy CA certificates
-func (auth *Client) WebProxyCACertificates(accessGroupID string) ([]CA, error) {
-	certificates := []CA{}
-	filters := Params{
-		AccessGroupID: accessGroupID,
+// MARK: Web-Proxy
+// GetWebProxyCACertificates gets authorizer's web proxy CA certificates.
+// Note, the v1 endpoint doesn't return the count as part of the response body,
+// this will change with v2. Until then, we will handle it internally within the SDK.
+func (c *Authorizer) GetWebProxyCACertificates(opts ...filters.Option) (*response.ResultSet[CA], error) {
+	cs := []CA{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/icap/cas").
-		Query(&filters).
-		Get(&certificates)
+		Query(params).
+		Get(&cs)
+
+	// v1 endpoint does not return count,
+	// return count internally in sdk until v2 is introduced
+	certificates := &response.ResultSet[CA]{
+		Count: len(cs),
+		Items: cs,
+	}
 
 	return certificates, err
 }
 
-// WebProxyCACertificate gets authorizer's web proxy CA certificate
-func (auth *Client) WebProxyCACertificate(trustedClientID string) (*CA, error) {
+// GetWebProxyCACertificate gets authorizer's web proxy CA certificate by id.
+func (c *Authorizer) GetWebProxyCACertificate(id string) (*CA, error) {
 	certificate := &CA{}
 
-	_, err := auth.api.
-		URL("/authorizer/api/v1/icap/cas/%s", url.PathEscape(trustedClientID)).
+	_, err := c.api.
+		URL("/authorizer/api/v1/icap/cas/%s", id).
 		Get(&certificate)
 
 	return certificate, err
 }
 
-// DownloadWebProxyCertificateCRL gets authorizer CA's certificate revocation list
-func (auth *Client) DownloadWebProxyCertificateCRL(filename, trustedClientID string) error {
-	err := auth.api.
-		URL("/authorizer/api/v1/icap/cas/%s/crl", url.PathEscape(trustedClientID)).
+// DownloadWebProxyCertificateCRL fetch authorizer CA certificate revocation list as a download object.
+func (c *Authorizer) DownloadWebProxyCertificateCRL(filename, id string) error {
+	err := c.api.
+		URL("/authorizer/api/v1/icap/cas/%s/crl", id).
 		Download(filename)
 
 	return err
 }
 
-// WebProxySessionDownloadHandle get a session id for a web proxy config
-func (auth *Client) WebProxySessionDownloadHandle(trustedClientID string) (*DownloadHandle, error) {
-	sessionID := &DownloadHandle{}
+// GetWebProxyConfigSessions get web proxy config session ids.
+func (c *Authorizer) GetWebProxyConfigSessions(trustedClientID string) (*SessionIDResponse, error) {
+	sessionIDs := &SessionIDResponse{}
 
-	_, err := auth.api.
-		URL("/authorizer/api/v1/icap/conf/%s", url.PathEscape(trustedClientID)).
-		Post(nil, &sessionID)
+	_, err := c.api.
+		URL("/authorizer/api/v1/icap/conf/%s", trustedClientID).
+		Post(nil, &sessionIDs)
 
-	return sessionID, err
+	return sessionIDs, err
 }
 
-// DownloadWebProxyConfig gets a pre-configured web proxy config
-func (auth *Client) DownloadWebProxyConfig(trustedClientID, sessionID, filename string) error {
-	err := auth.api.
-		URL("/authorizer/api/v1/icap/conf/%s/%s", url.PathEscape(trustedClientID), url.PathEscape(sessionID)).
+// DownloadWebProxyConfig fetch a pre-configured web proxy config as a download object.
+func (c *Authorizer) DownloadWebProxyConfig(trustedClientID, sessionID, filename string) error {
+	err := c.api.
+		URL("/authorizer/api/v1/icap/conf/%s/%s", trustedClientID, sessionID).
 		Download(filename)
 
 	return err
 }
 
-// CertTemplates returns the certificate authentication templates for the service
-func (auth *Client) CertTemplates(service string) ([]CertTemplate, error) {
-	result := templatesResult{}
-	filters := Params{
-		Service: service,
+// MARK: Templates
+// GetCertTemplates returns the certificate authentication templates.
+func (c *Authorizer) GetCertTemplates(opts ...filters.Option) (*response.ResultSet[CertTemplate], error) {
+	templates := &response.ResultSet[CertTemplate]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/cert/templates").
-		Query(&filters).
-		Get(&result)
+		Query(params).
+		Get(&templates)
 
-	return result.Items, err
+	return templates, err
 }
 
-// SSLTrustAnchor returns the SSL trust anchor (PrivX TLS CA certificate)
-func (auth *Client) SSLTrustAnchor() (*TrustAnchor, error) {
-	anchor := &TrustAnchor{}
+// MARK: Trust Anchors
+// GetSSLTrustAnchor returns the SSL trust anchor.
+func (c *Authorizer) GetSSLTrustAnchor() (*TrustAnchor, error) {
+	trustAnchor := &TrustAnchor{}
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/ssl-trust-anchor").
-		Get(&anchor)
+		Get(&trustAnchor)
 
-	return anchor, err
+	return trustAnchor, err
 }
 
-// ExtenderTrustAnchor returns the extender trust anchor (PrivX TLS CA certificate)
-func (auth *Client) ExtenderTrustAnchor() (*TrustAnchor, error) {
-	anchor := &TrustAnchor{}
+// GetExtenderTrustAnchor returns the extender trust anchor.
+func (c *Authorizer) GetExtenderTrustAnchor() (*TrustAnchor, error) {
+	trustAnchor := &TrustAnchor{}
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/extender-trust-anchor").
-		Get(&anchor)
+		Get(&trustAnchor)
 
-	return anchor, err
+	return trustAnchor, err
 }
 
 // MARK: Access Groups
-// AccessGroups lists all access group
-func (auth *Client) AccessGroups(offset, limit int, sortkey, sortdir string) ([]AccessGroup, error) {
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
+// GetAccessGroups get all access group.
+func (c *Authorizer) GetAccessGroups(opts ...filters.Option) (*response.ResultSet[AccessGroup], error) {
+	accessGroups := &response.ResultSet[AccessGroup]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
-	result := accessGroupResult{}
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/accessgroups").
-		Query(&filters).
-		Get(&result)
+		Query(params).
+		Get(&accessGroups)
 
-	return result.Items, err
+	return accessGroups, err
 }
 
-// CreateAccessGroup create a access group
-func (auth *Client) CreateAccessGroup(accessGroup *AccessGroup) (string, error) {
-	var object struct {
-		ID string `json:"id"`
-	}
+// CreateAccessGroup create access group.
+func (c *Authorizer) CreateAccessGroup(accessGroup *AccessGroup) (response.Identifier, error) {
+	identifier := response.Identifier{}
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/accessgroups").
-		Post(&accessGroup, &object)
+		Post(&accessGroup, &identifier)
 
-	return object.ID, err
+	return identifier, err
 }
 
-// SearchAccessGroup search for access groups
-func (auth *Client) SearchAccessGroup(offset, limit int, sortkey, sortdir string, search *SearchParams) ([]AccessGroup, error) {
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
-	}
-	result := accessGroupResult{}
+// SearchAccessGroups search for access groups.
+func (c *Authorizer) SearchAccessGroups(search *AccessGroupSearch, opts ...filters.Option) (*response.ResultSet[AccessGroup], error) {
+	accessGroups := &response.ResultSet[AccessGroup]{}
+	params := url.Values{}
 
-	_, err := auth.api.
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
 		URL("/authorizer/api/v1/accessgroups/search").
-		Query(&filters).
-		Post(search, &result)
+		Query(params).
+		Post(search, &accessGroups)
 
-	return result.Items, err
+	return accessGroups, err
 }
 
-// AccessGroup get access group
-func (auth *Client) AccessGroup(accessGroupID string) (*AccessGroup, error) {
+// GetAccessGroup get access group by id.
+func (c *Authorizer) GetAccessGroup(accessGroupID string) (*AccessGroup, error) {
 	accessGroup := &AccessGroup{}
 
-	_, err := auth.api.
-		URL("/authorizer/api/v1/accessgroups/%s", url.PathEscape(accessGroupID)).
+	_, err := c.api.
+		URL("/authorizer/api/v1/accessgroups/%s", accessGroupID).
 		Get(&accessGroup)
 
 	return accessGroup, err
 }
 
-// UpdateAccessGroup update access group
-func (auth *Client) UpdateAccessGroup(accessGroupID string, accessGroup *AccessGroup) error {
-	_, err := auth.api.
-		URL("/authorizer/api/v1/accessgroups/%s", url.PathEscape(accessGroupID)).
-		Put(accessGroup)
+// UpdateAccessGroup update access group by id.
+func (c *Authorizer) UpdateAccessGroup(accessGroupID string, update *AccessGroup) error {
+	_, err := c.api.
+		URL("/authorizer/api/v1/accessgroups/%s", accessGroupID).
+		Put(update)
 
 	return err
 }
 
-// DeleteAccessGroup delete a access group
-func (auth *Client) DeleteAccessGroup(accessGroupID string) error {
-	_, err := auth.api.
+// DeleteAccessGroup delete access group by id.
+func (c *Authorizer) DeleteAccessGroup(accessGroupID string) error {
+	_, err := c.api.
 		URL("/authorizer/api/v1/accessgroups/%s", accessGroupID).
 		Delete()
 
 	return err
 }
 
-// CreateAccessGroupsIdCas create CA Key to an access group
-func (auth *Client) CreateAccessGroupsIdCas(accessGroupID string) (string, error) {
-	var result string
+// RenewAccessGroupCAKey renew access group CA key.
+func (c *Authorizer) RenewAccessGroupCAKey(accessGroupID string) (string, error) {
+	var keyID string
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/accessgroups/%s/cas", accessGroupID).
-		Post(nil, &result)
+		Post(nil, &keyID)
 
-	return result, err
+	return keyID, err
 }
 
-// DeleteAccessGroup delete a CA Key to an access group
-func (auth *Client) DeleteAccessGroupsIdCas(accessGroupID string, caID string) error {
-	_, err := auth.api.
+// RevokeAccessGroupCAKey revoke access group CA key.
+func (c *Authorizer) RevokeAccessGroupCAKey(accessGroupID string, caID string) error {
+	_, err := c.api.
 		URL("/authorizer/api/v1/accessgroups/%s/cas/%s", accessGroupID, caID).
 		Delete()
 
@@ -460,124 +525,123 @@ func (auth *Client) DeleteAccessGroupsIdCas(accessGroupID string, caID string) e
 }
 
 // MARK: Certs
-// SearchCert search for certificates
-func (auth *Client) SearchCert(offset, limit int, sortkey, sortdir string, cert *APICertificateSearch) ([]APICertificate, error) {
-	filters := Params{
-		Offset:  offset,
-		Limit:   limit,
-		Sortkey: sortkey,
-		Sortdir: sortdir,
+// SearchCerts search certificates.
+func (c *Authorizer) SearchCerts(search *ApiCertificateSearch, opts ...filters.Option) (*response.ResultSet[ApiCertificate], error) {
+	certs := &response.ResultSet[ApiCertificate]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
-	result := apiCertificateResult{}
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/cert/search").
-		Query(&filters).
-		Post(cert, &result)
+		Query(params).
+		Post(search, &certs)
 
-	return result.Items, err
+	return certs, err
 }
 
-// Get all Certificates
-func (auth *Client) GetAllCertificates() (apiCertificateResult, error) {
-	certificates := apiCertificateResult{}
+// GetAllCertificates get all certificates.
+func (c *Authorizer) GetAllCertificates() (*response.ResultSet[ApiCertificate], error) {
+	certs := &response.ResultSet[ApiCertificate]{}
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/cert").
-		Get(&certificates)
+		Get(&certs)
 
-	return certificates, err
+	return certs, err
 }
 
-// Get Certificate by ID
-func (auth *Client) GetCertByID(ID string) (ApiCertificateObject, error) {
-	cert := ApiCertificateObject{}
+// GetCert get certificate by id.
+func (c *Authorizer) GetCert(certID string) (*ApiCertificate, error) {
+	cert := &ApiCertificate{}
 
-	_, err := auth.api.
-		URL("/authorizer/api/v1/cert/%s", url.PathEscape(ID)).
+	_, err := c.api.
+		URL("/authorizer/api/v1/cert/%s", certID).
 		Get(&cert)
 
 	return cert, err
 }
 
 // MARK: Secrets
-// AccountSecrets lists all account secrets
-func (auth *Client) AccountSecrets(limit int, sortdir string) (AccountSecretsResult, error) {
-	filters := Params{
-		Limit:   limit,
-		Sortdir: sortdir,
-	}
-	result := AccountSecretsResult{}
+// GetAccountSecrets get all account secrets.
+func (c *Authorizer) GetAccountSecrets(opts ...filters.Option) (*response.ResultSet[HostAccountSecret], error) {
+	secrets := &response.ResultSet[HostAccountSecret]{}
+	params := url.Values{}
 
-	_, err := auth.api.
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
 		URL("/authorizer/api/v1/secrets").
-		Query(&filters).
-		Get(&result)
+		Query(params).
+		Get(&secrets)
 
-	return result, err
+	return secrets, err
 }
 
-// SearchAccountSecrets search for account secrets
-func (auth *Client) SearchAccountSecrets(limit int, sortdir string, search *AccountSecretsSearchRequest) (AccountSecretsResult, error) {
-	filters := Params{
-		Limit:   limit,
-		Sortdir: sortdir,
-	}
-	result := AccountSecretsResult{}
+// SearchAccountSecrets search for account secrets.
+func (c *Authorizer) SearchAccountSecrets(search *AccountSecretSearch, opts ...filters.Option) (*response.ResultSet[HostAccountSecret], error) {
+	secrets := &response.ResultSet[HostAccountSecret]{}
+	params := url.Values{}
 
-	_, err := auth.api.
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
 		URL("/authorizer/api/v1/secrets/search").
-		Query(&filters).
-		Post(search, &result)
+		Query(params).
+		Post(search, &secrets)
 
-	return result, err
+	return secrets, err
 }
 
-// CheckoutAccountSecret checkout account secret
-func (auth *Client) CheckoutAccountSecret(path string) (CheckoutResult, error) {
-	checkoutReq := CheckoutRequest{
-		Path: path,
+// GetSecretCheckouts get secret checkouts.
+func (c *Authorizer) GetSecretCheckouts(opts ...filters.Option) (*response.ResultSet[Checkout], error) {
+	checkouts := &response.ResultSet[Checkout]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
 	}
-	result := CheckoutResult{}
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/secrets/checkouts").
-		Post(checkoutReq, &result)
+		Query(params).
+		Get(&checkouts)
 
-	return result, err
+	return checkouts, err
 }
 
-// Checkouts lists secret checkouts
-func (auth *Client) Checkouts(limit int, sortdir string) (CheckoutResult, error) {
-	filters := Params{
-		Limit:   limit,
-		Sortdir: sortdir,
-	}
-	result := CheckoutResult{}
+// CheckoutAccountSecret checkout account secret.
+func (c *Authorizer) CheckoutAccountSecret(checkout CheckoutRequest) (*response.ResultSet[Checkout], error) {
+	checkoutResp := &response.ResultSet[Checkout]{}
 
-	_, err := auth.api.
+	_, err := c.api.
 		URL("/authorizer/api/v1/secrets/checkouts").
-		Query(&filters).
-		Get(&result)
+		Post(checkout, &checkoutResp)
 
-	return result, err
+	return checkoutResp, err
 }
 
-// Checkout get checkout by id
-func (auth *Client) Checkout(checkoutId string) (*Checkout, error) {
+// GetSecretCheckout get secret checkout by id.
+func (c *Authorizer) GetSecretCheckout(checkoutID string) (*Checkout, error) {
 	checkout := &Checkout{}
 
-	_, err := auth.api.
-		URL("/authorizer/api/v1/secrets/checkouts/%s", url.PathEscape(checkoutId)).
+	_, err := c.api.
+		URL("/authorizer/api/v1/secrets/checkouts/%s", checkoutID).
 		Get(&checkout)
 
 	return checkout, err
 }
 
-// ReleaseCheckout release secret checkout
-func (auth *Client) ReleaseCheckout(checkoutId string) error {
-	_, err := auth.api.
-		URL("/authorizer/api/v1/secrets/checkouts/%s/release", url.PathEscape(checkoutId)).
+// ReleaseSecretCheckout release secret checkout.
+func (c *Authorizer) ReleaseSecretCheckout(checkoutID string) error {
+	_, err := c.api.
+		URL("/authorizer/api/v1/secrets/checkouts/%s/release", checkoutID).
 		Post(nil)
 
 	return err

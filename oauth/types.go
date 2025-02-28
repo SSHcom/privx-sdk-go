@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/SSHcom/privx-sdk-go/restapi"
+	"github.com/SSHcom/privx-sdk-go/v2/restapi"
 )
 
 // AccessToken contains OAuth2 access token information.

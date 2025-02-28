@@ -8,16 +8,8 @@ package auth
 
 import "time"
 
-// Params query params definition
-type Params struct {
-	Sortkey string `json:"sortkey,omitempty"`
-	Sortdir string `json:"sortdir,omitempty"`
-	Offset  int    `json:"offset,omitempty"`
-	Limit   int    `json:"limit,omitempty"`
-}
-
-// IDPClient idp client definition
-type IDPClient struct {
+// IdpClient identity provider client definition.
+type IdpClient struct {
 	ID                             string            `json:"id"`
 	Name                           string            `json:"name"`
 	Created                        time.Time         `json:"created,omitempty"`
@@ -43,46 +35,35 @@ type IDPClient struct {
 	OIDCRefreshTokenValidInMinutes int               `json:"oidc_refresh_token_valid_in_minutes,omitempty"`
 	UserFilter                     string            `json:"user_filter,omitempty"`
 	Enabled                        bool              `json:"enabled"`
+	ContainerRequired              bool              `json:"container_required,omitempty"`
 }
 
-// IDPClientsResult idp client list result definition
-type IDPClientsResult struct {
-	Count int         `json:"count"`
-	Items []IDPClient `json:"items"`
-}
-
-// IdpClientConfig config definition with client_id and client_secret
+// IdpClientConfig identity provider client config definition.
 type IdpClientConfig struct {
 	ClientId     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 }
 
-type IDstruct struct {
-	ID string `json:"id"`
-}
-
+// Session session definition
 type Session struct {
-	ID           string    `json:"id"`
-	UserID       string    `json:"user_id"`
-	SourceID     string    `json:"source_id"`
-	Domain       string    `json:"domain"`
-	Username     string    `json:"username"`
-	RemoteAddr   string    `json:"remote_addr"`
-	UserAgent    string    `json:"user_agent"`
-	Type         string    `json:"type"`
-	Created      time.Time `json:"created"`
-	Updated      time.Time `json:"updated"`
-	Expires      time.Time `json:"expires"`
-	TokenExpires time.Time `json:"token_expires"`
-	LoggedOut    bool      `json:"logged_out"`
-	Current      bool      `json:"current,omitempty"`
+	ID              string    `json:"id"`
+	UserID          string    `json:"user_id"`
+	SourceID        string    `json:"source_id"`
+	Domain          string    `json:"domain"`
+	Username        string    `json:"username"`
+	RemoteAddr      string    `json:"remote_addr"`
+	UserAgent       string    `json:"user_agent"`
+	Type            string    `json:"type"`
+	ParentSessionID string    `json:"parent_session_id,omitempty"`
+	Created         time.Time `json:"created"`
+	Updated         time.Time `json:"updated"`
+	Expires         time.Time `json:"expires"`
+	TokenExpires    time.Time `json:"token_expires"`
+	LoggedOut       bool      `json:"logged_out"`
+	Current         bool      `json:"current,omitempty"`
 }
 
-type sessionsResult struct {
-	Items []Session `json:"items"`
-	Count int       `json:"count"`
-}
-
+// SessionPasswordPolicy session password policy definition.
 type SessionPasswordPolicy struct {
 	PasswordMinLength    int    `json:"password_min_length"`
 	PasswordMaxLength    int    `json:"password_max_length"`
@@ -94,13 +75,14 @@ type SessionPasswordPolicy struct {
 	PasswordStrength     string `json:"password_strength,omitempty"`
 }
 
-// SearchParams search params definition
-type SearchParams struct {
+// SessionSearch session search request parameter definition.
+type SessionSearch struct {
 	Keywords string `json:"keywords,omitempty"`
 	UserID   string `json:"user_id,omitempty"`
 	Type     string `json:"type,omitempty"`
 }
 
+// Device paired mobile gateway device definition.
 type Device struct {
 	ID        string `json:"id"`
 	OS        string `json:"os"`
@@ -108,9 +90,4 @@ type Device struct {
 	Activated string `json:"activated"`
 	Updated   string `json:"updated"`
 	LastUsed  string `json:"lastUsed"`
-}
-
-type PairedDevices struct {
-	Count int      `json:"count"`
-	Items []Device `json:"items"`
 }

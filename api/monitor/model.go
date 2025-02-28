@@ -6,17 +6,8 @@
 
 package monitor
 
-// Params struct for pagination queries.
-type Params struct {
-	Offset     int    `json:"offset,omitempty"`
-	Limit      int    `json:"limit,omitempty"`
-	Sortdir    string `json:"sortdir,omitempty"`
-	Sortkey    string `json:"sortkey,omitempty"`
-	FuzzyCount bool   `json:"fuzzycount,omitempty"`
-}
-
-// AuditEventSearchObject audit event search definitions
-type AuditEventSearchObject struct {
+// AuditEventSearch audit event search request definitions.
+type AuditEventSearch struct {
 	Keywords      string `json:"keywords"`
 	UserID        string `json:"user_id"`
 	ConnectionID  string `json:"connection_id"`
@@ -28,17 +19,17 @@ type AuditEventSearchObject struct {
 	EndTime       string `json:"end_time"`
 }
 
-// AuditEventCodes audit event codes definitions
-type AuditEventCodes map[string]AuditEventInfo
+// AuditEventCodes audit event codes response definitions
+type AuditEventCodes map[int]AuditEventInfo
 
-// AuditEventInfo audit event codes value definitions
+// AuditEventInfo audit event codes value definitions.
 type AuditEventInfo struct {
-	EventID          int    `json:"event_id"`
-	EventName        string `json:"event_name"`
-	EventDescription string `json:"event_desc"`
+	EventID   int    `json:"event_id"`
+	EventName string `json:"event_name"`
+	EventDesc string `json:"event_desc"`
 }
 
-// AuditEvent audit event definitions
+// AuditEvent audit event definition.
 type AuditEvent struct {
 	ServiceID   string            `json:"service_id,omitempty"`
 	ServiceName string            `json:"service_name,omitempty"`
@@ -46,4 +37,9 @@ type AuditEvent struct {
 	EventName   string            `json:"event_name,omitempty"`
 	Created     string            `json:"created,omitempty"`
 	Message     map[string]string `json:"message,omitempty"`
+}
+
+// Clock server clock definition.
+type Clock struct {
+	TimeUTC string `json:"time_utc"`
 }

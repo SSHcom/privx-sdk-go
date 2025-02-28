@@ -3,11 +3,10 @@ package oauth
 import (
 	"strings"
 
-	"github.com/SSHcom/privx-sdk-go/restapi"
+	"github.com/SSHcom/privx-sdk-go/v2/restapi"
 )
 
 /*
-
 With implements fallback auth strategy, it choose the desired
 strategy depends on provided configuration options.
 
@@ -23,7 +22,6 @@ of access/secret key is provided. It allows usage of username and password
 * Client Secret Key, see oauth.Secret(...)
 
 3. Finally, it falls back explicit token token definition
-
 */
 func With(client restapi.Connector, opts ...Option) restapi.Authorizer {
 	auth := newAuth(client, opts...)

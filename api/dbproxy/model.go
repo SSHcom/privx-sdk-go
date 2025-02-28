@@ -6,7 +6,7 @@
 
 package dbproxy
 
-// DBProxyCACertificateInfo DB proxy x509 CA certificate information
+// DBProxyCACertificateInfo db proxy x509 CA certificate definition.
 type DBProxyCACertificateInfo struct {
 	Subject           string `json:"subject,omitempty"`
 	Issuer            string `json:"issuer,omitempty"`
@@ -17,8 +17,8 @@ type DBProxyCACertificateInfo struct {
 	FingerPrintSHA256 string `json:"fingerprint_sha256,omitempty"`
 }
 
-// DBProxyConf DB proxy config definition
-type DBProxyConf struct {
+// DBProxyAPIConf db proxy configuration definition.
+type DBProxyAPIConf struct {
 	CACertificate *DBProxyCACertificateInfo `json:"ca_certificate,omitempty"`
 	Chain         string                    `json:"ca_certificate_chain,omitempty"`
 }

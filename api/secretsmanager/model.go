@@ -2,13 +2,46 @@ package secretsmanager
 
 import "time"
 
-type Params struct {
-	Offset  int    `json:"offset,omitempty"`
-	Limit   int    `json:"limit,omitempty"`
-	Sortdir string `json:"sortdir,omitempty"`
-	Sortkey string `json:"sortkey,omitempty"`
+// HostSecretMetadata host secret metadata definition.
+type HostSecretMetadata struct {
+	Metadata HostSecret      `json:"metadata"`
+	Accounts []AccountSecret `json:"accounts"`
 }
 
+// AccountSecret account secret definition.
+type AccountSecret struct {
+	Account           string     `json:"account"`
+	HostID            string     `json:"host_id"`
+	RotationInitiated *time.Time `json:"rotation_initiate,omitempty"`
+	LastRotated       *time.Time `json:"last_rotated,omitempty"`
+	LastError         *time.Time `json:"last_error,omitempty"`
+	LastErrorDetails  string     `json:"last_error_details"`
+	InitialPassword   string     `json:"initial_password,omitempty"`
+	Created           *time.Time `json:"created,omitempty"`
+	CreatedBy         string     `json:"created_by"`
+}
+
+// HostSecret host secret definition.
+type HostSecret struct {
+	HostID                           string     `json:"host_id"`
+	AccessGroupID                    string     `json:"access_group_id"`
+	Address                          string     `json:"address"`
+	Port                             int        `json:"port"`
+	OperatingSystem                  string     `json:"operating_system"`
+	Protocol                         string     `json:"protocol"`
+	CertificateValidationOptions     string     `json:"certificate_validation_options"`
+	WinRMHostCertificateTrustAnchors string     `json:"winrm_host_certificate_trust_anchors"`
+	UseMainAccount                   bool       `json:"use_main_account"`
+	MainAccount                      string     `json:"main_account"`
+	PolicyID                         string     `json:"policy_id"`
+	ScriptTemplateID                 string     `json:"script_template_id"`
+	Created                          *time.Time `json:"created,omitempty"`
+	CreatedBy                        string     `json:"created_by"`
+	Updated                          *time.Time `json:"updated,omitempty"`
+	UpdatedBy                        string     `json:"updated_by"`
+}
+
+// PasswordPolicy password policy definition.
 type PasswordPolicy struct {
 	ID                     string     `json:"id"`
 	Name                   string     `json:"name"`
@@ -26,28 +59,36 @@ type PasswordPolicy struct {
 	MaxCheckoutDuration    string     `json:"max_checkout_duration"`
 	RotateOnRelease        bool       `json:"rotate_on_release"`
 	VerifyAfterRotation    bool       `json:"verify_after_rotation"`
-	Created                *time.Time `json:"created"`
+	Created                *time.Time `json:"created,omitempty"`
 	CreatedBy              string     `json:"created_by"`
-	Updated                *time.Time `json:"updated"`
+	Updated                *time.Time `json:"updated,omitempty"`
 	UpdatedBy              string     `json:"updated_by"`
 }
 
+// ScriptTemplate script template definition.
 type ScriptTemplate struct {
 	ID              string     `json:"id"`
 	Name            string     `json:"name"`
 	OperatingSystem string     `json:"operating_system"`
 	Script          string     `json:"script"`
-	Created         *time.Time `json:"created"`
+	Created         *time.Time `json:"created,omitempty"`
 	CreatedBy       string     `json:"created_by"`
-	Updated         *time.Time `json:"updated"`
+	Updated         *time.Time `json:"updated,omitempty"`
 	UpdatedBy       string     `json:"updated_by"`
 }
 
-type CompileScriptRequest struct {
+// CompileScript compile script request definition.
+type CompileScript struct {
 	OperatingSystem string `json:"operating_system"`
 	Script          string `json:"script"`
 }
 
+// CompileScriptResponse compile script response definition.
+type CompileScriptResponse struct {
+	Script string `json:"script"`
+}
+
+// TargetDomain target domain definition.
 type TargetDomain struct {
 	ID                   string                 `json:"id"`
 	Name                 string                 `json:"name"`
@@ -68,14 +109,15 @@ type TargetDomain struct {
 	UpdatedBy            string                 `json:"updated_by,omitempty"`
 }
 
+// PasswordPolicyHandle password policy handle definition.
 type PasswordPolicyHandle struct {
 	ID      string `json:"id,omitempty"`
 	Name    string `json:"name,omitempty"`
 	Deleted bool   `json:"deleted,omitempty"`
 }
 
+// TargetDomainEndpoint target domain endpoint definition.
 type TargetDomainEndpoint struct {
-	TargetDomainID          string            `json:"-"`
 	Type                    string            `json:"type"`
 	ScanPriority            int               `json:"scan_priority"`
 	RotationPriority        int               `json:"rotation_priority"`
@@ -105,6 +147,7 @@ type TargetDomainsSearch struct {
 	AutoOnboarding *bool  `json:"auto_onboarding,omitempty"`
 }
 
+// ScannedAccount scanned account definition.
 type ScannedAccount struct {
 	ID             string             `json:"id"`
 	Username       string             `json:"username"`
@@ -122,12 +165,14 @@ type ScannedAccount struct {
 	UpdatedBy      string             `json:"updated_by,omitempty"`
 }
 
+// TargetDomainHandle target domain handle definition.
 type TargetDomainHandle struct {
 	ID      string `json:"id"`
 	Name    string `json:"name,omitempty"`
 	Deleted bool   `json:"deleted,omitempty"`
 }
 
+// ScannedAccountsSearch scanned account search request definition.
 type ScannedAccountsSearch struct {
 	Keywords      string     `json:"keywords,omitempty"`
 	CreatedAfter  *time.Time `json:"created_after,omitempty"`
@@ -138,16 +183,19 @@ type ScannedAccountsSearch struct {
 	Ignored       *bool      `json:"ignored,omitempty"`
 }
 
+// ScannedAccountChangeSet scanned account change set definition.
 type ScannedAccountChangeSet struct {
 	Ignored *bool   `json:"ignored,omitempty"`
 	Comment *string `json:"comment,omitempty"`
 }
 
+// ScannedAccountEditBatch scanned account edit batch request definition.
 type ScannedAccountEditBatch struct {
 	IDs       []string                `json:"ids"`
 	ChangeSet ScannedAccountChangeSet `json:"changes"`
 }
 
+// ManagedAccount managed account definition.
 type ManagedAccount struct {
 	ID                 string                `json:"id"`
 	Username           string                `json:"username"`
@@ -173,9 +221,10 @@ type ManagedAccount struct {
 	Author             string                `json:"author,omitempty"`
 	Updated            *time.Time            `json:"updated,omitempty"`
 	UpdatedBy          string                `json:"updated_by,omitempty"`
-	DisableRdpCertAuth bool                  `json:"disable_rdp_cert_auth"`
+	DisableRDPCertAuth bool                  `json:"disable_rdp_cert_auth"`
 }
 
+// SecretRotationEvent secret rotation event definition.
 type SecretRotationEvent struct {
 	Version int       `json:"version"`
 	Rotated time.Time `json:"rotated"`
@@ -183,6 +232,7 @@ type SecretRotationEvent struct {
 	Status  string    `json:"status"`
 }
 
+// SecretCheckout secret checkout definition.
 type SecretCheckout struct {
 	ID               string          `json:"id"`
 	Type             string          `json:"type"`
@@ -201,12 +251,14 @@ type SecretCheckout struct {
 	Meta             string          `json:"meta,omitempty"`
 }
 
+// SecretVersion secret version definition.
 type SecretVersion struct {
 	Version int       `json:"version"`
 	Secret  string    `json:"secret"`
 	Created time.Time `json:"created"`
 }
 
+// ManagedAccountsSearch managed account search request definition.
 type ManagedAccountsSearch struct {
 	Keywords         string     `json:"keywords,omitempty"`
 	Enabled          *bool      `json:"enabled,omitempty"`
@@ -219,21 +271,29 @@ type ManagedAccountsSearch struct {
 	ExplicitCheckout *bool      `json:"explicit_checkout,omitempty"`
 }
 
-type ManagedAccountPasswordRequest struct {
+// ManagedAccountPasswordSet manage account password set request definition.
+type ManagedAccountPasswordSet struct {
 	Password string `json:"password"`
 }
 
+// IDList id list response definition.
+type IDList struct {
+	IDs []string `json:"ids"`
+}
+
+// ManagedAccountCreateBatch managed account create batch definition.
 type ManagedAccountCreateBatch struct {
 	IDs  []string                 `json:"ids"`
 	Data ManagedAccountCreateData `json:"data"`
 }
 
+// ManagedAccountCreateData managed account batch create data definition.
 type ManagedAccountCreateData struct {
 	Enabled            bool                 `json:"enabled"`
 	RotationEnabled    bool                 `json:"rotation_enabled"`
 	Rotate             bool                 `json:"rotate"`
 	ExplicitCheckout   bool                 `json:"explicit_checkout"`
-	DisableRdpCertAuth bool                 `json:"disable_rdp_cert_auth"`
+	DisableRDPCertAuth bool                 `json:"disable_rdp_cert_auth"`
 	PasswordPolicy     PasswordPolicyHandle `json:"password_policy,omitempty"`
 	Comment            string               `json:"comment,omitempty"`
 }
@@ -243,42 +303,25 @@ type ManagedAccountEditBatch struct {
 	ChangeSet ManagedAccountChangeSet `json:"changes"`
 }
 
+// ManagedAccountChangeSet manage account change set request definition.
 type ManagedAccountChangeSet struct {
-	Enabled            *bool                 `json:"enabled"`
-	RotationEnabled    *bool                 `json:"rotation_enabled"`
-	ExplicitCheckout   *bool                 `json:"explicit_checkout"`
-	DisableRdpCertAuth *bool                 `json:"disable_rdp_cert_auth"`
+	Enabled            *bool                 `json:"enabled,omitempty"`
+	RotationEnabled    *bool                 `json:"rotation_enabled,omitempty"`
+	ExplicitCheckout   *bool                 `json:"explicit_checkout,omitempty"`
+	DisableRDPCertAuth *bool                 `json:"disable_rdp_cert_auth,omitempty"`
 	PasswordPolicy     *PasswordPolicyHandle `json:"password_policy,omitempty"`
 	Comment            *string               `json:"comment,omitempty"`
 }
 
-type ManagedAccountBatch struct {
+// ManagedAccountDeleteBatch manage account batch delete request definition.
+type ManagedAccountDeleteBatch struct {
 	IDs []string `json:"ids"`
 }
 
-type PwPolicyResult struct {
-	Count int              `json:"count"`
-	Items []PasswordPolicy `json:"items"`
-}
+// ManagedAccountRotateBatch manage account batch rotate request definition.
 
-type ScriptTemplateResult struct {
-	Count int              `json:"count"`
-	Items []ScriptTemplate `json:"items"`
-}
-
-type TdResult struct {
-	Count int            `json:"count"`
-	Items []TargetDomain `json:"items"`
-}
-
-type ScannedAccountResult struct {
-	Count int              `json:"count"`
-	Items []ScannedAccount `json:"items"`
-}
-
-type ManagedAccountResult struct {
-	Count int              `json:"count"`
-	Items []ManagedAccount `json:"items"`
+type ManagedAccountRotateBatch struct {
+	IDs []string `json:"ids"`
 }
 
 type TargetDomainsResolveResponse struct {

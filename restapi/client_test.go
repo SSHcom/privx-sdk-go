@@ -14,7 +14,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SSHcom/privx-sdk-go/restapi"
+	"github.com/SSHcom/privx-sdk-go/v2/restapi"
 )
 
 func TestGet(t *testing.T) {
@@ -39,7 +39,7 @@ func TestGetFails(t *testing.T) {
 	if err == nil {
 		t.Errorf("client get is not failing.")
 	} else if err.Error() !=
-		"error: error42, message: borken request, property: mock" {
+		"error: error42, message: broken request, property: mock" {
 		t.Errorf("unexpected error: %s", err)
 	}
 }
@@ -106,7 +106,6 @@ func TestRecvNoIdP(t *testing.T) {
 	}
 }
 
-//
 func mock() *httptest.Server {
 	return httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +121,6 @@ func mock() *httptest.Server {
 	)
 }
 
-//
 func mockStatus() *httptest.Server {
 	return httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -133,7 +131,7 @@ func mockStatus() *httptest.Server {
 				w.WriteHeader(http.StatusBadRequest)
 				body, _ := json.Marshal(map[string]string{
 					"error_code":    "error42",
-					"error_message": "borken request",
+					"error_message": "broken request",
 					"property":      "mock",
 				})
 				w.Write(body)

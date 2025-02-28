@@ -6,7 +6,7 @@
 
 package settings
 
-// Params query parameter definition
-type Params struct {
-	Merge string `json:"merge,omitempty"`
+// ScopeSettingsParams scope settings query parameter definition.
+type ScopeSettingsParams struct {
+	Merge string `url:"merge,omitempty"`
 }
