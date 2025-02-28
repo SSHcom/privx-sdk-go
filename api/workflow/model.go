@@ -73,6 +73,7 @@ type Workflow struct {
 	CanBypassRevokeWF         bool           `json:"can_bypass_revoke_workflow"`
 	Comment                   string         `json:"comment,omitempty"`
 	Steps                     []WorkflowStep `json:"steps,omitempty"`
+	RequiresJustification     bool           `json:"requires_justification"`
 }
 
 // Decision request decision definition.
