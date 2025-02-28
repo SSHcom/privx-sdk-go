@@ -22,10 +22,12 @@ type NetworkTarget struct {
 	Name             string        `json:"name"`
 	Dst              []Destination `json:"dst"`
 	SrcNAT           bool          `json:"src_nat,omitempty"`
+	StaticConfig     string        `json:"static_config,omitempty"`
 	Roles            []RoleHandle  `json:"roles"`
 	Tags             []string      `json:"tags"`
 	Comment          string        `json:"comment,omitempty"`
 	UserInstructions string        `json:"user_instructions,omitempty"`
+	IntegrationType  string        `json:"integration_type"`
 	ExclusiveAccess  bool          `json:"exclusive_access,omitempty"`
 	Disabled         string        `json:"disabled,omitempty"`
 	Created          string        `json:"created"`

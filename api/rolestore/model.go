@@ -212,15 +212,24 @@ type SourceConnection struct {
 	SCIMUserFilter         string `json:"scim_user_filter"`
 
 	// VMWare ESXi/vCenter
-	VMWareEndpoint   string `json:"vmware_url"`
-	VMWareUsername   string `json:"vmware_username"`
-	VMWarePassword   string `json:"vmware_password"`
-	VMWareDataCenter string `json:"vmware_datacenter"`
+	VMWareEndpoint       string `json:"vmware_url"`
+	VMWareUsername       string `json:"vmware_username"`
+	VMWarePassword       string `json:"vmware_password"`
+	VMWareDataCenter     string `json:"vmware_datacenter"`
+	VMWareUseVMBiosUUIDs bool   `json:"vmware_use_vmbios_uuids"`
 
 	// UKM
 	UKMEndpoint    string `json:"ukm_endpoint"`
 	UKMToken       string `json:"ukm_token"`
 	UKMTrustAnchor string `json:"um_ca_pem"`
+
+	OCIUser              string   `json:"oci_user"`
+	OCITenancy           string   `json:"oci_tenancy"`
+	OCIHomeRegion        string   `json:"oci_home_region"`
+	OCIFingerprint       string   `json:"oci_fingerprint"`
+	OCIPrivateKey        string   `json:"oci_private_key"`
+	OCIPassphrase        string   `json:"oci_passphrase"`
+	OCICompartmentFilter []string `json:"oci_compartment_filter,omitempty"`
 }
 
 // User user definition.
