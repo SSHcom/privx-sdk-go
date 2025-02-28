@@ -3,7 +3,7 @@
 PrivX is a lean and modern privileged access management solution to automate your AWS, Azure and GCP infrastructure access management in one multi-cloud solution. This Software Development Kit (SDK) offers a high-level abstraction to programmatically configure your PrivX instances.
 
 [![Documentation](https://godoc.org/github.com/SSHcom/privx-sdk-go?status.svg)](http://godoc.org/github.com/SSHcom/privx-sdk-go)
-[![Build Status](https://img.shields.io/github/workflow/status/SSHcom/privx-sdk-go/Go)](https://github.com/SSHcom/privx-sdk-go/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/SSHcom/privx-sdk-go/go.yml)](https://github.com/SSHcom/privx-sdk-go/actions)
 [![Git Hub](https://img.shields.io/github/last-commit/SSHcom/privx-sdk-go.svg)](https://github.com/SSHcom/privx-sdk-go/actions)
 [![Coverage Status](https://coveralls.io/repos/github/SSHcom/privx-sdk-go/badge.svg?branch=master)](https://coveralls.io/github/SSHcom/privx-sdk-go?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/SSHcom/privx-sdk-go)](https://goreportcard.com/report/github.com/SSHcom/privx-sdk-go)
@@ -11,26 +11,16 @@ PrivX is a lean and modern privileged access management solution to automate you
 **Jump To**:
 [PrivX REST API Reference](https://privx.docs.ssh.com/reference)
 
-# Important Notice: Final Major Release of SDK Version 1
-
-Version 1.37.0 will be the last major release of SDK Version 1.
-
-Starting with the next release, we will intorudce Version 2 of the SDK, which will include significant changes, including breaking changes to backward compatibility.
-We will continue to provide critical bug fixes for Version 1, there will be no new features or support for PrivX versions greater than 37 in this version.
-
-
 ## Getting Started
 
 The latest version of SDK is available at `master` branch of the repository. All development, including new features and bug fixes, take place on the `master` branch using forking and pull requests as described in contribution guidelines.
-
-**Work in Progress**
 
 ### Instantiate SDK Client
 
 PrivX SDK composes API client from three independent layers:
 * `restapi` generic HTTPS transport layer
 * `oauth` implements OAuth2 access token grant flows
-* `api/...` type-safe implementation of PrivX API 
+* `api/...` type-safe implementation of PrivX API
 
 Here is a typical workflow explained with an example to setup the client:
 
@@ -98,7 +88,7 @@ curl := restapi.New(
 	restapi.UseConfigFile(/* path to file */),
 	// attempt to read environment
 	restapi.UseEnvironment(),
-	// attempt to fetch data from command line flags 
+	// attempt to fetch data from command line flags
 	restapi.BaseURL(/* command line value */)
 )
 ```
@@ -160,7 +150,7 @@ Alternatively, you can use api client on behalf of existing user using its crede
 auth := oauth.WithCredential(/* ... */)
 ```
 
-If your app needs to implement a flexible auth strategy that supports both. Use following method, it dynamically chooses a right strategy depending of available credentials  
+If your app needs to implement a flexible auth strategy that supports both. Use following method, it dynamically chooses a right strategy depending of available credentials
 ```go
 auth := oauth.With(/* ... */)
 ```
@@ -181,11 +171,26 @@ If you experience any issues with the library, please let us know via [GitHub is
 The project is [Apache 2.0](LICENSE) licensed and accepts contributions via GitHub pull requests:
 
 1. Fork it
-2. Select the Appropriate Branch (`git switch v1`)
-3. Create your feature branch (`git switch -c my-new-feature`)
-4. Commit your changes (`git commit -am 'Added some feature'`)
-5. Push to the branch (`git push origin my-new-feature`)
-6. Create new Pull Request
+2. Create your feature branch
+- For SDK v2:
+     ```sh
+     git switch -c my-new-feature
+     ```
+- For SDK v1: First, switch to the `v1` branch before creating your feature branch:
+     ```sh
+     git switch v1
+     git switch -c my-new-feature
+     ```
+3. Commit your changes
+	```sh
+	git commit -am Added some feature
+	```
+4. Push to the branch
+	```sh
+	git push origin my-new-feature
+	```
+5. Create new Pull Request
+   If the change is for SDK v1, update the base branch to `v1` when creating the PR.
 
 
 ## License
