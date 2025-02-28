@@ -1,4 +1,4 @@
-# PrivX SDK for Go
+# PrivX SDK v2 for Go
 
 PrivX is a lean and modern privileged access management solution to automate your AWS, Azure and GCP infrastructure access management in one multi-cloud solution. This Software Development Kit (SDK) offers a high-level abstraction to programmatically configure your PrivX instances.
 
@@ -10,6 +10,10 @@ PrivX is a lean and modern privileged access management solution to automate you
 
 **Jump To**:
 [PrivX REST API Reference](https://privx.docs.ssh.com/reference)
+
+## SDK v2 Notice
+
+PrivX SDK v2 for Go is finally here. Check out the latest [release notes](https://github.com/SSHcom/privx-sdk-go/releases/tag/v2.38.0) to see what’s changed and what to expect whether you upgrade from SDK v1 or continue using it.
 
 ## Table of Contents
 - [Getting Started](#getting-started)
