@@ -11,11 +11,21 @@ PrivX is a lean and modern privileged access management solution to automate you
 **Jump To**:
 [PrivX REST API Reference](https://privx.docs.ssh.com/reference)
 
+## Table of Contents
+- [Getting Started](#getting-started)
+- [Instantiate SDK Client](#instantiate-sdk-client)
+- [SDK Configuration Providers](#sdk-configuration-providers)
+- [Identity and Access Management](#identity-and-access-management)
+- [How to Use the Filters Package](#how-to-use-the-filters-package)
+- [Bugs](#bugs)
+- [How to Contribute](#how-to-contribute)
+- [License](#license)
+
 ## Getting Started
 
 The latest version of SDK is available at `master` branch of the repository. All development, including new features and bug fixes, take place on the `master` branch using forking and pull requests as described in contribution guidelines.
 
-### Instantiate SDK Client
+## Instantiate SDK Client
 
 PrivX SDK composes API client from three independent layers:
 * `restapi` generic HTTPS transport layer
@@ -63,7 +73,7 @@ func curl() restapi.Connector {
 roleStore := rolestore.New(curl())
 ```
 
-### SDK Configuration providers
+## SDK Configuration Providers
 
 As application developers you have three options to configure PrivX SDK
 * explicitly
@@ -136,7 +146,7 @@ export PRIVX_API_OAUTH_CLIENT_ID=privx-external
 export PRIVX_API_OAUTH_CLIENT_SECRET=another-random-base64
 ```
 
-### Identity and Access Management
+## Identity And Access Management
 
 Usage of PrivX SDK requires API credential, which are available from your PrivX deployment: Settings > API Clients > Add API Client. Authorizer implement OAuth2 Resource Owner Password Grant
 
@@ -155,6 +165,35 @@ If your app needs to implement a flexible auth strategy that supports both. Use 
 auth := oauth.With(/* ... */)
 ```
 
+## How To Use The Filters Package
+
+The `filters` package simplifies handling of query parameters by providing helper functions for commonly used parameters.
+
+#### **Example Usage**
+```go
+c.SearchSomething(&searchObject, filters.Paging(0, 5), filters.Sort("id", "ASC"))
+c.SearchSomething(&searchObject, filters.Limit(50))
+```
+
+You can also set custom query parameters:
+```go
+c.SearchSomething(&searchObject, filters.SetCustomParams("customKey", "customValue"))
+```
+
+We also introduced struct based query parameter handling, allowing you to define parameters using a struct with a `url` tag.
+```go
+type ExampleParams struct {
+    Example bool `url:"example"`
+}
+
+q := ExampleParams{
+    Example: true,
+}
+
+c.SearchSomething(&searchObject, filters.SetStructParams(q))
+```
+Predefined parameter structs are available in the model files of the respective service packages.
+
 ## Bugs
 
 If you experience any issues with the library, please let us know via [GitHub issues](https://github.com/SSHcom/privx-sdk-go/issues). We appreciate detailed and accurate reports that help us to identity and replicate the issue.
@@ -166,12 +205,13 @@ If you experience any issues with the library, please let us know via [GitHub is
 * **Reveal** the steps you took to reproduce the problem, include code snippet or links to your project.
 
 
-## How To Contribute to SDK Version 1
+## How To Contribute
 
 The project is [Apache 2.0](LICENSE) licensed and accepts contributions via GitHub pull requests:
 
-1. Fork it
-2. Create your feature branch
+1. Before contributing, please read the [style guide](styleguide.md)
+2. Fork it
+3. Create your feature branch
 - For SDK v2:
      ```sh
      git switch -c my-new-feature
@@ -181,15 +221,15 @@ The project is [Apache 2.0](LICENSE) licensed and accepts contributions via GitH
      git switch v1
      git switch -c my-new-feature
      ```
-3. Commit your changes
+4. Commit your changes
 	```sh
 	git commit -am Added some feature
 	```
-4. Push to the branch
+5. Push to the branch
 	```sh
 	git push origin my-new-feature
 	```
-5. Create new Pull Request
+6. Create new Pull Request
    If the change is for SDK v1, update the base branch to `v1` when creating the PR.
 
 
