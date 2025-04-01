@@ -192,6 +192,7 @@ type SourceConnection struct {
 	// OpenID Connect
 	OIDCEnabled             bool     `json:"oidc_enabled"`
 	OIDCIssuer              string   `json:"oidc_issuer"`
+	OIDCAdditionalIssuer    string   `json:"oidc_additional_issuer"`
 	OIDCClientID            string   `json:"oidc_client_id"`
 	OIDCClientSecret        string   `json:"oidc_client_secret"`
 	OIDCButtonTitle         string   `json:"oidc_button_title"`
