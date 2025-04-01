@@ -13,7 +13,7 @@ PrivX is a lean and modern privileged access management solution to automate you
 
 ## SDK v2 Notice
 
-PrivX SDK v2 for Go is finally here. Check out the latest [release notes](https://github.com/SSHcom/privx-sdk-go/releases/tag/v2.38.0) to see what’s changed and what to expect whether you upgrade from SDK v1 or continue using it.
+PrivX SDK v2 for Go is finally here. Check out the following [release notes](https://github.com/SSHcom/privx-sdk-go/releases/tag/v2.38.0) to see what’s changed and what to expect whether you upgrade from SDK v1 or continue using it.
 
 ## Table of Contents
 - [Getting Started](#getting-started)

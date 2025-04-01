@@ -129,6 +129,7 @@ type Host struct {
 	ID                      string                   `json:"id"`
 	Deployable              *bool                    `json:"deployable,omitempty"`
 	Tofu                    *bool                    `json:"tofu,omitempty"`
+	Toch                    *bool                    `json:"toch"` // Trust on Changed Hostkey
 	StandAloneHost          bool                     `json:"stand_alone_host"`
 	ExternalID              string                   `json:"external_id"`
 	InstanceID              string                   `json:"instance_id"`
