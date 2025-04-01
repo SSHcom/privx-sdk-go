@@ -14,17 +14,21 @@ type SMTPResponse struct {
 
 // WorkflowSettings workflow settings definition.
 type WorkflowSettings struct {
-	Host               string `json:"smtp_server"`
-	Port               int    `json:"smtp_server_port"`
-	MaxApprovers       int    `json:"request_role_max_approvers"`
-	Enabled            bool   `json:"smtp_server_enabled"`
-	BackendAddress     string `json:"privx_backend_address"`
-	Username           string `json:"smtp_server_username"`
-	Password           string `json:"smtp_server_password"`
-	Protocol           string `json:"smtp_server_protocol"`
-	SenderAddress      string `json:"smtp_sender_address"`
-	EmailRetryAttempts int    `json:"smtp_retry_attempts"`
-	InsecureVerify     bool   `json:"smtp_server_insecure_verify"`
+	Host                  string `json:"smtp_server"`
+	Port                  int    `json:"smtp_server_port"`
+	MaxApprovers          int    `json:"request_role_max_approvers"`
+	Enabled               bool   `json:"smtp_server_enabled"`
+	BackendAddress        string `json:"privx_backend_address"`
+	Username              string `json:"smtp_server_username"`
+	Password              string `json:"smtp_server_password"`
+	Protocol              string `json:"smtp_server_protocol"`
+	SenderAddress         string `json:"smtp_sender_address"`
+	EmailRetryAttempts    int    `json:"smtp_retry_attempts"`
+	InsecureVerify        bool   `json:"smtp_server_insecure_verify"`
+	Provider              string `json:"smtp_provider"`
+	AuthenticationMode    string `json:"smtp_authentication_mode"`
+	ProviderTokenEndpoint string `json:"smtp_provider_token_endpoint"`
+	ProviderTokenScope    string `json:"smtp_provider_token_scope"`
 }
 
 // WorkflowStepApprover workflow step approver definition.
