@@ -29,18 +29,18 @@ type tAuthCode struct{ *tAuth }
 WithCredential executes OAuth2 Authorization Code Grant
 It uses access/secret key pair to authenticate client
 
-	  auth := oauth2.WithCredential(
-			oauth2.Access(...),
-			oauth2.Secret(...),
-			oauth2.Transport(...),
-		)
+	auth := oauth.WithCredential(
+		restapi.New(
+		restapi.BaseURL(url),
+	),
+		oauth.Access(access),
+		oauth.Secret(secret),
+	)
 
-		client := restapi.New(
-			restapi.Auth(auth),
-			restapi.Endpoint("https://privx.example.com"),
-		)
-
-		rolestore.New(client)
+	return restapi.New(
+		restapi.Auth(auth()),
+		restapi.BaseURL(url),
+	)
 */
 func WithCredential(client restapi.Connector, opts ...Option) restapi.Authorizer {
 	return &tAuthCode{tAuth: newAuth(client, opts...)}
