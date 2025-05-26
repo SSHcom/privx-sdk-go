@@ -23,6 +23,7 @@ It uses access/secret key pair to authenticate client
 		restapi.New(
 		restapi.BaseURL(url),
 	),
+		oauth.Digest(oauthAccess, oauthSecret),
 		oauth.Access(access),
 		oauth.Secret(secret),
 	)
