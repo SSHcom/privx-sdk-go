@@ -19,18 +19,19 @@ type tAuthPassword struct{ *tAuth }
 WithClientID executes OAuth2 Resource Owner Password Grant
 It uses access/secret key pair to authenticate client
 
-	  auth := oauth2.WithClientID(
-			restapi.New(...),
-			oauth2.Access(...),
-			oauth2.Secret(...),
-		)
+	auth := oauth.WithClientID(
+		restapi.New(
+		restapi.BaseURL(url),
+	),
+		oauth.Digest(oauthAccess, oauthSecret),
+		oauth.Access(access),
+		oauth.Secret(secret),
+	)
 
-		client := restapi.New(
-			restapi.Auth(auth),
-			restapi.Endpoint("https://privx.example.com"),
-		)
-
-		rolestore.New(client)
+	return restapi.New(
+		restapi.Auth(auth()),
+		restapi.BaseURL(url),
+	)
 */
 func WithClientID(client restapi.Connector, opts ...Option) restapi.Authorizer {
 	return &tAuthPassword{tAuth: newAuth(client, opts...)}

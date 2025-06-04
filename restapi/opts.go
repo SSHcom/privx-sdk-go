@@ -67,7 +67,8 @@ func Retry(n int) Option {
 	}
 }
 
-// UseConfigFile setup rest client from toml file
+// UseConfigFile setup rest client from toml file.
+// UseConfigFile will panic if it fails to read or parse the config file.
 func UseConfigFile(path string) Option {
 	return func(client *tClient) *tClient {
 		type config struct {
