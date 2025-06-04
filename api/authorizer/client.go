@@ -102,11 +102,17 @@ func (c *Authorizer) DownloadCertificateRevocationList(caID, filename string) er
 }
 
 // GetTargetHostCredentials get target host credentials for the user.
-func (c *Authorizer) GetTargetHostCredentials(request *ApiIdentities) (*ApiIdentitiesResponse, error) {
+func (c *Authorizer) GetTargetHostCredentials(request *ApiIdentities, opts ...filters.Option) (*ApiIdentitiesResponse, error) {
 	principal := &ApiIdentitiesResponse{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
 
 	_, err := c.api.
 		URL("/authorizer/api/v1/ca/authorize").
+		Query(params).
 		Post(&request, &principal)
 
 	return principal, err
