@@ -223,6 +223,18 @@ type AccessGroup struct {
 	Default                          bool   `json:"default,omitempty"`
 }
 
+// AccessGroupCreate access group request create body definition.
+type AccessGroupCreate struct {
+	AccessGroup
+	CAKeyType string `json:"key_type"`
+}
+
+// AccessGroupCARenewal access group ca renewal request body definition.
+// Optionally passed in the access group CA renewal request body.
+type AccessGroupCARenewal struct {
+	CAKeyType string `json:"key_type"`
+}
+
 // AccessGroupSearch access group request search body definition.
 type AccessGroupSearch struct {
 	Keywords string `json:"keywords,omitempty"`
