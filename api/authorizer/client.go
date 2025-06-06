@@ -511,12 +511,12 @@ func (c *Authorizer) DeleteAccessGroup(accessGroupID string) error {
 }
 
 // RenewAccessGroupCAKey renew access group CA key.
-func (c *Authorizer) RenewAccessGroupCAKey(accessGroupID string) (string, error) {
+func (c *Authorizer) RenewAccessGroupCAKey(accessGroupID string, renewal *AccessGroupCARenewal) (string, error) {
 	var keyID string
 
 	_, err := c.api.
 		URL("/authorizer/api/v1/accessgroups/%s/cas", accessGroupID).
-		Post(nil, &keyID)
+		Post(renewal, &keyID)
 
 	return keyID, err
 }
