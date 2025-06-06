@@ -454,7 +454,7 @@ func (c *Authorizer) GetAccessGroups(opts ...filters.Option) (*response.ResultSe
 }
 
 // CreateAccessGroup create access group.
-func (c *Authorizer) CreateAccessGroup(accessGroup *AccessGroupCreate) (response.Identifier, error) {
+func (c *Authorizer) CreateAccessGroup(accessGroup *AccessGroup) (response.Identifier, error) {
 	identifier := response.Identifier{}
 
 	_, err := c.api.
