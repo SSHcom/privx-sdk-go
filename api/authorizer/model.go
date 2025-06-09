@@ -221,6 +221,13 @@ type AccessGroup struct {
 	Updated                          string `json:"updated,omitempty"`
 	UpdatedBy                        string `json:"updated_by,omitempty"`
 	Default                          bool   `json:"default,omitempty"`
+	CAKeyType                        string `json:"key_type"`
+}
+
+// AccessGroupCARenewal access group ca renewal request body definition.
+// Optionally passed in the access group CA renewal request body.
+type AccessGroupCARenewal struct {
+	CAKeyType string `json:"key_type"`
 }
 
 // AccessGroupSearch access group request search body definition.
