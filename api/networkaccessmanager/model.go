@@ -78,4 +78,5 @@ type NATParameters struct {
 type NetworkTargetSearch struct {
 	Keywords string   `json:"keywords,omitempty"`
 	Tags     []string `json:"tags,omitempty"`
+	Filter   string   `json:"filter,omitempty"`
 }

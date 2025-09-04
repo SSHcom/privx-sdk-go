@@ -40,6 +40,7 @@ type HostSearch struct {
 	Deployable            bool     `json:"deployable,omitempty"`
 	Statuses              []string `json:"statuses,omitempty"`
 	Disabled              string   `json:"disabled,omitempty"`
+	Filter                string   `json:"filter,omitempty"`
 }
 
 // SessionRecordingOptions optional host options to disable session recording per feature.

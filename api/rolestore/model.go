@@ -417,7 +417,13 @@ type RoleSearch struct {
 // Role PrivX role definition.
 type Role struct {
 	ID                   string           `json:"id"`
+	Type                 string           `json:"type,omitempty"`
+	AwsArn               string           `json:"arn,omitempty"`
+	Created              string           `json:"created,omitempty"`
 	Name                 string           `json:"name,omitempty"`
+	Updated              string           `json:"updated,omitempty"`
+	Author               string           `json:"author,omitempty"`
+	UpdatedBy            string           `json:"updatedby,omitempty"`
 	Explicit             bool             `json:"explicit"`
 	Implicit             bool             `json:"implicit"`
 	System               bool             `json:"system"`
@@ -427,11 +433,25 @@ type Role struct {
 	GrantValidityPeriods []ValidityPeriod `json:"grant_validity_periods,omitempty"`
 	FloatingLength       int64            `json:"floating_length,omitempty"`
 	Comment              string           `json:"comment,omitempty"`
+	Tags                 []string         `json:"tags,omitempty"`
+	AwsSource            string           `json:"source,omitempty"`
 	Permissions          []string         `json:"permissions"`
 	AccessGroupID        string           `json:"access_group_id"`
+	CreatedByDirectory   string           `json:"owner_src"`
 	PrincipalPublicKeys  []string         `json:"principal_public_key_strings,omitempty"`
 	PermitAgent          bool             `json:"permit_agent,omitempty"`
+	SourceRules          SourceRule       `json:"source_rules,omitempty"`
 	Context              ContextualLimit  `json:"context"`
+	MemberCount          *int             `json:"member_count,omitempty"`
+	ExplicitMemberCount  *int             `json:"explicit_count,omitempty"`
+}
+
+type SourceRule struct {
+	Type         string       `json:"type,omitempty"`
+	Source       string       `json:"source,omitempty"`
+	SearchString string       `json:"search_string,omitempty"`
+	Match        string       `json:"match,omitempty"`
+	SourceRules  []SourceRule `json:"rules"`
 }
 
 type ContextualLimit struct {
