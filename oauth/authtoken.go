@@ -6,7 +6,11 @@
 
 package oauth
 
-import "github.com/SSHcom/privx-sdk-go/v2/restapi"
+import (
+	"net/http"
+
+	"github.com/SSHcom/privx-sdk-go/v2/restapi"
+)
 
 type tAuthExplicit struct{ string }
 
@@ -18,10 +22,15 @@ func WithToken(token string) restapi.Authorizer {
 	return &tAuthExplicit{token}
 }
 
+func (auth *tAuthExplicit) CookieJar() http.CookieJar {
+	return nil
+}
+
 func (auth *tAuthExplicit) AccessToken() (string, error) {
 	return auth.string, nil
 }
 
+// Deprecated: Use auth.CookieJar() instead.
 func (auth *tAuthExplicit) Cookie() string {
 	// Session cookies not supported for explicit auth
 	return ""

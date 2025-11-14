@@ -47,10 +47,19 @@ func WithCredential(client restapi.Connector, opts ...Option) restapi.Authorizer
 }
 
 func (auth *tAuthCode) AccessToken() (token string, err error) {
-	if err = auth.synchronized(auth.grantAuthorizationCode); err == nil {
+	if err = auth.synchronized(auth.getAccessToken); err == nil {
 		token = fmt.Sprintf("Bearer %s", auth.token.AccessToken)
 	}
 	return
+}
+
+func (auth *tAuthCode) getAccessToken() error {
+	if auth.token != nil && auth.token.RefreshToken != "" {
+		if auth.authRefreshToken() == nil {
+			return nil
+		}
+	}
+	return auth.grantAuthorizationCode()
 }
 
 func (auth *tAuthCode) grantAuthorizationCode() error {
@@ -99,6 +108,7 @@ func (auth *tAuthCode) authSession(challenge, method, state string) (string, err
 	head, err := auth.client.
 		URL("/auth/api/v1/oauth/authorize").
 		Query(request).
+		CookieJar(auth.cookieJar).
 		Status(307)
 
 	if err != nil {
@@ -127,6 +137,7 @@ func (auth *tAuthCode) authCredential(session, state string) (string, error) {
 
 	_, err := auth.client.
 		URL("/auth/api/v1/login").
+		CookieJar(auth.cookieJar).
 		Post(request, &response)
 
 	if response.State != state {
@@ -148,14 +159,38 @@ func (auth *tAuth) authAccessToken(code string, cv pkce.CodeVerifier) (*AccessTo
 	_, err := auth.client.
 		URL("/auth/api/v1/oauth/token").
 		Header("Content-Type", "application/x-www-form-urlencoded").
+		CookieJar(auth.cookieJar).
 		Post(request, &token)
 
-	if err != nil {
+	if err == nil {
 		token.notAfter = time.Now().Add(
 			time.Duration(token.ExpiresIn) * time.Second)
 	}
 
 	return &token, err
+}
+
+func (auth *tAuth) authRefreshToken() error {
+	request := reqRefreshToken{
+		tClientID:    clientID,
+		GrantType:    "refresh_token",
+		RefreshToken: auth.token.RefreshToken,
+	}
+	var token AccessToken
+
+	_, err := auth.client.
+		URL("/auth/api/v1/oauth/token").
+		Header("Content-Type", "application/x-www-form-urlencoded").
+		CookieJar(auth.cookieJar).
+		Post(request, &token)
+
+	if err == nil {
+		token.notAfter = time.Now().Add(
+			time.Duration(token.ExpiresIn) * time.Second)
+		auth.token = &token
+	}
+
+	return err
 }
 
 func (auth *tAuth) random() (string, error) {
