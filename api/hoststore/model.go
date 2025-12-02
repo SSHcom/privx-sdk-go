@@ -353,3 +353,10 @@ type HostCertificateInfo struct {
 	FingerPrintSHA1   string   `json:"fingerprint_sha1,omitempty"`
 	FingerPrintSHA256 string   `json:"fingerprint_sha256,omitempty"`
 }
+
+type SessionHostCertificateResponse struct {
+	ID                 string               `json:"id"`
+	Hostname           string               `json:"hostname"`
+	HostCertificate    *HostCertificateInfo `json:"host_certificate"`
+	HostCertificateRaw string               `json:"host_certificate_raw"`
+}
