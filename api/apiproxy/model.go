@@ -144,3 +144,74 @@ type ApiTargetSearchRequest struct {
 	// Tags is a search constraint for api target tags
 	Tags []string `json:"tags"`
 }
+
+// ClientCredential object
+type ClientCredential struct {
+	// ID is the unique UUID for the client_credential.
+	ID string `json:"id"`
+
+	// UserID is the ID of the user owning this client credential.
+	UserID string `json:"user_id"`
+
+	// Target specifies the api target this client credential is associated to.
+	Target ApiTargetHandle `json:"target"`
+
+	// NotBefore specifies the start of the client credential validity period.
+	NotBefore string `json:"not_before"`
+
+	// NotAfter specifies the end of the client credential validity period.
+	NotAfter string `json:"not_after"`
+
+	// SourceAddress specifies optional IP address and/or CIDRs from which
+	// requests using this client credential are allowed.
+	SourceAddress []string `json:"source_address"`
+
+	// Enabled specifies whether this client credential is enabled or not. All
+	// requests using disabled client credentials are rejected.
+	Enabled bool `json:"enabled"`
+
+	// Type is the client credential type. Accepted values are "token",
+	// "basicauth" and "certificate"
+	Type string `json:"type"`
+
+	// BasicAuthUsername is the username for client credentials of type
+	// "basicauth"
+	BasicAuthUsername string `json:"basic_auth_username,omitempty"`
+
+	// BasicAuthPassword is the password for client credentials of type
+	// "basicauth"
+	BasicAuthPassword string `json:"basic_auth_password,omitempty"`
+
+	// BearerToken is the static bearer token for client credentials of type
+	// "token"
+	BearerToken string `json:"bearer_token,omitempty"`
+
+	// Certificate is the certificate for client credentials of type
+	// "certificate"
+	Certificate string `json:"certificate,omitempty"`
+
+	// PrivateKey is the private key for client credentials of type
+	// "certificate"
+	PrivateKey string `json:"private_key,omitempty"`
+
+	// Name is a human readable name for the client credential
+	Name string `json:"name"`
+
+	// Comment is an optional human readable comment
+	Comment string `json:"comment,omitempty"`
+
+	// LastUsed is the approximate timestamp of when client credential was last
+	// used
+	LastUsed string `json:"last_used,omitempty"`
+
+	Created   string `json:"created"`
+	Author    string `json:"author"`
+	Updated   string `json:"updated,omitempty"`
+	UpdatedBy string `json:"updated_by,omitempty"`
+}
+
+type ApiTargetHandle struct {
+	ID      string `json:"id"`
+	Name    string `json:"name,omitempty"`
+	Deleted bool   `json:"deleted,omitempty"`
+}

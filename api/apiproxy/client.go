@@ -133,3 +133,70 @@ func (c *ApiProxy) DeleteApiTarget(apiTargetID string) error {
 
 	return err
 }
+
+// MARK: Current Users Client Credentials
+// GetCurrentUserClientCredentials get current users client credentials.
+func (c *ApiProxy) GetCurrentUserClientCredentials(opts ...filters.Option) (*response.ResultSet[ApiTarget], error) {
+	creds := &response.ResultSet[ApiTarget]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/api-proxy/api/v1/users/current/client-credentials").
+		Query(params).
+		Get(&creds)
+
+	return creds, err
+}
+
+// CreateCurrentUserClientCredential create client crendetial for current user.
+func (c *ApiProxy) CreateCurrentUserClientCredential(creds *ClientCredential) (response.Identifier, error) {
+	identifier := response.Identifier{}
+
+	_, err := c.api.
+		URL("/api-proxy/api/v1/users/current/client-credentials").
+		Post(&creds, &identifier)
+
+	return identifier, err
+}
+
+// GetCurrentUserClientCredential get current users client credential by credential id.
+func (c *ApiProxy) GetCurrentUserClientCredential(credID string) (*ClientCredential, error) {
+	cred := &ClientCredential{}
+
+	_, err := c.api.
+		URL("/api-proxy/api/v1/users/current/client-credentials/%s", credID).
+		Get(&cred)
+
+	return cred, err
+}
+
+// GetCurrentUserClientCredentialSecret get current users client credential secret by credential id.
+func (c *ApiProxy) GetCurrentUserClientCredentialSecret(credID string) ([]byte, error) {
+	secret, err := c.api.
+		URL("/api-proxy/api/v1/users/current/client-credentials/%s/secret", credID).
+		Fetch()
+
+	return secret, err
+}
+
+// UpdateCurrentUserClientCredential update current user client credential by credential id.
+func (c *ApiProxy) UpdateCurrentUserClientCredential(credID string, cred *ClientCredential) error {
+	_, err := c.api.
+		URL("/api-proxy/api/v1/users/current/client-credentials/%s", credID).
+		Put(&cred)
+
+	return err
+}
+
+// DeleteCurrentUserClientCredential delete current user client credential by credential id.
+func (c *ApiProxy) DeleteCurrentUserClientCredential(credID string) error {
+	_, err := c.api.
+		URL("/api-proxy/api/v1/users/current/client-credentials/%s", credID).
+		Delete()
+
+	return err
+}
