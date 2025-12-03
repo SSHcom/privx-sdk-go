@@ -136,8 +136,8 @@ func (c *ApiProxy) DeleteApiTarget(apiTargetID string) error {
 
 // MARK: Current Users Client Credentials
 // GetCurrentUserClientCredentials get current users client credentials.
-func (c *ApiProxy) GetCurrentUserClientCredentials(opts ...filters.Option) (*response.ResultSet[ApiTarget], error) {
-	creds := &response.ResultSet[ApiTarget]{}
+func (c *ApiProxy) GetCurrentUserClientCredentials(opts ...filters.Option) (*response.ResultSet[ClientCredential], error) {
+	creds := &response.ResultSet[ClientCredential]{}
 	params := url.Values{}
 
 	for _, opt := range opts {
@@ -196,6 +196,73 @@ func (c *ApiProxy) UpdateCurrentUserClientCredential(credID string, cred *Client
 func (c *ApiProxy) DeleteCurrentUserClientCredential(credID string) error {
 	_, err := c.api.
 		URL("/api-proxy/api/v1/users/current/client-credentials/%s", credID).
+		Delete()
+
+	return err
+}
+
+// MARK: Users Client Credentials
+// GetUserClientCredentials get users client credentials by user id.
+func (c *ApiProxy) GetUserClientCredentials(userID string, opts ...filters.Option) (*response.ResultSet[ClientCredential], error) {
+	creds := &response.ResultSet[ClientCredential]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/api-proxy/api/v1/users/%s/client-credentials", userID).
+		Query(params).
+		Get(&creds)
+
+	return creds, err
+}
+
+// CreateUserClientCredential create client crendetial for user by user id.
+func (c *ApiProxy) CreateUserClientCredential(userID string, creds *ClientCredential) (response.Identifier, error) {
+	identifier := response.Identifier{}
+
+	_, err := c.api.
+		URL("/api-proxy/api/v1/users/%s/client-credentials", userID).
+		Post(&creds, &identifier)
+
+	return identifier, err
+}
+
+// GetUserClientCredential get users client credential by credential and user id.
+func (c *ApiProxy) GetUserClientCredential(userID, credID string) (*ClientCredential, error) {
+	cred := &ClientCredential{}
+
+	_, err := c.api.
+		URL("/api-proxy/api/v1/users/%s/client-credentials/%s", userID, credID).
+		Get(&cred)
+
+	return cred, err
+}
+
+// GetUserClientCredentialSecret get users client credential secret by credential and user id.
+func (c *ApiProxy) GetUserClientCredentialSecret(userID, credID string) ([]byte, error) {
+	secret, err := c.api.
+		URL("/api-proxy/api/v1/users/%s/client-credentials/%s/secret", userID, credID).
+		Fetch()
+
+	return secret, err
+}
+
+// UpdateUserClientCredential update user client credential by credential and user id.
+func (c *ApiProxy) UpdateUserClientCredential(userID, credID string, cred *ClientCredential) error {
+	_, err := c.api.
+		URL("/api-proxy/api/v1/users/%s/client-credentials/%s", userID, credID).
+		Put(&cred)
+
+	return err
+}
+
+// DeleteUserClientCredential delete user client credential by credential and user id.
+func (c *ApiProxy) DeleteUserClientCredential(userID, credID string) error {
+	_, err := c.api.
+		URL("/api-proxy/api/v1/users/%s/client-credentials/%s", userID, credID).
 		Delete()
 
 	return err
