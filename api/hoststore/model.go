@@ -288,44 +288,59 @@ type HostPrincipalApplications struct {
 }
 
 type HostService struct {
-	Service                      string                  `json:"service"`
-	Address                      string                  `json:"address"`
-	Port                         int                     `json:"port"`
-	UseForPasswordRotation       bool                    `json:"use_for_password_rotation"`
-	TunnelPort                   int                     `json:"ssh_tunnel_port"`
-	UsePlainTextVNC              bool                    `json:"use_plaintext_vnc"`
-	Source                       string                  `json:"source"`
-	Realm                        string                  `json:"realm,omitempty"`
-	LoginPageURL                 string                  `json:"login_page_url"`
-	UsernameFieldName            string                  `json:"username_field_name"`
-	PasswordFieldName            string                  `json:"password_field_name"`
-	LoginRequestUrl              string                  `json:"login_request_url"`
-	LoginRequestPasswordProperty string                  `json:"login_request_password_property"`
-	AuthType                     string                  `json:"auth_type"`
-	HealthCheckStatus            string                  `json:"status"`
-	HealthCheckStatusUpdated     string                  `json:"status_updated"`
-	AllowedDomains               []string                `json:"allowed_domains"`
-	Browser                      string                  `json:"browser"`
-	BrowserKioskMode             bool                    `json:"kiosk_mode"`
-	BrowserUrlBar                bool                    `json:"enable_urlbar"`
-	BrowserNaviBar               bool                    `json:"enable_navibar"`
-	BrowserNaviBarAutoHide       bool                    `json:"autohide_navibar"`
-	BrowserDevTools              bool                    `json:"enable_devtools"`
-	BrowserPopups                bool                    `json:"enable_popups"`
-	BrowserWebCompatibleMode     bool                    `json:"enable_web_compatibility_mode"`
-	BrowserTimeZone              string                  `json:"timezone"`
-	WebIdleTimeLimit             int                     `json:"idle_time_limit"`
-	ServiceVersion               string                  `json:"service_version"`
-	Created                      time.Time               `json:"created"`
-	Updated                      time.Time               `json:"updated"`
-	CertificateTemplate          string                  `json:"certificate_template"`
-	AllowModifiedWebParams       bool                    `json:"allow_modified_web_params"`
-	ProtocolVersion              string                  `json:"protocol_version,omitempty"`
-	Latency                      int                     `json:"latency_in_microseconds,omitempty"`
-	DB                           HostServiceDBParameters `json:"db"`
-	UseLegacyCipherSuites        bool                    `json:"use_legacy_cipher_suites"`
-	TLSMinVersion                string                  `json:"tls_min_version"`
-	TLSMaxVersion                string                  `json:"tls_max_version"`
+	Service                      string                           `json:"service"`
+	Address                      string                           `json:"address"`
+	Port                         int                              `json:"port"`
+	UseForPasswordRotation       bool                             `json:"use_for_password_rotation"`
+	TunnelPort                   int                              `json:"ssh_tunnel_port"`
+	UsePlainTextVNC              bool                             `json:"use_plaintext_vnc"`
+	Source                       string                           `json:"source"`
+	Realm                        string                           `json:"realm,omitempty"`
+	LoginPageURL                 string                           `json:"login_page_url"`
+	UsernameFieldName            string                           `json:"username_field_name"`
+	PasswordFieldName            string                           `json:"password_field_name"`
+	LoginRequestUrl              string                           `json:"login_request_url"`
+	LoginRequestPasswordProperty string                           `json:"login_request_password_property"`
+	AuthType                     string                           `json:"auth_type"`
+	HealthCheckStatus            string                           `json:"status"`
+	HealthCheckStatusUpdated     string                           `json:"status_updated"`
+	AllowedDomains               []string                         `json:"allowed_domains"`
+	Browser                      string                           `json:"browser"`
+	BrowserKioskMode             bool                             `json:"kiosk_mode"`
+	BrowserUrlBar                bool                             `json:"enable_urlbar"`
+	BrowserNaviBar               bool                             `json:"enable_navibar"`
+	BrowserNaviBarAutoHide       bool                             `json:"autohide_navibar"`
+	BrowserDevTools              bool                             `json:"enable_devtools"`
+	BrowserPopups                bool                             `json:"enable_popups"`
+	BrowserWebCompatibleMode     bool                             `json:"enable_web_compatibility_mode"`
+	BrowserTimeZone              string                           `json:"timezone"`
+	WebIdleTimeLimit             int                              `json:"idle_time_limit"`
+	WebX11Backend                string                           `json:"web_x11_backend"`
+	ServiceVersion               string                           `json:"service_version"`
+	Created                      time.Time                        `json:"created"`
+	Updated                      time.Time                        `json:"updated"`
+	CertificateTemplate          string                           `json:"certificate_template"`
+	AllowModifiedWebParams       bool                             `json:"allow_modified_web_params"`
+	ProtocolVersion              string                           `json:"protocol_version,omitempty"`
+	Latency                      int                              `json:"latency_in_microseconds,omitempty"`
+	DB                           HostServiceDBParameters          `json:"db"`
+	UseLegacyCipherSuites        bool                             `json:"use_legacy_cipher_suites"`
+	TLSMinVersion                string                           `json:"tls_min_version"`
+	TLSMaxVersion                string                           `json:"tls_max_version"`
+	RDSType                      string                           `json:"rds_type"`
+	RDSLoadBalancer              HostServiceRDSLoadBalancerParams `json:"rds_lb"`
+	RDSBroker                    HostServiceRDSBrokerParams       `json:"rds_broker"`
+}
+
+type HostServiceRDSBrokerParams struct {
+	BrokerHostname    string `json:"broker_hostname,omitempty"`
+	BrokerPort        int    `json:"broker_port,omitempty"`
+	CollectionName    string `json:"collection_name,omitempty"`
+	SessionHostsCount uint16 `json:"session_hosts_count,omitempty"`
+}
+
+type HostServiceRDSLoadBalancerParams struct {
+	SessionHostsCount uint16 `json:"session_hosts_count,omitempty"`
 }
 
 type HostSSHPubKeys struct {

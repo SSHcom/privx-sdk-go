@@ -7,6 +7,7 @@
 package authorizer
 
 import (
+	"net"
 	"time"
 
 	"github.com/SSHcom/privx-sdk-go/v2/api/secretsmanager"
@@ -174,6 +175,7 @@ type Principal struct {
 	Type            string `json:"type"`
 	ID              string `json:"id"`
 	GroupID         string `json:"group_id"`
+	Name            string `json:"name,omitempty"`
 	Comment         string `json:"comment,omitempty"`
 	PublicKey       string `json:"public_key"`
 	PublicKeyString string `json:"public_key_string"`
@@ -196,9 +198,11 @@ type CertificateEnrollResponse struct {
 
 // CertificateRevocation certificate revocation request definition.
 type CertificateRevocation struct {
-	Reason string `json:"reason,omitempty"`
-	Owner  string `json:"owner,omitempty"`
-	Cert   string `json:"cert,omitempty"`
+	Reason      string   `json:"reason,omitempty"`
+	Owner       string   `json:"owner,omitempty"`
+	IPAddresses []net.IP `json:"ip_addresses,omitempty"`
+	DNSNames    []string `json:"dns_names,omitempty"`
+	Cert        string   `json:"cert,omitempty"`
 }
 
 // CertificateRevocationResponse certificate revocation response definition.

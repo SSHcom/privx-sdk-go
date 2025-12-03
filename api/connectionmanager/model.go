@@ -9,6 +9,7 @@ package connectionmanager
 import (
 	"time"
 
+	"github.com/SSHcom/privx-sdk-go/v2/api/apiproxy"
 	"github.com/SSHcom/privx-sdk-go/v2/api/hoststore"
 	"github.com/SSHcom/privx-sdk-go/v2/api/networkaccessmanager"
 	"github.com/SSHcom/privx-sdk-go/v2/api/rolestore"
@@ -46,6 +47,7 @@ type Connection struct {
 	TargetHostRoles   []ConnectionRole                    `json:"target_host_roles,omitempty"`
 	TargetHostData    *hoststore.Host                     `json:"target_host_data,omitempty"`
 	TargetNetworkData *networkaccessmanager.NetworkTarget `json:"target_network_data,omitempty"`
+	TargetAPIData     *apiproxy.ApiTarget                 `json:"target_api_data,omitempty"`
 	RemoteAddress     string                              `json:"remote_address,omitempty"`
 	Connected         string                              `json:"connected,omitempty"`
 	Disconnected      string                              `json:"disconnected,omitempty"`

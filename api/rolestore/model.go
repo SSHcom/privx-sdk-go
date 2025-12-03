@@ -224,6 +224,7 @@ type SourceConnection struct {
 	UKMToken       string `json:"ukm_token"`
 	UKMTrustAnchor string `json:"um_ca_pem"`
 
+	// Oracle Cloud
 	OCIUser              string   `json:"oci_user"`
 	OCITenancy           string   `json:"oci_tenancy"`
 	OCIHomeRegion        string   `json:"oci_home_region"`
@@ -231,6 +232,12 @@ type SourceConnection struct {
 	OCIPrivateKey        string   `json:"oci_private_key"`
 	OCIPassphrase        string   `json:"oci_passphrase"`
 	OCICompartmentFilter []string `json:"oci_compartment_filter,omitempty"`
+
+	// Proxmox VE
+	ProxmoxEndpoint       string `json:"proxmox_url"`
+	ProxmoxTokenId        string `json:"proxmox_token_id"`
+	ProxmoxSecret         string `json:"proxmox_secret"`
+	ProxmoxUseSMBiosUUIDs bool   `json:"proxmox_use_smbios_uuids"`
 }
 
 // User user definition.
@@ -308,22 +315,23 @@ type UserAttribute struct {
 
 // AuthorizedKey authorized key definition.
 type AuthorizedKey struct {
-	ID            string   `json:"id"`
-	UserID        string   `json:"user_id,omitempty"`
-	Username      string   `json:"username,omitempty"`
-	Source        string   `json:"source,omitempty"`
-	PublicKey     string   `json:"public_key,omitempty"`
-	NotBefore     string   `json:"not_before,omitempty"`
-	NotAfter      string   `json:"not_after,omitempty"`
-	ExpiresIn     int64    `json:"expires_in,omitempty"`
-	SourceAddress []string `json:"source_address"`
-	Fingerprints  []string `json:"fingerprints,omitempty"`
-	Name          string   `json:"name,omitempty"`
-	Comment       string   `json:"comment,omitempty"`
-	Created       string   `json:"created,omitempty"`
-	Updated       string   `json:"updated,omitempty"`
-	UpdatedBy     string   `json:"updated_by,omitempty"`
-	Author        string   `json:"author,omitempty"`
+	ID                    string   `json:"id"`
+	UserID                string   `json:"user_id,omitempty"`
+	Username              string   `json:"username,omitempty"`
+	Source                string   `json:"source,omitempty"`
+	PublicKey             string   `json:"public_key,omitempty"`
+	NotBefore             string   `json:"not_before,omitempty"`
+	NotAfter              string   `json:"not_after,omitempty"`
+	ExpiresIn             int64    `json:"expires_in,omitempty"`
+	SourceAddress         []string `json:"source_address"`
+	Fingerprints          []string `json:"fingerprints,omitempty"`
+	EnableInteractiveAuth bool     `json:"enable_interactive_auth,omitempty"`
+	Name                  string   `json:"name,omitempty"`
+	Comment               string   `json:"comment,omitempty"`
+	Created               string   `json:"created,omitempty"`
+	Updated               string   `json:"updated,omitempty"`
+	UpdatedBy             string   `json:"updated_by,omitempty"`
+	Author                string   `json:"author,omitempty"`
 }
 
 // UserSettings user settings update request definition.
