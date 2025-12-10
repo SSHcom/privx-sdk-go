@@ -151,8 +151,8 @@ func (c *Auth) TerminateSession(sessionID string) error {
 }
 
 // TerminateUserSessions terminates all sessions for a user.
-func (store *Auth) TerminateUserSessions(userID string) error {
-	_, err := store.api.
+func (c *Auth) TerminateUserSessions(userID string) error {
+	_, err := c.api.
 		URL("/auth/api/v1/sessionstorage/users/%s/sessions/terminate", userID).
 		Post(nil)
 
@@ -161,8 +161,8 @@ func (store *Auth) TerminateUserSessions(userID string) error {
 
 // MARK: Users
 // Logout log out user.
-func (store *Auth) Logout() error {
-	_, err := store.api.
+func (c *Auth) Logout() error {
+	_, err := c.api.
 		URL("/auth/api/v1/logout").
 		Post(nil)
 
@@ -171,10 +171,10 @@ func (store *Auth) Logout() error {
 
 // MARK: Mobile Gateway
 // GetUserPairedDevices get users paired devices.
-func (store *Auth) GetUserPairedDevices(userID string) (*response.ResultSet[Device], error) {
+func (c *Auth) GetUserPairedDevices(userID string) (*response.ResultSet[Device], error) {
 	devices := &response.ResultSet[Device]{}
 
-	_, err := store.api.
+	_, err := c.api.
 		URL("/auth/api/v1/users/%s/devices", userID).
 		Get(devices)
 
@@ -182,8 +182,8 @@ func (store *Auth) GetUserPairedDevices(userID string) (*response.ResultSet[Devi
 }
 
 // UnpairUserDevice unpair users device.
-func (store *Auth) UnpairUserDevice(userID, deviceID string) error {
-	_, err := store.api.
+func (c *Auth) UnpairUserDevice(userID, deviceID string) error {
+	_, err := c.api.
 		URL("/auth/api/v1/users/%s/devices/%s", userID, deviceID).
 		Delete()
 

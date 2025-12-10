@@ -269,3 +269,39 @@ func (c *HostStore) EvaluateWhitelist(evaluate *WhitelistEvaluate) (*WhitelistEv
 
 	return result, err
 }
+
+// MARK: Session Host Certificates
+// GetSessionHostCertificates get session host certificates by host id.
+func (c *HostStore) GetSessionHostCertificates(hostID string, opts ...filters.Option) (*response.ResultSet[SessionHostCertificateResponse], error) {
+	certs := &response.ResultSet[SessionHostCertificateResponse]{}
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
+	_, err := c.api.
+		URL("/host-store/api/v1/hosts/%s/session_host_certificates", hostID).
+		Query(params).
+		Get(&certs)
+
+	return certs, err
+}
+
+// DeleteSessionHostCertificates delete all session host certificates by host id.
+func (c *HostStore) DeleteSessionHostCertificates(hostID string) error {
+	_, err := c.api.
+		URL("/host-store/api/v1/hosts/%s/session_host_certificates", hostID).
+		Delete()
+
+	return err
+}
+
+// DeleteSessionHostCertificates delete session host certificate by host id.
+func (c *HostStore) DeleteSessionHostCertificate(hostID, certID string) error {
+	_, err := c.api.
+		URL("/host-store/api/v1/hosts/%s/session_host_certificates/%s", hostID, certID).
+		Delete()
+
+	return err
+}

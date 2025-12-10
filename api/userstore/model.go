@@ -29,6 +29,7 @@ type TrustedClient struct {
 	Subnets                       []string `json:"subnets"`
 	Enabled                       bool     `json:"enabled"`
 	Registered                    bool     `json:"registered"`
+	AllowRepeatedRegistration     bool     `json:"allow_repeated_registration"`
 	ExtenderAddress               []string `json:"extender_address"`
 	OAuthClientID                 string   `json:"oauth_client_id,omitempty"`
 	OAuthClientSecret             string   `json:"oauth_client_secret,omitempty"`
@@ -38,6 +39,10 @@ type TrustedClient struct {
 	WebProxyExtenderRoutePatterns []string `json:"web_proxy_extender_route_patterns,omitempty"`
 	Data                          string   `json:"data,omitempty"`
 	RoutingPrefix                 string   `json:"routing_prefix"`
+	ExtenderMode                  string   `json:"extender_mode"`
+	ExtenderSSHAddress            string   `json:"extender_ssh_address,omitempty"`
+	ExtenderSSHPort               int      `json:"extender_ssh_port,omitempty"`
+	ExtenderPublicKey             string   `json:"extender_public_key,omitempty"`
 }
 
 type ExtenderClient struct {
@@ -46,6 +51,10 @@ type ExtenderClient struct {
 	RoutingPrefix                 string   `json:"routing_prefix"`
 	WebProxyExtenderRoutePatterns []string `json:"web_proxy_extender_route_patterns,omitempty"`
 	WebProxyExtenderRoutes        []string `json:"web_proxy_extender_routes,omitempty"`
+	ExtenderMode                  string   `json:"extender_mode"`
+	ExtenderSSHAddress            string   `json:"extender_ssh_address,omitempty"`
+	ExtenderSSHPort               int      `json:"extender_ssh_port,omitempty"`
+	ExtenderPublicKey             string   `json:"extender_public_key,omitempty"`
 }
 
 // APIClient api client definition.
