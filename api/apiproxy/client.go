@@ -13,7 +13,7 @@ type ApiProxy struct {
 	api restapi.Connector
 }
 
-// New host store client constructor.
+// New api proxy client constructor.
 func New(api restapi.Connector) *ApiProxy {
 	return &ApiProxy{api: api}
 }
