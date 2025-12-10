@@ -54,17 +54,14 @@ func (auth *tAuthPassword) grantPasswordCredentials() error {
 	}
 	var token AccessToken
 
-	header, err := auth.client.
+	_, err := auth.client.
 		URL("/auth/api/v1/oauth/token").
 		Header("Content-Type", "application/x-www-form-urlencoded").
 		Header("Authorization", "Basic "+auth.digest).
+		CookieJar(auth.cookieJar).
 		Post(request, &token)
 
-	if auth.useCookies && auth.cookie == "" {
-		auth.cookie = header.Get("Set-Cookie")
-	}
-
-	if err != nil {
+	if err == nil {
 		token.notAfter = time.Now().Add(
 			time.Duration(token.ExpiresIn) * time.Second)
 	}

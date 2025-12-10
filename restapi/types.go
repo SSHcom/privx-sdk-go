@@ -25,6 +25,8 @@ type CURL interface {
 	Query(interface{}) CURL
 	// Header defines request header
 	Header(string, string) CURL
+	// CookieJar sets the cookie jar for the request
+	CookieJar(jar http.CookieJar) CURL
 	// Status evalutes the request
 	Status(...int) (http.Header, error)
 	Get(interface{}) (http.Header, error)
@@ -38,7 +40,14 @@ type CURL interface {
 // Authorizer provides access token for REST API client
 type Authorizer interface {
 	AccessToken() (string, error)
+	// Deprecated: Use CookieJarProvider.CookieJar() instead.
 	Cookie() string
+}
+
+// CookieJarProvider extends the Authorizer interface with a capability to
+// return a cookie jar used in making the requests
+type CookieJarProvider interface {
+	CookieJar() http.CookieJar
 }
 
 const (

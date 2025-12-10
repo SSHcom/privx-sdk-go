@@ -7,6 +7,8 @@
 package oauth
 
 import (
+	"net/http"
+	"net/http/cookiejar"
 	"sync"
 	"time"
 
@@ -36,7 +38,7 @@ type tAuth struct {
 	client     restapi.Connector
 	token      *AccessToken
 	useCookies bool
-	cookie     string
+	cookieJar  http.CookieJar
 	pending    bool
 }
 
@@ -49,6 +51,15 @@ func newAuth(client restapi.Connector, opts ...Option) *tAuth {
 	for _, opt := range opts {
 		auth = opt(auth)
 	}
+
+	if auth.useCookies {
+		jar, err := cookiejar.New(nil)
+		if err != nil {
+			panic(err)
+		}
+		auth.cookieJar = jar
+	}
+
 	return auth
 }
 
@@ -73,8 +84,13 @@ func (auth *tAuth) synchronized(f func() error) (err error) {
 	return
 }
 
+// Deprecated: Use auth.CookieJar() instead
 func (auth *tAuth) Cookie() string {
-	return auth.cookie
+	return ""
+}
+
+func (auth *tAuth) CookieJar() http.CookieJar {
+	return auth.cookieJar
 }
 
 // tClientID is a pair of unique client id and redirect uri
@@ -106,6 +122,13 @@ type reqAccessToken struct {
 	GrantType  string `json:"grant_type"`
 	Code       string `json:"code"`
 	CodeVerify string `json:"code_verifier"`
+}
+
+// reqRefreshToken exchanges the refresh token for access token
+type reqRefreshToken struct {
+	tClientID
+	GrantType    string `json:"grant_type"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 // reqAccessToken

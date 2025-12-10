@@ -84,10 +84,6 @@ func (client *tClient) do(req *http.Request) (*http.Response, error) {
 			return nil, err
 		}
 		req.Header.Set("Authorization", token)
-
-		if cookie := client.auth.Cookie(); cookie != "" {
-			req.Header.Set("Cookie", cookie)
-		}
 	}
 	req.Header.Set("User-Agent", UserAgent)
 
@@ -121,13 +117,14 @@ func (client *tClient) URL(templatePath string, args ...interface{}) CURL {
 
 // CURL is a builder type, constructs HTTP request
 type tCURL struct {
-	client  *tClient
-	method  string
-	url     string
-	header  http.Header
-	payload *bytes.Buffer
-	output  *http.Response
-	fail    error
+	client    *tClient
+	method    string
+	url       string
+	header    http.Header
+	payload   *bytes.Buffer
+	output    *http.Response
+	fail      error
+	cookieJar http.CookieJar
 }
 
 // Query defines URI parameters of the request
@@ -185,6 +182,12 @@ func (curl *tCURL) encodeURL(query interface{}) (url.Values, error) {
 // Header defines request header
 func (curl *tCURL) Header(head, value string) CURL {
 	curl.header.Add(head, value)
+	return curl
+}
+
+// CookieJar sets cookie jar for request
+func (curl *tCURL) CookieJar(jar http.CookieJar) CURL {
+	curl.cookieJar = jar
 	return curl
 }
 
@@ -291,6 +294,8 @@ func (curl *tCURL) Download(filename string) error {
 		return err
 	}
 
+	curl.addCookies(req)
+
 	resp, err := curl.client.do(req)
 	if err != nil {
 		return err
@@ -300,6 +305,8 @@ func (curl *tCURL) Download(filename string) error {
 	if resp.StatusCode != 200 {
 		log.Fatal(resp.Status)
 	}
+
+	curl.setCookies(resp)
 
 	err = writeToFile(filename, resp)
 	if err != nil {
@@ -438,7 +445,12 @@ func (curl *tCURL) unsafeIO() *tCURL {
 		req.Header.Set(head, curl.header.Get(head))
 	}
 
+	curl.addCookies(req)
+
 	curl.output, curl.fail = curl.client.doWithRetry(req)
+
+	curl.setCookies(curl.output)
+
 	return curl
 }
 
@@ -463,4 +475,33 @@ func (curl *tCURL) unWrapWithData(body []byte, data interface{}) (http.Header, e
 	}
 
 	return curl.output.Header, nil
+}
+
+// addCookies adds cookies from the cookie jar to the request
+func (curl *tCURL) addCookies(req *http.Request) {
+	// Prefer the request specific cookie jar from CURL
+	jar := curl.cookieJar
+	if jar == nil && curl.client.auth != nil {
+		if cjp, ok := curl.client.auth.(CookieJarProvider); ok {
+			jar = cjp.CookieJar()
+		}
+	}
+	if jar != nil {
+		curl.cookieJar = jar
+		for _, cookie := range jar.Cookies(req.URL) {
+			req.AddCookie(cookie)
+		}
+	} else if curl.client.auth != nil {
+		// Fallback to calling the deprecated Cookie() function
+		if cookie := curl.client.auth.Cookie(); cookie != "" {
+			req.Header.Add("Cookie", cookie)
+		}
+	}
+}
+
+// setCookies stores cookies from the response to the cookie jar
+func (curl *tCURL) setCookies(resp *http.Response) {
+	if curl.cookieJar != nil {
+		curl.cookieJar.SetCookies(resp.Request.URL, resp.Cookies())
+	}
 }
