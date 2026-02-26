@@ -75,14 +75,22 @@ type TrustAnchor struct {
 
 // CertTemplate certification template definition
 type CertTemplate struct {
-	Name              string   `json:"name"`
-	Description       string   `json:"description"`
-	Service           string   `json:"service"`
-	Type              string   `json:"type"`
-	KeyID             string   `json:"key_id,omitempty"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Service     string `json:"service"`
+	Type        string `json:"type"`
+
+	// Common fields for openssh and ssh-x509v3* types
 	RsaSignatureTypes []string `json:"rsa_signature_types,omitempty"`
-	Principals        []string `json:"principals,omitempty"`
-	Extensions        []string `json:"extensions,omitempty"`
+
+	// Fields for type openssh
+	KeyID      string   `json:"key_id,omitempty"`
+	Principals []string `json:"principals,omitempty"`
+	Extensions []string `json:"extensions,omitempty"`
+
+	// Fields for type api-proxy
+	KeyUsage         []string `json:"key_usage,omitempty"`
+	ExtendedKeyUsage []string `json:"extended_key_usage,omitempty"`
 }
 
 // SessionIDResponse session id response definition.
