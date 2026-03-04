@@ -60,7 +60,8 @@ type ApiTarget struct {
 
 // TargetCredential object contains the credentials for authenticating to the api target.
 type TargetCredential struct {
-	// Type is the api target credential type. Accepted values are "basicauth" and "token".
+	// Type is the api target credential type. Accepted values are "basicauth",
+	// "token", "certificate" and "ephemeral-certificate".
 	Type string `json:"type"`
 
 	// BasicAuthUsername is the username for credentials of type "basicauth"
@@ -77,6 +78,18 @@ type TargetCredential struct {
 
 	// PrivateKey is the private key for api target of type "certificate"
 	PrivateKey string `json:"private_key,omitempty"`
+
+	// EphemeralCertificateSubject is the certificate subject name pattern for
+	// credentials of type "ephemeral-certificate"
+	EphemeralCertificateSubject string `json:"ephemeral_certificate_subject"`
+
+	// EphemeralCertificateSAN is the certificate subject alternative name
+	// pattern for credentials of type "ephemeral-certificate"
+	EphemeralCertificateSAN string `json:"ephemeral_certificate_san"`
+
+	// EphemeralCertificateTemplate is the certificate template for credentials
+	// of type "ephemeral-certificate"
+	EphemeralCertificateTemplate string `json:"ephemeral_certificate_template"`
 }
 
 // ApiTargetEndpoint API endpoint patterns that are matched against request URLs.
@@ -166,12 +179,21 @@ type ClientCredential struct {
 	// requests using this client credential are allowed.
 	SourceAddress []string `json:"source_address"`
 
+	// PrivxLoginSessionRequired controls whether a valid PrivX login session is
+	// required for the owner of the client credential when using it. When set
+	// to DEFAULT, the ApiProxyInternal.require_privx_login_session setting
+	// decides the behavior.
+	// Accepted values are "DEFAULT", "ENABLED" and "DISABLED".
+	PrivxLoginSessionRequired string `json:"privx_login_session_required,omitempty"`
+
 	// Enabled specifies whether this client credential is enabled or not. All
 	// requests using disabled client credentials are rejected.
 	Enabled bool `json:"enabled"`
 
-	// Type is the client credential type. Accepted values are "token",
-	// "basicauth" and "certificate"
+	// Type is the client credential type. Accepted values are "token", "basicauth" and "certificate".
+	// If credential type is passed as empty string, backend will automatically select the credential type based on
+	// the api-target the credential is associated with. If credential.type is specified, backend verifies the type
+	// is compatible with the api-target.
 	Type string `json:"type"`
 
 	// BasicAuthUsername is the username for client credentials of type

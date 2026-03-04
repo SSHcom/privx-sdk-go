@@ -175,9 +175,18 @@ func (c *ApiProxy) GetCurrentUserClientCredential(credID string) (*ClientCredent
 }
 
 // GetCurrentUserClientCredentialSecret get current users client credential secret by credential id.
-func (c *ApiProxy) GetCurrentUserClientCredentialSecret(credID string) ([]byte, error) {
+// Query parameter "format" (return the secret in specific format) supports the values
+// "raw" and "kubeconfig".
+func (c *ApiProxy) GetCurrentUserClientCredentialSecret(credID string, opts ...filters.Option) ([]byte, error) {
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
 	secret, err := c.api.
 		URL("/api-proxy/api/v1/users/current/client-credentials/%s/secret", credID).
+		Query(params).
 		Fetch()
 
 	return secret, err
@@ -242,9 +251,18 @@ func (c *ApiProxy) GetUserClientCredential(userID, credID string) (*ClientCreden
 }
 
 // GetUserClientCredentialSecret get users client credential secret by credential and user id.
-func (c *ApiProxy) GetUserClientCredentialSecret(userID, credID string) ([]byte, error) {
+// Query parameter "format" (return the secret in specific format) supports the values
+// "raw" and "kubeconfig".
+func (c *ApiProxy) GetUserClientCredentialSecret(userID, credID string, opts ...filters.Option) ([]byte, error) {
+	params := url.Values{}
+
+	for _, opt := range opts {
+		opt(&params)
+	}
+
 	secret, err := c.api.
 		URL("/api-proxy/api/v1/users/%s/client-credentials/%s/secret", userID, credID).
+		Query(params).
 		Fetch()
 
 	return secret, err

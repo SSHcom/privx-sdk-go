@@ -38,6 +38,9 @@ func (c *ConnectionManager) Status() (*response.ServiceStatus, error) {
 
 // MARK: Connections
 // GetConnections get connections.
+// Query parameter "verbose" supports the following values:
+// "true", return unfiltered data as before.
+// "false", drop user_roles (duplicated by user snapshot data), the snapshot contains only relevant roles.
 func (c *ConnectionManager) GetConnections(opts ...filters.Option) (*response.ResultSet[Connection], error) {
 	connections := &response.ResultSet[Connection]{}
 	params := url.Values{}
@@ -47,6 +50,7 @@ func (c *ConnectionManager) GetConnections(opts ...filters.Option) (*response.Re
 		filters.Paging(0, 25),
 		filters.Sort("connected", "DESC"),
 		filters.FuzzyCount(true),
+		filters.SetCustomParams("verbose", "true"),
 	}, opts...)
 
 	for _, opt := range options {
@@ -62,6 +66,9 @@ func (c *ConnectionManager) GetConnections(opts ...filters.Option) (*response.Re
 }
 
 // SearchConnections search for connections.
+// Query parameter "verbose" supports the following values:
+// "true", return unfiltered data as before.
+// "false", drop user_roles (duplicated by user snapshot data), the snapshot contains only relevant roles.
 func (c *ConnectionManager) SearchConnections(search *ConnectionSearch, opts ...filters.Option) (*response.ResultSet[Connection], error) {
 	connections := &response.ResultSet[Connection]{}
 	params := url.Values{}
@@ -71,6 +78,7 @@ func (c *ConnectionManager) SearchConnections(search *ConnectionSearch, opts ...
 		filters.Paging(0, 25),
 		filters.Sort("connected", "DESC"),
 		filters.FuzzyCount(true),
+		filters.SetCustomParams("verbose", "true"),
 	}, opts...)
 
 	for _, opt := range options {
@@ -86,11 +94,25 @@ func (c *ConnectionManager) SearchConnections(search *ConnectionSearch, opts ...
 }
 
 // GetConnection get connection by id.
-func (c *ConnectionManager) GetConnection(connID string) (*Connection, error) {
+// Query parameter "verbose" supports the following values:
+// "true", return unfiltered data as before.
+// "false", drop user_roles (duplicated by user snapshot data), the snapshot contains only relevant roles.
+func (c *ConnectionManager) GetConnection(connID string, opts ...filters.Option) (*Connection, error) {
 	connection := &Connection{}
+	params := url.Values{}
+
+	// Set default options, which will be overwritten by opts if defined.
+	options := append([]filters.Option{
+		filters.SetCustomParams("verbose", "true"),
+	}, opts...)
+
+	for _, opt := range options {
+		opt(&params)
+	}
 
 	_, err := c.api.
 		URL("/connection-manager/api/v1/connections/%s", connID).
+		Query(params).
 		Get(&connection)
 
 	return connection, err

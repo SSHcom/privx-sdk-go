@@ -8,27 +8,28 @@ package trailindex
 
 // TrailIndexResponse trail index response definition.
 type TrailIndexResponse struct {
-	ConnID      string          `json:"connection_id"`
-	ChanID      string          `json:"channel_id"`
-	Protocol    string          `json:"protocol"`
-	ChannelType string          `json:"type"`
-	Extra       TrailIndexExtra `json:"extra,omitempty"`
-	TimeStamp   string          `json:"timestamp"`
-	Position    int             `json:"position"`
-	Content     string          `json:"content"`
+	ConnectionType string          `json:"connection_type"`
+	ConnID         string          `json:"connection_id"`
+	ChanID         string          `json:"channel_id"`
+	Protocol       string          `json:"protocol"`
+	ChannelType    string          `json:"type"`
+	Extra          TrailIndexExtra `json:"extra,omitempty"`
+	TimeStamp      string          `json:"timestamp"`
+	Position       int             `json:"position"`
+	Content        string          `json:"content"`
 }
 
 // TrailIndexExtra trail index extra definition.
 type TrailIndexExtra struct {
-	Command           string `json:"command,omitempty"`
-	SubsystemName     string `json:"subsystem_name,omitempty"`
-	OriginatorAddress string `json:"originator_address,omitempty"`
-	OriginatorPort    uint32 `json:"originator_port,omitempty"`
-	ListenerAddress   string `json:"listener_address,omitempty"`
-	ListenerPort      uint32 `json:"listener_port,omitempty"`
-	DstAddress        string `json:"dst_address,omitempty"`
-	DstPort           uint32 `json:"dst_port,omitempty"`
-	PTY               bool   `json:"pty,omitempty"`
+	// exec
+	Command string `json:"command,omitempty"`
+	PTY     bool   `json:"pty,omitempty"`
+	// api-proxy
+	HTTPRequest           string `json:"http_request,omitempty"`
+	HTTPRequestID         string `json:"http_request_id,omitempty"`
+	HTTPResponse          string `json:"http_response,omitempty"`
+	HTTPResponseTimeStamp string `json:"http_response_timestamp,omitempty"`
+	HTTPTransport         string `json:"http_transport,omitempty"`
 }
 
 // TranscriptSearch transcript search request object definition.
