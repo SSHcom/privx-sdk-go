@@ -24,7 +24,7 @@ WithExchangeToken authenticate users using externally created JWT Token in excha
 	),
 		oauth.ExchangeToken(token), # required
 		oauth.ExchangeScope("privx-user"), # optional
-		oauth.ExchangeClientId("privx-ui"), # optional
+		oauth.AuthClientId("privx-ui"), # optional
 	)
 
 	return restapi.New(
