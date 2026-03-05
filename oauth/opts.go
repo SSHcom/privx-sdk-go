@@ -37,6 +37,36 @@ func Secret(secret string) Option {
 	}
 }
 
+// ExchangeToken setups externally created JWT Token
+func ExchangeToken(token string) Option {
+	return func(auth *tAuth) *tAuth {
+		if token != "" {
+			auth.exchangeToken = token
+		}
+		return auth
+	}
+}
+
+// ExchangeScope setups access token scope e.g. privx-user
+func ExchangeScope(scope string) Option {
+	return func(auth *tAuth) *tAuth {
+		if scope != "" {
+			auth.scope = scope
+		}
+		return auth
+	}
+}
+
+// AuthClientId setups OAUTH client Id e.g. privx-ui
+func AuthClientId(clientId string) Option {
+	return func(auth *tAuth) *tAuth {
+		if clientId != "" {
+			auth.clientId = clientId
+		}
+		return auth
+	}
+}
+
 // Digest setups client secret digest
 func Digest(oauthAccess, oauthSecret string) Option {
 	return func(auth *tAuth) *tAuth {
@@ -55,6 +85,8 @@ func UseConfigFile(path string) Option {
 			AuthClientSecret string `toml:"oauth_client_secret"`
 			ClientID         string `toml:"api_client_id"`
 			ClientSecret     string `toml:"api_client_secret"`
+			ExchangeToken    string `toml:"exchange_token"`
+			ExchangeScope    string `toml:"exchange_scope"`
 		}
 		var file struct {
 			Auth config
@@ -82,6 +114,9 @@ func UseConfigFile(path string) Option {
 		auth = Access(file.Auth.ClientID)(auth)
 		auth = Secret(file.Auth.ClientSecret)(auth)
 		auth = Digest(file.Auth.AuthClientID, file.Auth.AuthClientSecret)(auth)
+		auth = AuthClientId(file.Auth.AuthClientID)(auth)
+		auth = ExchangeToken(file.Auth.ExchangeToken)(auth)
+		auth = ExchangeScope(file.Auth.ExchangeScope)(auth)
 		return auth
 	}
 }
@@ -103,7 +138,17 @@ func UseEnvironment() Option {
 			auth = Secret(secret)(auth)
 		}
 
+		if token, ok := os.LookupEnv("PRIVX_EXCHANGE_TOKEN"); ok {
+			auth = ExchangeToken(token)(auth)
+		}
+
+		if token, ok := os.LookupEnv("PRIVX_EXCHANGE_SCOPE"); ok {
+			auth = ExchangeScope(token)(auth)
+		}
+
 		if authAccess, ok := os.LookupEnv("PRIVX_API_OAUTH_CLIENT_ID"); ok {
+			auth = AuthClientId(authAccess)(auth)
+
 			if authSecret, ok := os.LookupEnv("PRIVX_API_OAUTH_CLIENT_SECRET"); ok {
 				auth = Digest(authAccess, authSecret)(auth)
 			}

@@ -24,6 +24,13 @@ type AccessToken struct {
 	notAfter     time.Time
 }
 
+// Token request struct for external JWT token authentication.
+type Token struct {
+	Token    string `json:"token"`
+	ClientId string `json:"client_id"`
+	Scope    string `json:"scope"`
+}
+
 // isInvalid checks if token is valid
 func (token *AccessToken) isInvalid() bool {
 	return token == nil || time.Now().After(token.notAfter)
@@ -32,14 +39,17 @@ func (token *AccessToken) isInvalid() bool {
 // tAuth authorizer client
 type tAuth struct {
 	*sync.Cond
-	access     string
-	secret     string
-	digest     string
-	client     restapi.Connector
-	token      *AccessToken
-	useCookies bool
-	cookieJar  http.CookieJar
-	pending    bool
+	access        string
+	secret        string
+	digest        string
+	exchangeToken string
+	clientId      string
+	scope         string
+	client        restapi.Connector
+	token         *AccessToken
+	useCookies    bool
+	cookieJar     http.CookieJar
+	pending       bool
 }
 
 func newAuth(client restapi.Connector, opts ...Option) *tAuth {
