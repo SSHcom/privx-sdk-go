@@ -131,6 +131,12 @@ api_client_secret="some-random-base64"
 # oauth.Digest(...)
 oauth_client_id="privx-external"
 oauth_client_secret="another-random-base64"
+
+# oauth.ExchangeToken(...)
+exchange_token="external-jwt-exchange-token"
+
+# oauth.ExchangeScope(...)
+exchange_scope="access-token-scope"
 ```
 
 PrivX SDK `UseEnvironment` support following environment variables
