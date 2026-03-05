@@ -154,6 +154,12 @@ export PRIVX_API_CLIENT_SECRET=some-random-base64
 # oauth.Digest(...)
 export PRIVX_API_OAUTH_CLIENT_ID=privx-external
 export PRIVX_API_OAUTH_CLIENT_SECRET=another-random-base64
+
+# oauth.ExchangeToken(...)
+export PRIVX_EXCHANGE_TOKEN=external-jwt-exchange-token
+
+# oauth.ExchangeScope(...)
+export PRIVX_EXCHANGE_SCOPE=access-token-scope
 ```
 
 ## Identity And Access Management
@@ -168,6 +174,12 @@ Alternatively, you can use api client on behalf of existing user using its crede
 
 ```go
 auth := oauth.WithCredential(/* ... */)
+```
+
+You can also use externally created JWT Token in exchange to a PrivX access token in order to authenticate users. Visit our official docs for more information about [external JWT authentication](https://privx.docs.ssh.com/docs/users-and-permissions/additional-authentication-methods/external-jwt-authentication).
+
+```go
+auth := oauth.WithExchangeToken(/* ... */)
 ```
 
 If your app needs to implement a flexible auth strategy that supports both. Use following method, it dynamically chooses a right strategy depending of available credentials

@@ -36,11 +36,12 @@ func WithExchangeToken(client restapi.Connector, opts ...Option) restapi.Authori
 	return &tAuthTokenExchange{tAuth: newAuth(client, opts...)}
 }
 
-func (auth *tAuthTokenExchange) AccessToken() (token string, err error) {
-	if err = auth.synchronized(auth.getAccessToken); err == nil {
-		token = fmt.Sprintf("Bearer %s", auth.token.AccessToken)
+func (auth *tAuthTokenExchange) AccessToken() (string, error) {
+	if err := auth.synchronized(auth.getAccessToken); err != nil {
+		return "", err
 	}
-	return
+
+	return fmt.Sprintf("Bearer %s", auth.token.AccessToken), nil
 }
 
 func (auth *tAuthTokenExchange) getAccessToken() error {
