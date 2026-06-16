@@ -190,16 +190,21 @@ type SourceConnection struct {
 	SkipStrictCertCheck bool `json:"skip_strict_cert_check"`
 
 	// OpenID Connect
-	OIDCEnabled             bool     `json:"oidc_enabled"`
-	OIDCIssuer              string   `json:"oidc_issuer"`
-	OIDCAdditionalIssuer    string   `json:"oidc_additional_issuer"`
-	OIDCClientID            string   `json:"oidc_client_id"`
-	OIDCClientSecret        string   `json:"oidc_client_secret"`
-	OIDCButtonTitle         string   `json:"oidc_button_title"`
-	OIDCTagsAttributeName   string   `json:"oidc_tags_attribute_name"`
-	OIDCAllowLoginTag       string   `json:"oidc_allow_login_tag"`
-	OIDCAdditionalScopes    []string `json:"oidc_additional_scopes"`
-	OIDCUseUserInfoEndpoint bool     `json:"oidc_use_userinfo_endpoint"`
+	OIDCEnabled                  bool              `json:"oidc_enabled"`
+	OIDCIssuer                   string            `json:"oidc_issuer"`
+	OIDCAdditionalIssuer         string            `json:"oidc_additional_issuer"`
+	OIDCClientID                 string            `json:"oidc_client_id"`
+	OIDCClientSecret             string            `json:"oidc_client_secret"`
+	OIDCButtonTitle              string            `json:"oidc_button_title"`
+	OIDCTagsAttributeName        string            `json:"oidc_tags_attribute_name"`
+	OIDCAllowLoginTag            string            `json:"oidc_allow_login_tag"`
+	OIDCAdditionalScopes         []string          `json:"oidc_additional_scopes"`
+	OIDCUseUserInfoEndpoint      bool              `json:"oidc_use_userinfo_endpoint"`
+	OIDCExpireImplicitRoles      bool              `json:"oidc_expire_implicit_roles"`
+	OIDCRequireIdTokenAttributes map[string]string `json:"oidc_require_idtoken_attributes"`
+
+	// OIDC and Ephemeral user lifecycle
+	UserRetentionTTL int `json:"user_retention_ttl"`
 
 	// User directory group filter
 	GroupFilter []string `json:"group_filter"`
@@ -238,6 +243,10 @@ type SourceConnection struct {
 	ProxmoxTokenId        string `json:"proxmox_token_id"`
 	ProxmoxSecret         string `json:"proxmox_secret"`
 	ProxmoxUseSMBiosUUIDs bool   `json:"proxmox_use_smbios_uuids"`
+
+	// Ephemeral
+	EphemeralTagsAttributeName string `json:"ephemeral_tags_attribute_name"`
+	EphemeralGrantPrivXUser    bool   `json:"ephemeral_grant_privx_user_role"`
 }
 
 // User user definition.
@@ -279,6 +288,14 @@ type User struct {
 	StaleAccessToken       bool            `json:"stale_access_token,omitempty"`
 	CurrentSessionID       string          `json:"current_session_id,omitempty"`
 	RefreshTimestamp       string
+
+	// Ephemeral/OIDC users' implicit roles expiration date.
+	ImplicitRolesExpired bool `json:"implicit_roles_expired,omitempty"`
+
+	// Status for /users/current if user belongs to OIDC directory which has oidc_expire_implicit_roles enabled
+	// This attribute is used on frontend to determine if OIDC user restrictions should be removed.
+	// Reduces the frontend complexity.
+	OIDCExpireImplicitRoles *bool `json:"oidc_expire_implicit_roles,omitempty"`
 }
 
 // Credential webauthn credential definition.

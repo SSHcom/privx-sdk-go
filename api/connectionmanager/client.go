@@ -436,14 +436,3 @@ func (c *ConnectionManager) GetUebaStatus() (*response.ServiceStatus, error) {
 
 	return status, err
 }
-
-// GetUebaInternalStatus get ueba internal status.
-func (c *ConnectionManager) GetUebaInternalStatus() (UebaInternalStatus, error) {
-	uebaInternalStatus := UebaInternalStatus{}
-
-	_, err := c.api.
-		URL("/connection-manager/api/v1/ueba/status/internal").
-		Get(&uebaInternalStatus)
-
-	return uebaInternalStatus, err
-}

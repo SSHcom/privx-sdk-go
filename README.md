@@ -1,4 +1,4 @@
-# PrivX SDK v2 for Go
+# PrivX SDK V2 for Go
 
 PrivX is a lean and modern privileged access management solution to automate your AWS, Azure and GCP infrastructure access management in one multi-cloud solution. This Software Development Kit (SDK) offers a high-level abstraction to programmatically configure your PrivX instances.
 
@@ -11,7 +11,7 @@ PrivX is a lean and modern privileged access management solution to automate you
 **Jump To**:
 [PrivX REST API Reference](https://privx.docs.ssh.com/reference)
 
-## SDK v2 Notice
+## SDK V2 Notice
 
 PrivX SDK v2 for Go is finally here. Check out the following [release notes](https://github.com/SSHcom/privx-sdk-go/releases/tag/v2.38.0) to see what’s changed and what to expect whether you upgrade from SDK v1 or continue using it.
 
@@ -36,7 +36,7 @@ PrivX SDK composes API client from three independent layers:
 * `oauth` implements OAuth2 access token grant flows
 * `api/...` type-safe implementation of PrivX API
 
-Here is a typical workflow explained with an example to setup the client:
+Here is a typical workflow explained with an example to set up the client:
 
 ```go
 // 1. Create Authorizer and Access Token Provider
@@ -107,7 +107,7 @@ curl := restapi.New(
 )
 ```
 
-Please see available config option for [restapi](restapi/opts.go) and [oauth](oauth/opts.go).
+Please see available config option for [restapi](restapi/opts.go) and [OAuth](oauth/opts.go).
 
 PrivX SDK `UseConfigFile` support following config file format
 
@@ -162,7 +162,7 @@ export PRIVX_EXCHANGE_TOKEN=external-jwt-exchange-token
 export PRIVX_EXCHANGE_SCOPE=access-token-scope
 ```
 
-## Identity And Access Management
+## Identity and Access Management
 
 Usage of PrivX SDK requires API credential, which are available from your PrivX deployment: Settings > API Clients > Add API Client. Authorizer implement OAuth2 Resource Owner Password Grant
 
@@ -170,7 +170,7 @@ Usage of PrivX SDK requires API credential, which are available from your PrivX 
 auth := oauth.WithClientID(/* ... */)
 ```
 
-Alternatively, you can use api client on behalf of existing user using its credentials. Authorizer implements OAuth2 Authorization Code Grant
+Alternatively, you can use API client on behalf of existing user using its credentials. Authorizer implements OAuth2 Authorization Code Grant
 
 ```go
 auth := oauth.WithCredential(/* ... */)
@@ -187,8 +187,8 @@ If your app needs to implement a flexible auth strategy that supports both. Use 
 auth := oauth.With(/* ... */)
 ```
 
-## How To Use The Filters Package
 
+## How to Use the Filters Package
 The `filters` package simplifies handling of query parameters by providing helper functions for commonly used parameters.
 
 #### **Example Usage**
@@ -222,12 +222,12 @@ If you experience any issues with the library, please let us know via [GitHub is
 
 * **Specify** the configuration of your environment. Include which operating system you use and the versions of runtime environments.
 
-* **Attach** logs, screenshots and exceptions, in possible.
+* **Attach** logs, screenshots, and exceptions, in possible.
 
 * **Reveal** the steps you took to reproduce the problem, include code snippet or links to your project.
 
 
-## How To Contribute
+## How to Contribute
 
 The project is [Apache 2.0](LICENSE) licensed and accepts contributions via GitHub pull requests:
 

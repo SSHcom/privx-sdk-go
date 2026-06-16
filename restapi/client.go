@@ -11,7 +11,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"math"
 	"net"
 	"net/http"
@@ -302,8 +301,12 @@ func (curl *tCURL) Download(filename string) error {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		log.Fatal(resp.Status)
+	if resp.StatusCode != http.StatusOK {
+		body, readErr := io.ReadAll(resp.Body)
+		if readErr != nil {
+			return readErr
+		}
+		return ErrorFromResponse(resp, body)
 	}
 
 	curl.setCookies(resp)
@@ -428,6 +431,10 @@ func (curl *tCURL) Fetch() ([]byte, error) {
 		return nil, err
 	}
 
+	if err := curl.isSuccess(body); err != nil {
+		return nil, err
+	}
+
 	return body, nil
 }
 
@@ -448,6 +455,9 @@ func (curl *tCURL) unsafeIO() *tCURL {
 	curl.addCookies(req)
 
 	curl.output, curl.fail = curl.client.doWithRetry(req)
+	if curl.fail != nil {
+		return curl
+	}
 
 	curl.setCookies(curl.output)
 
@@ -501,7 +511,9 @@ func (curl *tCURL) addCookies(req *http.Request) {
 
 // setCookies stores cookies from the response to the cookie jar
 func (curl *tCURL) setCookies(resp *http.Response) {
-	if curl.cookieJar != nil {
-		curl.cookieJar.SetCookies(resp.Request.URL, resp.Cookies())
+	if curl.cookieJar == nil || resp == nil || resp.Request == nil {
+		return
 	}
+
+	curl.cookieJar.SetCookies(resp.Request.URL, resp.Cookies())
 }
