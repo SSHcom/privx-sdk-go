@@ -180,6 +180,8 @@ type SourceConnection struct {
 	LdapBindDN                              string `json:"ldap_bind_dn"`
 	LdapBindPassword                        string `json:"ldap_bind_password"`
 	LdapProtocol                            string `json:"ldap_protocol"`
+	LdapSizeLimit                           int    `json:"ldap_size_limit"`
+	LdapTimeLimit                           int    `json:"ldap_time_limit_sec"`
 	Certificates                            string `json:"root_certificates"`
 	PasswordChangeEnabled                   bool   `json:"password_change_enabled"`
 	ClientCertificateAuthenticationEnabled  bool   `json:"client_certificate_authentication_enabled"`

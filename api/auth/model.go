@@ -84,10 +84,35 @@ type SessionSearch struct {
 
 // Device paired mobile gateway device definition.
 type Device struct {
-	ID        string `json:"id"`
-	OS        string `json:"os"`
-	Name      string `json:"name"`
-	Activated string `json:"activated"`
-	Updated   string `json:"updated"`
-	LastUsed  string `json:"lastUsed"`
+	ID            string   `json:"id"`
+	OS            string   `json:"os"`
+	Name          string   `json:"name"`
+	Activated     string   `json:"activated"`
+	Updated       string   `json:"updated"`
+	LastUsed      string   `json:"lastUsed"`
+	Subscriptions []string `json:"subscriptions,omitempty"`
+}
+
+// ManualUserPairingResponse manual user pairing response definition.
+type ManualUserPairingResponse struct {
+	PairingID string `json:"id"`
+	QRCode    string `json:"qrcode"`
+}
+
+// PairingStatusResponse device pairing status response definition.
+type PairingStatusResponse struct {
+	Status string `json:"status"`
+}
+
+// DeviceSubscriptionResponse device mobile approval subscription definition.
+type DeviceSubscriptionResponse struct {
+	ID     string `json:"id"`
+	Status string `json:"status"`
+}
+
+// PairingTestResponse pairing test response definition.
+type PairingTestResponse struct {
+	AuthID   string `json:"id"`
+	AuthCode string `json:"auth_code"`
+	Status   string `json:"status"`
 }

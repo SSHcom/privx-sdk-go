@@ -181,6 +181,26 @@ func (c *Auth) GetUserPairedDevices(userID string) (*response.ResultSet[Device],
 	return devices, err
 }
 
+// GetCurrentUserPairedDevices get current users paired devices.
+func (c *Auth) GetCurrentUserPairedDevices() (*response.ResultSet[Device], error) {
+	devices := &response.ResultSet[Device]{}
+
+	_, err := c.api.
+		URL("/auth/api/v1/users/current/devices").
+		Get(devices)
+
+	return devices, err
+}
+
+// UnpairCurrentUserDevice unpair current users device.
+func (c *Auth) UnpairCurrentUserDevice(deviceID string) error {
+	_, err := c.api.
+		URL("/auth/api/v1/users/current/devices/%s", deviceID).
+		Delete()
+
+	return err
+}
+
 // UnpairUserDevice unpair users device.
 func (c *Auth) UnpairUserDevice(userID, deviceID string) error {
 	_, err := c.api.
@@ -188,4 +208,79 @@ func (c *Auth) UnpairUserDevice(userID, deviceID string) error {
 		Delete()
 
 	return err
+}
+
+// PairCurrentUserDevice pair device with current user.
+func (c *Auth) PairCurrentUserDevice() (*ManualUserPairingResponse, error) {
+	pairing := &ManualUserPairingResponse{}
+
+	_, err := c.api.
+		URL("/auth/api/v1/users/current/devices/pair").
+		Post(nil, pairing)
+
+	return pairing, err
+}
+
+// GetCurrentUserPairingStatus get the current users paring status.
+func (c *Auth) GetCurrentUserPairingStatus(pairingID string) (*PairingStatusResponse, error) {
+	status := &PairingStatusResponse{}
+
+	_, err := c.api.
+		URL("/auth/api/v1/users/current/devices/pairing/%s/status", pairingID).
+		Get(status)
+
+	return status, err
+}
+
+// TestCurrentUserDevicePairing test current user device pairing.
+func (c *Auth) TestCurrentUserDevicePairing() (*PairingTestResponse, error) {
+	pairingTest := &PairingTestResponse{}
+
+	_, err := c.api.
+		URL("/auth/api/v1/users/current/devices/pairing/test").
+		Post(nil, pairingTest)
+
+	return pairingTest, err
+}
+
+// GetCurrentUserPairingTestStatus get the current users test paring status.
+func (c *Auth) GetCurrentUserPairingTestStatus(authID string) (*PairingStatusResponse, error) {
+	status := &PairingStatusResponse{}
+
+	_, err := c.api.
+		URL("/auth/api/v1/users/current/devices/pairing/test/%s", authID).
+		Get(status)
+
+	return status, err
+}
+
+// SubsribeCurrentUserDevice subscribe current user device to mobile approvals.
+func (c *Auth) SubsribeCurrentUserDevice(deviceID string) (*DeviceSubscriptionResponse, error) {
+	deviceSub := &DeviceSubscriptionResponse{}
+
+	_, err := c.api.
+		URL("/auth/api/v1/users/current/devices/%s/subscriptions/mobile-approvals", deviceID).
+		Post(nil, deviceSub)
+
+	return deviceSub, err
+}
+
+// UnsubscribeCurrentUserDevice unsubscribe current user device from mobile approvals.
+func (c *Auth) UnsubscribeCurrentUserDevice(deviceID string) error {
+	_, err := c.api.
+		URL("/auth/api/v1/users/current/devices/%s/subscriptions/mobile-approvals", deviceID).
+		Delete()
+
+	return err
+}
+
+// GetSubscribeCurrentUserDeviceStatus get the current users mobile approvals subscription status.
+func (c *Auth) GetSubscribeCurrentUserDeviceStatus(deviceID, transactionID string) (*DeviceSubscriptionResponse, error) {
+	status := &DeviceSubscriptionResponse{}
+
+	_, err := c.api.
+		URL("/auth/api/v1/users/current/devices/%s/subscriptions/mobile-approvals/%s", deviceID, transactionID).
+		Get(status)
+
+	return status, err
 }
