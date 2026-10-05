@@ -379,6 +379,7 @@ type HostCertificateInfo struct {
 
 type SessionHostCertificateResponse struct {
 	ID                 string               `json:"id"`
+	Role               string               `json:"role,omitempty"`
 	Hostname           string               `json:"hostname"`
 	HostCertificate    *HostCertificateInfo `json:"host_certificate"`
 	HostCertificateRaw string               `json:"host_certificate_raw"`
