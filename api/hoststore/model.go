@@ -199,18 +199,20 @@ type RotationStatusItem struct {
 }
 
 type HostPrincipals struct {
-	Principal              string                             `json:"principal"`
-	TargetDomain           *secretsmanager.TargetDomainHandle `json:"target_domain,omitempty"`
-	Passphrase             string                             `json:"passphrase"`
-	Rotate                 bool                               `json:"rotate"`
-	UseForPasswordRotation bool                               `json:"use_for_password_rotation"`
-	UsernameAttribute      string                             `json:"username_attribute"`
-	UseUserAccount         bool                               `json:"use_user_account"`
-	Source                 string                             `json:"source"`
-	Roles                  []HostRole                         `json:"roles"`
-	Applications           []HostPrincipalApplications        `json:"applications"`
-	ServiceOptions         *HostServiceOptions                `json:"service_options,omitempty"`
-	CommandRestrictions    HostCommandRestrictions            `json:"command_restrictions,omitempty"`
+	Principal                     string                             `json:"principal"`
+	TargetDomain                  *secretsmanager.TargetDomainHandle `json:"target_domain,omitempty"`
+	Passphrase                    string                             `json:"passphrase"`
+	Rotate                        bool                               `json:"rotate"`
+	AllowExplicitPasswordCheckout bool                               `json:"allow_explicit_password_checkout"`
+	UseForPasswordRotation        bool                               `json:"use_for_password_rotation"`
+	UsernameAttribute             string                             `json:"username_attribute"`
+	UseUserAccount                bool                               `json:"use_user_account"`
+	Source                        string                             `json:"source"`
+	Roles                         []HostRole                         `json:"roles"`
+	Applications                  []HostPrincipalApplications        `json:"applications"`
+	ServiceOptions                *HostServiceOptions                `json:"service_options,omitempty"`
+	CommandRestrictions           HostCommandRestrictions            `json:"command_restrictions,omitempty"`
+	NotifyAboutOngoingSession     bool                               `json:"notify_about_ongoing_session"`
 }
 
 type HostCommandRestrictions struct {
@@ -330,6 +332,12 @@ type HostService struct {
 	RDSType                      string                           `json:"rds_type"`
 	RDSLoadBalancer              HostServiceRDSLoadBalancerParams `json:"rds_lb"`
 	RDSBroker                    HostServiceRDSBrokerParams       `json:"rds_broker"`
+	Justification                *Justification                   `json:"justification,omitzero"`
+}
+
+// Justification host service connection justification definition.
+type Justification struct {
+	Enabled bool `json:"enabled"`
 }
 
 type HostServiceRDSBrokerParams struct {
@@ -371,6 +379,7 @@ type HostCertificateInfo struct {
 
 type SessionHostCertificateResponse struct {
 	ID                 string               `json:"id"`
+	Role               string               `json:"role,omitempty"`
 	Hostname           string               `json:"hostname"`
 	HostCertificate    *HostCertificateInfo `json:"host_certificate"`
 	HostCertificateRaw string               `json:"host_certificate_raw"`

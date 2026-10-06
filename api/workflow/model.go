@@ -78,6 +78,7 @@ type Workflow struct {
 	Comment                   string         `json:"comment,omitempty"`
 	Steps                     []WorkflowStep `json:"steps,omitempty"`
 	RequiresJustification     bool           `json:"requires_justification"`
+	MobileApprovalsEnabled    bool           `json:"mobile_approvals_enabled"`
 }
 
 // Decision request decision definition.
@@ -89,12 +90,13 @@ type Decision struct {
 
 // RequestStepApprover request step approver definition.
 type RequestStepApprover struct {
-	ID           string        `json:"id"`
-	Role         WorkflowRole  `json:"role"`
-	Decision     string        `json:"decision"`
-	User         *WorkflowUser `json:"user,omitempty"`
-	DecisionTime *string       `json:"decision_time,omitempty"`
-	Comment      string        `json:"comment"`
+	ID            string        `json:"id"`
+	PrincipalHash string        `json:"principalHash"`
+	Role          WorkflowRole  `json:"role"`
+	Decision      string        `json:"decision"`
+	User          *WorkflowUser `json:"user,omitempty"`
+	DecisionTime  *string       `json:"decision_time,omitempty"`
+	Comment       string        `json:"comment"`
 }
 
 // RequestStep request step definition.
@@ -107,28 +109,29 @@ type RequestStep struct {
 
 // AccessRequest access request definition.
 type AccessRequest struct {
-	ID                   string        `json:"id"`
-	Author               string        `json:"author"`
-	Created              string        `json:"created"`
-	Updated              string        `json:"updated"`
-	UpdatedBy            string        `json:"updated_by"`
-	Name                 string        `json:"name"`
-	Requester            *WorkflowUser `json:"requester,omitempty"`
-	RequestedRole        *WorkflowRole `json:"requested_role,omitempty"`
-	RequestJustification string        `json:"request_justification"`
-	GrantType            string        `json:"grant_type,omitempty"`
-	GrantStart           string        `json:"grant_start,omitempty"`
-	GrantEnd             string        `json:"grant_end,omitempty"`
-	FloatingLength       int64         `json:"floating_length,omitempty"`
-	TargetUser           *WorkflowUser `json:"target_user,omitempty"`
-	Action               string        `json:"action,omitempty"`
-	Status               string        `json:"status,omitempty"`
-	Comment              string        `json:"comment,omitempty"`
-	Steps                []RequestStep `json:"steps,omitempty"`
-	ApproverCanRevoke    bool          `json:"approver_can_revoke"`
-	TargetRoleRevoked    bool          `json:"target_role_revoked"`
-	TargetRoleRevokeTime *string       `json:"target_role_revocation_time,omitempty"`
-	TargetRoleRevokedBy  *WorkflowUser `json:"target_role_revoked_by,omitempty"`
+	ID                     string        `json:"id"`
+	Author                 string        `json:"author"`
+	Created                string        `json:"created"`
+	Updated                string        `json:"updated"`
+	UpdatedBy              string        `json:"updated_by"`
+	Name                   string        `json:"name"`
+	Requester              *WorkflowUser `json:"requester,omitempty"`
+	RequestedRole          *WorkflowRole `json:"requested_role,omitempty"`
+	RequestJustification   string        `json:"request_justification"`
+	GrantType              string        `json:"grant_type,omitempty"`
+	GrantStart             string        `json:"grant_start,omitempty"`
+	GrantEnd               string        `json:"grant_end,omitempty"`
+	FloatingLength         int64         `json:"floating_length,omitempty"`
+	TargetUser             *WorkflowUser `json:"target_user,omitempty"`
+	Action                 string        `json:"action,omitempty"`
+	Status                 string        `json:"status,omitempty"`
+	Comment                string        `json:"comment,omitempty"`
+	Steps                  []RequestStep `json:"steps,omitempty"`
+	MobileApprovalsEnabled bool          `json:"mobile_approvals_enabled"`
+	ApproverCanRevoke      bool          `json:"approver_can_revoke"`
+	TargetRoleRevoked      bool          `json:"target_role_revoked"`
+	TargetRoleRevokeTime   *string       `json:"target_role_revocation_time,omitempty"`
+	TargetRoleRevokedBy    *WorkflowUser `json:"target_role_revoked_by,omitempty"`
 }
 
 // AccessRequestSearch access request search definition.

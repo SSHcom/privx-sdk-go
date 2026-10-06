@@ -68,6 +68,7 @@ type Connection struct {
 	AccessGroupID     string                              `json:"access_group_id,omitempty"`
 	Keywords          string                              `json:"keywords,omitempty"`
 	SessionID         string                              `json:"session_id,omitempty"`
+	Justification     string                              `json:"justification,omitzero"`
 	AccessRoles       []AccessRoles                       `json:"access_roles,omitempty"`
 	Tags              []string                            `json:"tags,omitempty"`
 }
@@ -124,6 +125,7 @@ type ConnectionSearch struct {
 	HasAccessRoles       *bool            `json:"has_access_roles,omitempty"`
 	SessionID            string           `json:"session_id,omitempty"`
 	Tags                 []string         `json:"tags,omitempty"`
+	Justification        string           `json:"justification,omitzero"`
 }
 
 // TimestampSearch timestamp search request definition.

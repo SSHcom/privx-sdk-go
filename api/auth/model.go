@@ -84,10 +84,11 @@ type SessionSearch struct {
 
 // Device paired mobile gateway device definition.
 type Device struct {
-	ID        string `json:"id"`
-	OS        string `json:"os"`
-	Name      string `json:"name"`
-	Activated string `json:"activated"`
-	Updated   string `json:"updated"`
-	LastUsed  string `json:"lastUsed"`
+	ID            string   `json:"id"`
+	OS            string   `json:"os"`
+	Name          string   `json:"name"`
+	Activated     string   `json:"activated"`
+	Updated       string   `json:"updated"`
+	LastUsed      string   `json:"lastUsed"`
+	Subscriptions []string `json:"subscriptions,omitempty"`
 }

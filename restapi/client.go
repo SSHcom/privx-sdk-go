@@ -41,9 +41,9 @@ func New(opts ...Option) Connector {
 		http: &http.Client{
 			Transport: &http.Transport{
 				ReadBufferSize: 128 * 1024,
-				Dial: (&net.Dialer{
+				DialContext: (&net.Dialer{
 					Timeout: 10 * time.Second,
-				}).Dial,
+				}).DialContext,
 			},
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				return http.ErrUseLastResponse
